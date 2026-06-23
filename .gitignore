@@ -220,3 +220,7 @@ __marimo__/
 # docs stuff
 docs/*
 !docs/*.yaml
+
+# downloads
+downloads/*
+!downloads/.gitkeep
