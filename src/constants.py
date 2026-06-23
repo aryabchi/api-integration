@@ -17,5 +17,19 @@ IMAP_MAIL_SEARCH_TEMPLATE = (
 )
 
 # Desired email attachment extension
-
 ALLOWED_ATTACHMENT_FILE_EXTENSIONS = (".xlsx", ".xls", ".xlsm", ".xlsb")
+
+# Draft RFQ link
+RFQ_DRAFT_LINK = r"https://7rights.ru"
+
+# Reply email template
+DEFAULT_REPLY_TEMPLATE = (
+    "Здравствуйте, {sender_name},\n\n"
+    "В ответ на Ваше письмо {subject_line} от {date}.\n\n"
+    "Мы создали RFQ {rfq_link}. "
+    "\n\n"
+    "---- Original message ----\n{body_excerpt}\n"
+    "------------------------------------\n\n"
+    "С наилучшими пожеланиями,\n"
+    "Агент Коля\n"
+)

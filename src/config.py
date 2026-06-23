@@ -21,12 +21,15 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    MAILBOX_NAME: str = Field(description="Имя почтового ящика")
+    MAILBOX_NAME: str = Field(description="Имя почтового ящика автологиста")
     MAILBOX_APP_PASSWORD: str = Field(
-        default=None, description="Пассворд почтового ящика для скрипта"
+        default=None, description="Секретный app-пароль почтового ящика для скрипта"
     )
-    IMAP_SERVER: str = Field(default="imap.yandex.ru", description="IMAP server")
-    IMAP_PORT: int = Field(default=993, description="IMAP port")
+    IMAP_SERVER: str = Field(default="imap.yandex.ru", description="IMAP сервер")
+    IMAP_PORT: int = Field(default=993, description="IMAP порт")
+
+    SMTP_SERVER: str = Field(default="smtp.yandex.ru", description="SMTP сервер")
+    SMTP_PORT: int = Field(default=465, description="SMTP порт")
 
 
 @lru_cache
