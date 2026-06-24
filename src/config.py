@@ -4,6 +4,7 @@ from functools import lru_cache
 from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
+    AnyHttpUrl,
 )
 
 from pydantic import Field
@@ -30,6 +31,11 @@ class Settings(BaseSettings):
 
     SMTP_SERVER: str = Field(default="smtp.yandex.ru", description="SMTP сервер")
     SMTP_PORT: int = Field(default=465, description="SMTP порт")
+
+    SEVEN_RIGHTS_API_BASE_URL: AnyHttpUrl = Field(description="Базовый URL API 7rights")
+    SEVEN_RIGHTS_API_KEY: str | None = Field(
+        default=None, description="API ключ 7rights"
+    )
 
 
 @lru_cache
