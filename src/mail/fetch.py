@@ -4,7 +4,9 @@ import imaplib
 import email
 import traceback
 from email.header import decode_header
+from email.utils import parseaddr
 from mail.sanitizers import sanitize_filename
+from mail.trusted import is_trusted_email
 
 from constants import (
     DOWNLOADS_DIR,
@@ -38,6 +40,7 @@ def fetch_mail(
     imap_mail_search_template: str = IMAP_MAIL_SEARCH_TEMPLATE,
     download_dir: str = DOWNLOADS_DIR,
     allowed_attachment_extensions: tuple = ALLOWED_ATTACHMENT_FILE_EXTENSIONS,
+    junk_subdir: str = "junk",
 ) -> None:
     """Connects to mailbox, searches for relevant emails and saves their
     content/attachments into per-email subfolders named by Message-ID.
@@ -87,7 +90,14 @@ def fetch_mail(
                 if not folder_name:
                     folder_name = f"empty_msgid_{e_id.decode()}"
 
-                email_folder_path = os.path.join(download_dir, folder_name)
+                # --- 1b. Check if sender is trusted ---
+                sender_email = parseaddr(msg.get("From", ""))[1]
+                if not is_trusted_email(sender_email):
+                    email_folder_path = os.path.join(
+                        download_dir, junk_subdir, folder_name
+                    )
+                else:
+                    email_folder_path = os.path.join(download_dir, folder_name)
 
                 # --- 2. Skip if folder already exists ---
                 if os.path.isdir(email_folder_path):
@@ -160,7 +170,10 @@ def fetch_mail(
                         continue
 
                     base, ext = os.path.splitext(filename)
-                    if ext.lower() not in allowed_attachment_extensions:
+                    if (
+                        allowed_attachment_extensions
+                        and ext.lower() not in allowed_attachment_extensions
+                    ):
                         continue  # skip off-topic attachment
 
                     filepath = os.path.join(email_folder_path, filename)
