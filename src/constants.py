@@ -35,7 +35,7 @@ RFQ_DRAFT_URL = "https://lk.7rights.ru/admin/newRfq/{rfq_id}"
 
 # Reply email template
 DEFAULT_REPLY_TEMPLATE = (
-    "Здравствуйте, {sender_name},\n\n"
+    "Здравствуйте,\n"
     "В ответ на Ваше письмо {subject_line} от {date}.\n\n"
     "Мы создали RFQ {rfq_link}. "
     "\n\n"

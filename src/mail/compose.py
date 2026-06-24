@@ -9,7 +9,10 @@ from constants import (
 
 
 def _extract_sender_name(from_field: str) -> str:
-    """'John Doe <john@example.com>' -> 'John Doe', fallback to local part."""
+    """
+    'John Doe <john@example.com>' -> 'John Doe', fallback to local part.
+    TODO: fix for non-unicode encoding
+    """
     m = re.match(r'^"?([^"<]*)"?\s*<', from_field or "")
     if m and m.group(1).strip():
         return m.group(1).strip()
@@ -74,7 +77,7 @@ def generate_replies(
         subject = meta.get("subject", "") or ""
         subject_line = f' "{subject}" ' if subject else " "
         reply_text = template.format(
-            sender_name=_extract_sender_name(meta.get("from", "")),
+            # sender_name=_extract_sender_name(meta.get("from", "")),
             subject_line=subject_line,
             date=meta.get("date", "unknown date"),
             body_excerpt=body[:body_excerpt_chars].strip() or "(empty body)",
