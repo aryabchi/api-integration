@@ -30,7 +30,7 @@ ALLOWED_ATTACHMENT_FILE_EXTENSIONS = (".xlsx", ".xls", ".xlsm", ".xlsb")
 REPLY_SENT_MARKER = "reply_sent.txt"
 
 # Draft RFQ link
-RFQ_DRAFT_LINK = "https://lk.7rights.ru/admin/newRfq/{rfq_id}"
+RFQ_DRAFT_URL = "https://lk.7rights.ru/admin/newRfq/{rfq_id}"
 
 # Reply email template
 DEFAULT_REPLY_TEMPLATE = (

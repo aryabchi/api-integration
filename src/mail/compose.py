@@ -4,7 +4,7 @@ import json
 from constants import (
     DOWNLOADS_DIR,
     DEFAULT_REPLY_TEMPLATE,
-    RFQ_DRAFT_LINK,
+    RFQ_DRAFT_URL,
 )
 
 
@@ -78,7 +78,7 @@ def generate_replies(
             subject_line=subject_line,
             date=meta.get("date", "unknown date"),
             body_excerpt=body[:body_excerpt_chars].strip() or "(empty body)",
-            rfq_link=RFQ_DRAFT_LINK or "(unable to generate valid link)",
+            rfq_link=RFQ_DRAFT_URL or "(unable to generate valid link)",
         )
 
         with open(reply_path, "w", encoding="utf-8") as f:
