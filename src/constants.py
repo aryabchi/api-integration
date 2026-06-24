@@ -7,6 +7,9 @@ project_root = Path(__file__).resolve().parent.parent
 # Local directory to save attachments
 DOWNLOADS_DIR = f"{project_root}/downloads"
 
+# Config dir for trusted recipients
+TRUSTED_RECIPIENTS_FILE = f"{project_root}/config/trusted_recipients.json"
+
 # The subject template to search for (IMAP does a substring match)
 SUBJECT_TEMPLATE = "*"
 

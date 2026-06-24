@@ -224,3 +224,7 @@ docs/*
 # downloads
 downloads/*
 !downloads/.gitkeep
+
+# trusted
+config/trusted_recipients.json
+!config/.gitkeep
