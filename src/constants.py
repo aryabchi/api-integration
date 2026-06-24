@@ -30,14 +30,29 @@ ALLOWED_ATTACHMENT_FILE_EXTENSIONS = ()  # (".xlsx", ".xls", ".xlsm", ".xlsb")
 # Name of the placeholder file that indicates a reply has been successfully sent
 REPLY_SENT_MARKER = "reply_sent.txt"
 
+# Name of the placeholder file that indicates result of RFQ create API call
+RFQ_INFO_MARKER = "rfq_info.json"
+
 # Draft RFQ link
 RFQ_DRAFT_URL = "https://lk.7rights.ru/admin/newRfq/{rfq_id}"
 
-# Reply email template
-DEFAULT_REPLY_TEMPLATE = (
+# Reply email templates
+SUCCESS_REPLY_TEMPLATE = (
     "Здравствуйте,\n"
     "В ответ на Ваше письмо {subject_line} от {date}.\n\n"
-    "Мы создали RFQ {rfq_link}. "
+    "Мы автоматически создали RFQ {message}. "
+    "\n\n"
+    "---- Original message ----\n{body_excerpt}\n"
+    "------------------------------------\n\n"
+    "С наилучшими пожеланиями,\n"
+    "Агент Коля\n"
+)
+
+ERROR_REPLY_TEMPLATE = (
+    "Здравствуйте,\n"
+    "В ответ на Ваше письмо {subject_line} от {date}.\n\n"
+    "Нам не удалось автоматически создать RFQ.\n\n"
+    "Описание причины {message}"
     "\n\n"
     "---- Original message ----\n{body_excerpt}\n"
     "------------------------------------\n\n"
