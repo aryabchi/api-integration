@@ -1,3 +1,5 @@
+"""Модуль проверки адресата письма на списку доверенных получателей"""
+
 import json
 import os
 import sys
@@ -44,8 +46,7 @@ def is_trusted_email(email: str, filename: str = TRUSTED_RECIPIENTS_FILE) -> boo
 
 if __name__ == "__main__":
     # Test cases
-    # test_email = "ADMIN@example.com "
-    test_email = "rimm82@yandex.ru "
+    test_email = "ADMIN@example.com "
 
     if is_trusted_email(test_email):
         print("Access granted.")

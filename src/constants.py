@@ -4,6 +4,10 @@ from pathlib import Path
 
 project_root = Path(__file__).resolve().parent.parent
 
+
+# Local directory with json samples for API requests
+SAMPLES_DIR = f"{project_root}/samples"
+
 # Local directory to save attachments
 DOWNLOADS_DIR = f"{project_root}/downloads"
 
@@ -26,7 +30,7 @@ ALLOWED_ATTACHMENT_FILE_EXTENSIONS = (".xlsx", ".xls", ".xlsm", ".xlsb")
 REPLY_SENT_MARKER = "reply_sent.txt"
 
 # Draft RFQ link
-RFQ_DRAFT_LINK = r"https://7rights.ru"
+RFQ_DRAFT_LINK = "https://lk.7rights.ru/admin/newRfq/{rfq_id}"
 
 # Reply email template
 DEFAULT_REPLY_TEMPLATE = (

@@ -228,3 +228,6 @@ downloads/*
 # trusted
 config/trusted_recipients.json
 !config/.gitkeep
+
+# json samples for API test
+samples/*
