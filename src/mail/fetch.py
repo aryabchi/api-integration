@@ -10,7 +10,6 @@ from mail.trusted import is_trusted_email
 
 from constants import (
     DOWNLOADS_DIR,
-    ALLOWED_ATTACHMENT_FILE_EXTENSIONS,
     IMAP_MAIL_SEARCH_TEMPLATE,
 )
 
@@ -39,7 +38,7 @@ def fetch_mail(
     password: str,
     imap_mail_search_template: str = IMAP_MAIL_SEARCH_TEMPLATE,
     download_dir: str = DOWNLOADS_DIR,
-    allowed_attachment_extensions: tuple = ALLOWED_ATTACHMENT_FILE_EXTENSIONS,
+    allowed_attachment_extensions: tuple = None,
     junk_subdir: str = "junk",
 ) -> None:
     """Connects to mailbox, searches for relevant emails and saves their
@@ -171,7 +170,7 @@ def fetch_mail(
 
                     base, ext = os.path.splitext(filename)
                     if (
-                        allowed_attachment_extensions
+                        allowed_attachment_extensions is not None
                         and ext.lower() not in allowed_attachment_extensions
                     ):
                         continue  # skip off-topic attachment

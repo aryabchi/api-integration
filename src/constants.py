@@ -25,7 +25,7 @@ IMAP_MAIL_SEARCH_TEMPLATE = (
 
 # Desired email attachment extension
 # Set empty to allow all types of attachments, populate if save only desired e.g. xlsx
-ALLOWED_ATTACHMENT_FILE_EXTENSIONS = ()  # (".xlsx", ".xls", ".xlsm", ".xlsb")
+ALLOWED_ATTACHMENT_FILE_EXTENSIONS = (".xlsx", ".xls", ".xlsm", ".xlsb")
 
 # Name of the placeholder file that indicates a reply has been successfully sent
 REPLY_SENT_MARKER = "reply_sent.txt"
