@@ -4,10 +4,12 @@ from functools import lru_cache
 from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
-    AnyHttpUrl,
 )
 
-from pydantic import Field
+from pydantic import (
+    Field,
+    AnyHttpUrl,
+)
 
 
 class Settings(BaseSettings):

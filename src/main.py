@@ -1,24 +1,25 @@
 from config import get_settings
 
-from mail.mail import (
-    fetch_mail,
-    generate_replies,
-    send_replies,
-)
+from mail.fetch import fetch_mail
+from mail.make_reply import generate_replies
+from mail.send import send_replies
 
-# TODO: change me
-EMAIL_TITLE_FOR_REPLY = r"excel с яндекс-почты"
+# TODO: test me
+TEST_MESSAGE_ID_FOR_REPLY = None  # r"87311782287117@mail.yandex.ru"
 
-if __name__ == "__main__":
+
+def main() -> None:
     # get settings
     settings = get_settings()
+    mailbox = settings.MAILBOX_NAME
+    password = settings.MAILBOX_APP_PASSWORD
 
     # 1. get emails and save attachments
     fetch_mail(
         imap_server=settings.IMAP_SERVER,
         imap_port=settings.IMAP_PORT,
-        mailbox=settings.MAILBOX_NAME,
-        password=settings.MAILBOX_APP_PASSWORD,
+        mailbox=mailbox,
+        password=password,
     )
 
     # 2. generate replies
@@ -30,8 +31,12 @@ if __name__ == "__main__":
     send_replies(
         smtp_server=settings.SMTP_SERVER,
         smtp_port=settings.SMTP_PORT,
-        sender_email=settings.MAILBOX_NAME,
-        sender_password=settings.MAILBOX_APP_PASSWORD,
-        subfolder=EMAIL_TITLE_FOR_REPLY,
+        sender_email=mailbox,
+        sender_password=password,
+        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
         dry_run=False,
     )
+
+
+if __name__ == "__main__":
+    main()
