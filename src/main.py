@@ -1,7 +1,7 @@
 from config import get_settings
 
 from mail.fetch import fetch_mail
-from mail.make_reply import generate_replies
+from mail.compose import generate_replies
 from mail.send import send_replies
 
 # TODO: test me
