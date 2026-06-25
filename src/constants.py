@@ -59,3 +59,9 @@ ERROR_REPLY_TEMPLATE = (
     "С наилучшими пожеланиями,\n"
     "Агент Коля\n"
 )
+
+
+TEST_RFQ_CREATE_BOILERPLATE = {
+    "title": "Тестовая закупка транспортных услуг",
+    "finish_datetime": "2026-07-01T18:00:00Z",
+}
