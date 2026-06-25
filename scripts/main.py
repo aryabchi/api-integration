@@ -17,7 +17,7 @@ TEST_MESSAGE_ID_FOR_REPLY = "26671782368771@mail.yandex.ru"
 
 
 def main() -> None:
-    # get settings
+    # 0. get settings
     settings = get_settings()
     mailbox = settings.MAILBOX_NAME
     password = settings.MAILBOX_APP_PASSWORD

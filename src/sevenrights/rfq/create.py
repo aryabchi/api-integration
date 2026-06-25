@@ -64,8 +64,22 @@ def create_rfqs(
 
         rfq_data = None
         if not test_run and os.path.exists(excel_marker_path):
-            with open(excel_marker_path, "r", encoding="utf-8") as f:
-                rfq_data = json.load(f)
+            try:
+                with open(excel_marker_path, "r", encoding="utf-8") as f:
+                    rfq_data = json.load(f)
+            except (json.JSONDecodeError, ValueError) as e:
+                with open(info_marker_path, "w", encoding="utf-8") as f:
+                    json.dump(
+                        {"error": str(e), "rfq_id": None},
+                        f,
+                        ensure_ascii=False,
+                        indent=2,
+                    )
+                print(
+                    f"  ✗ invalid JSON in {RFQ_EXCEL_MARKER} for {os.path.basename(folder_path)}: {e}"
+                )
+                skipped += 1
+                continue
 
         if dry_run:
             mode = "test-run" if test_run else "dry-run"
@@ -75,9 +89,9 @@ def create_rfqs(
 
         result = create_rfq(data=rfq_data)
 
-        if not test_run:
-            with open(info_marker_path, "w", encoding="utf-8") as f:
-                json.dump(result, f, ensure_ascii=False, indent=2)
+        # TODO: Revisit this — currently writes rfq_info.json even in test_run.
+        with open(info_marker_path, "w", encoding="utf-8") as f:
+            json.dump(result, f, ensure_ascii=False, indent=2)
 
         if result.get("error") is None:
             print(
