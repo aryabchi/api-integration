@@ -19,26 +19,29 @@ from constants import (
 from sevenrights.api.schemas.rfq import RfqCreateRequest
 
 
-def read_tender_excel(path: Union[str, Path]) -> dict[str, str]:
+def read_tender_excel(
+    path: Union[str, Path], sheet_name: str = "TENDER"
+) -> dict[str, str]:
     """
-    Reads an Excel file, extracts data from the 'TENDER' sheet,
+    Reads an Excel file, extracts data from the specified sheet,
     and returns a dictionary with keys from column A and values
     from column C (fallback to column B if C is empty/None).
 
     Args:
         path: Path to the Excel file (.xlsx, .xls, etc.)
+        sheet_name: Name of the sheet to read (default: "TENDER")
 
     Returns:
-        dict with str keys and str values.
+        dict with str keys and str values, or {"error": "..."} if sheet is missing.
     """
 
     wb = load_workbook(path, data_only=True)
-    if "TENDER" not in wb.sheetnames:
-        raise ValueError(
-            f"Sheet 'TENDER' not found in {path}. Available sheets: {wb.sheetnames}"
-        )
+    if sheet_name not in wb.sheetnames:
+        msg = f"Sheet '{sheet_name}' not found in {path}. Available sheets: {wb.sheetnames}"
+        print(msg)
+        return {"error": msg}
 
-    ws = wb["TENDER"]
+    ws = wb[sheet_name]
     result: dict[str, str] = {}
 
     for row in ws.iter_rows(min_row=2, values_only=True):
@@ -69,26 +72,33 @@ def remap_excel_to_rfq_properties(data: dict[str, str]) -> dict[str, str]:
 
     Returns:
         New dictionary with remapped keys where mapping exists.
+        If input contains 'error', it is retained in the output.
     """
-
-    return {
+    result = {
         rfq_key: data[excel_key]
         for excel_key, rfq_key in EXCEL_TO_RFQ_MAPPING.items()
         if excel_key in data
     }
+    if "error" in data:
+        result["error"] = data["error"]
+    return result
 
 
 def merge_rfq_with_defaults(data: dict[str, str]) -> dict[str, str]:
     """
     Merges the remapped RFQ dictionary with RFQ_TO_DEFAULTS_MAPPING from constants.py.
     Missing fields are added from defaults; overlapping keys take precedence from defaults.
+    If the input contains an 'error' key, returns a dict with only the error.
 
     Args:
         data: Dictionary returned by remap_excel_to_rfq_properties()
 
     Returns:
-        Merged dictionary.
+        Merged dictionary, or {'error': ...} if input contains an error.
     """
+    if "error" in data:
+        return {"error": data["error"]}
+
     merged = dict(data)
     merged.update(RFQ_TO_DEFAULTS_MAPPING)
     return merged
