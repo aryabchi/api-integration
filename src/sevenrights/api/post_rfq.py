@@ -45,7 +45,7 @@ def create_rfq(data: dict = None) -> dict:
 
     body = model.model_dump(mode="json", exclude_none=True)
 
-    url = f"{str(settings.SEVEN_RIGHTS_API_BASE_URL).rstrip('/')}/"
+    url = f"{settings.SEVEN_RIGHTS_API_URL.rstrip('/')}/"
 
     headers = {
         "Authorization": f"Bearer {settings.SEVEN_RIGHTS_API_KEY}",

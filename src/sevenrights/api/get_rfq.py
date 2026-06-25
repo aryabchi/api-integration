@@ -58,7 +58,14 @@ def get_rfq(
     except ValueError:
         print("ERROR: Response is not valid JSON.")
         print("\nRaw response:")
-        print(response.text)
+        # print(response.text[:256])
+        tmp_dir = Path(output_root)
+        tmp_dir.mkdir(parents=True, exist_ok=True)
+        response_file = tmp_dir / "response_detail.html"
+
+    with open(response_file, "w", encoding="utf-8") as f:
+        # save full page
+        f.write(response.text)
         sys.exit(1)
 
     #
@@ -96,10 +103,10 @@ def get_rfq(
     #
     # Save response
     #
-    rfq_dir = Path(output_root) / str(rfq_id)
-    rfq_dir.mkdir(parents=True, exist_ok=True)
+    tmp_dir = Path(output_root) / str(rfq_id)
+    tmp_dir.mkdir(parents=True, exist_ok=True)
 
-    response_file = rfq_dir / "rfq_detail.json"
+    response_file = tmp_dir / "rfq_detail.json"
 
     with open(response_file, "w", encoding="utf-8") as f:
         json.dump(response_json, f, indent=2, ensure_ascii=False)
@@ -132,9 +139,12 @@ def get_rfq(
 if __name__ == "__main__":
     #
     # Example usage:
+    # Python
     #
-    # python ./src/sevenrights/api/get_rfq.py --base-url http://api.example.com --rfq-id 123 --token abc
+    # python ./src/sevenrights/api/get_rfq.py --base-url https://7rights.ru/ --rfq-id 9785 --token "ххх"
     #
+    # Curl
+    # curl "https://7rights.ru/api/v1/rfq/9785" -H "Authorization: Bearer ххх" -H "Accept: application/json"
 
     import argparse
 
