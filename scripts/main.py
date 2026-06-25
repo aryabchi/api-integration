@@ -1,5 +1,12 @@
-from config import get_settings
+import os
+import sys
 
+# Path to the 'src' directory relative to this script
+src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
+
+from config import get_settings
 from mail.fetch import fetch_mail
 from mail.compose import generate_replies
 from mail.send import send_replies

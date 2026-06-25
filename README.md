@@ -120,8 +120,13 @@ flowchart TD
     AF --> AG
 ```
 
+## Среда исполнения
+* Python 3.11.9
+* pip install --upgrade pip 
+* pip install -r requirements.txt
+
 ## Как запустить скрипт
 
 ```
-python src/main.py
+python ./scripts/main.py
 ```
