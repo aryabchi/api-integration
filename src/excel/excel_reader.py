@@ -2,7 +2,7 @@ import sys
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Union
+from typing import Any, List, Union
 
 try:
     from openpyxl import load_workbook
@@ -75,6 +75,37 @@ def validate_attachment_templates(templates: AttachmentTemplates) -> bool:
     if len(templates.lot_template) != 1 or len(templates.rfq_template) != 1:
         return False
     return templates.lot_template[0] != templates.rfq_template[0]
+
+
+def process_attachments(
+    directory: Union[str, Path],
+    extensions: tuple[str, ...] = ALLOWED_ATTACHMENT_FILE_EXTENSIONS,
+    sheet_name: str = "TENDER",
+) -> dict[str, Any]:
+    """
+    End-to-end wrapper: find templates, validate, read RFQ Excel, remap, merge.
+    Skips lot_template processing for now (TODO).
+    """
+    templates = find_attachment_templates(directory, extensions)
+    if not validate_attachment_templates(templates):
+        msg = "Attachment validation failed: each template type must have exactly one unique file"
+        print(msg)
+        return {"error": msg}
+
+    # TODO: implement lot_template processing
+
+    if not templates.rfq_template:
+        msg = "No RFQ template file found"
+        print(msg)
+        return {"error": msg}
+
+    rfq_path = Path(directory) / templates.rfq_template[0]
+    data = read_tender_excel(rfq_path, sheet_name=sheet_name)
+    if "error" in data:
+        return data
+
+    rfq_data = remap_excel_to_rfq_properties(data)
+    return merge_rfq_with_defaults(rfq_data)
 
 
 def read_tender_excel(
@@ -202,3 +233,14 @@ if __name__ == "__main__":
     except Exception as exc:
         print("\n=== Pydantic validation ===")
         print("FAILED:", exc)
+
+    # test process_attachments
+    print("\n=== Attachments reading ===")
+    path = (
+        Path(__file__).resolve().parent.parent.parent
+        # / "downloads"
+        # / "233431782309822@mail.yandex.ru"
+        / "samples"
+        / "excel"
+    )
+    print(process_attachments(path))
