@@ -1,7 +1,8 @@
 import sys
 import json
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Union
+from typing import List, Union
 
 try:
     from openpyxl import load_workbook
@@ -13,10 +14,67 @@ if src_path not in sys.path:
     sys.path.append(src_path)
 
 from constants import (
+    ALLOWED_ATTACHMENT_FILE_EXTENSIONS,
+    ALLOWED_ATTACHMENT_LOT_TEMPLATE_TERMS,
+    ALLOWED_ATTACHMENT_RFQ_TEMPLATE_TERMS,
     EXCEL_TO_RFQ_MAPPING,
     RFQ_TO_DEFAULTS_MAPPING,
 )
 from sevenrights.api.schemas.rfq import RfqCreateRequest
+
+
+@dataclass
+class AttachmentTemplates:
+    lot_template: List[str]
+    rfq_template: List[str]
+
+
+def find_attachment_templates(
+    directory: Union[str, Path],
+    extensions: tuple[str, ...] = ALLOWED_ATTACHMENT_FILE_EXTENSIONS,
+) -> AttachmentTemplates:
+    """
+    Scans a directory for files with allowed extensions and classifies them
+    as lot template or rfq template based on filename pattern matching.
+
+    Args:
+        directory: Path to the directory to search.
+        extensions: Allowed file extensions (default from constants.py).
+
+    Returns:
+        AttachmentTemplates with lists of matching file names.
+    """
+    base = Path(directory)
+    normalized_exts = tuple(ext.lower().lstrip(".") for ext in extensions)
+    lot: List[str] = []
+    rfq: List[str] = []
+
+    if not base.is_dir():
+        return AttachmentTemplates(lot_template=[], rfq_template=[])
+
+    for path in sorted(base.iterdir()):
+        if not path.is_file():
+            continue
+        if path.suffix.lower().lstrip(".") not in normalized_exts:
+            continue
+        name = path.name.lower()
+        if any(term in name for term in ALLOWED_ATTACHMENT_LOT_TEMPLATE_TERMS):
+            lot.append(path.name)
+        elif any(term in name for term in ALLOWED_ATTACHMENT_RFQ_TEMPLATE_TERMS):
+            rfq.append(path.name)
+
+    return AttachmentTemplates(lot_template=lot, rfq_template=rfq)
+
+
+def validate_attachment_templates(templates: AttachmentTemplates) -> bool:
+    """
+    Validates AttachmentTemplates:
+    - each list must contain exactly one file
+    - file names must be different
+    """
+    if len(templates.lot_template) != 1 or len(templates.rfq_template) != 1:
+        return False
+    return templates.lot_template[0] != templates.rfq_template[0]
 
 
 def read_tender_excel(
