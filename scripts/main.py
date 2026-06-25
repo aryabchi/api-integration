@@ -10,9 +10,10 @@ from config import get_settings
 from mail.fetch import fetch_mail
 from mail.compose import generate_replies
 from mail.send import send_replies
+from sevenrights.rfq.create import create_rfqs
 
-# TODO: test me
-TEST_MESSAGE_ID_FOR_REPLY = None  # r"87311782287117@mail.yandex.ru"
+# === Test me ===
+TEST_MESSAGE_ID_FOR_REPLY = "26671782368771@mail.yandex.ru"
 
 
 def main() -> None:
@@ -29,10 +30,17 @@ def main() -> None:
         password=password,
     )
 
-    # 2. generate replies
+    # 2. create RFQs
+    create_rfqs(
+        dry_run=False,
+        test_run=True,
+        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
+    )
+
+    # 3. generate replies
     generate_replies()
 
-    # 3. send replies
+    # 4. send replies
     # set subfolder name (mail title) to send reply to specific email
     # set dry_run=True to skip real work
     send_replies(

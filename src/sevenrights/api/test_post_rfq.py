@@ -1,3 +1,5 @@
+"""Временный модуль pydantic валидации json запросов на создание RFQ к API"""
+
 import sys
 from pathlib import Path
 from datetime import datetime
