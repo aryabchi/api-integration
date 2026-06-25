@@ -16,6 +16,7 @@ from constants import (
     EXCEL_TO_RFQ_MAPPING,
     RFQ_TO_DEFAULTS_MAPPING,
 )
+from sevenrights.api.schemas.rfq import RfqCreateRequest
 
 
 def read_tender_excel(path: Union[str, Path]) -> dict[str, str]:
@@ -118,4 +119,18 @@ if __name__ == "__main__":
 
     merged_data = merge_rfq_with_defaults(rfq_data)
     print("\n=== Merged RFQ with defaults ===")
-    print(json.dumps(merged_data, ensure_ascii=False, indent=2))
+    print(
+        json.dumps(
+            merged_data,
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
+
+    try:
+        validated = RfqCreateRequest.model_validate(merged_data)
+        print("\n=== Pydantic validation ===")
+        print("OK:", validated.model_dump(mode="json", exclude_none=True))
+    except Exception as exc:
+        print("\n=== Pydantic validation ===")
+        print("FAILED:", exc)
