@@ -1,5 +1,5 @@
-from re import U
 import sys
+import time
 from pathlib import Path
 import requests
 from pydantic import ValidationError
@@ -30,7 +30,7 @@ def _print_validation_errors(exc: ValidationError) -> None:
     print("=" * 80)
 
 
-def create_rfq(data: dict = None) -> dict:
+def create_rfq(data: dict = None, timeout: int = 30) -> dict:
     settings = get_settings()
 
     payload_data = data if data is not None else TEST_RFQ_CREATE_BOILERPLATE
@@ -54,7 +54,7 @@ def create_rfq(data: dict = None) -> dict:
     }
 
     try:
-        response = requests.post(url, headers=headers, json=body, timeout=120)
+        response = requests.post(url, headers=headers, json=body, timeout=timeout)
     except requests.RequestException as exc:
         return {
             "error": str(exc),
@@ -103,7 +103,9 @@ def create_rfq(data: dict = None) -> dict:
 
 
 if __name__ == "__main__":
+    start_time = time.perf_counter()
     result = create_rfq(
+        timeout=180,
         data={
             "title": "АВТО - Артем - Хабаровский край - 08.07.2026 - 01.09.2026",
             "finish_datetime": "2026-06-29T17:00:00",
@@ -112,28 +114,35 @@ if __name__ == "__main__":
             "contract_end_date": "2026-09-01",
             "is_invite_link_enabled": True,  # Отправлять ссылку-приглашение по email
             "transport_type_ids": [1],  # "Авто, Полная FTL"
-            # "contact_ids": [
-            #     114835
-            # ],  # невозможно установить контакты ни в contacts[], ни в contact_ids[]; контакт != пользователь; нет enpoint получения контактов
-            # "lot_template_id": 12993, # каждый раз создается новый id, никак не влияет на Светофор
+            "contact_ids": [
+                118
+            ],  # Тимофеева Анастасия невозможно установить контакты ни в contacts[], ни в contact_ids[]; контакт != пользователь; нет enpoint получения контактов
+            # "lot_template_id": 12993, # каждый раз создается новый id
             "user_access_ids": [
-                108014,
                 100511,
                 108453,
                 114835,
-            ],  # пользователи добавились, но только создатель с "полный доступ", остальные с "только чтение"
+            ],  # создатель с "полный доступ", остальные с "только чтение"
+            # Поставщики PUT /rfq/{id} - "access_type": "groups" + "supplier_group_ids": [29, 36]
             # "access_type": "groups",  # отваливается с таймаутом соединения => потерян rfq_id
             # "supplier_group_ids": [29, 36],  # Авто FTL СНГ; Авто FTL РФ
-            "participant_access_type": 0,  # Прямой доступ (???1,2 - другие)
+            "participant_access_type": 0,  # 0 - Прямой доступ, 1 - Доступ на опред условиях, 2 - Дсотуп после анкеты
             # "valutum_rate": 1, Какой-то курс перевода поле =1
             "freight_spend_of_event": 1,  # объем запроса предложений
-            "freight_spend_currency_id": 1,  # тоже объем запроса предложений
-            "type_view": 2,  # Обратная связь для поставщика - Светофор
+            "freight_spend_currency_id": 1,  # выставляется в паре с объем запроса предложений
+            # Обратная связь для поставщика:
+            "type_view": 2,  #  0 - без обр связи, 1- рейтинг поставщика, 2- светофор, 3 - числовой рейтинг
+            "traffic_light_type": 1,  # 0 - по рейтингу, 1 - по цене
+            # нельзя настроить переключатель светофор на основе цены - лучшая, базовая, целевая (нет ответа от 7Rights)
             "show_best_price": False,  # Обратная связь для поставщика - Не показывать лучшую цену (False), Отобразить (True)
-            # "traffic_light_type": 11,  # Блок "Настройки светофора" None-1-2-6-10-11 всегда на основе отклонения от: Лучшей цены => нет словаря со значениями Светофора, нельзя угадать Целевая цена, 0 - Цвет на основе Рейтинга
+            # Пролонгация:
             "prolongacia": False,  # Условия автоматической пролонгации = Запрещено
+            # Повышение цен поставщиками в текущем туре
             "is_ban_on_price_increases_on_this_tour": True,  # Повышение цен поставщиками в текущем туре = Запрещено (false), Разрешено (true)
             # неясно какой параметр отвечает - Лучшая цена - отключено/включено??? Default - отключено
-        }
+        },
     )
+    end_time = time.perf_counter()
+    total_time = end_time - start_time
     print(result)
+    print(f"Request took {total_time:.6f} seconds to run")

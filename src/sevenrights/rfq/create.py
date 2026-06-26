@@ -22,6 +22,7 @@ def create_rfqs(
     subfolder: str = None,
     dry_run: bool = False,
     test_run: bool = True,
+    timeout: int = 30,
 ) -> int:
     processed = 0
     skipped = 0
@@ -87,7 +88,7 @@ def create_rfqs(
             processed += 1
             continue
 
-        result = create_rfq(data=rfq_data)
+        result = create_rfq(data=rfq_data, timeout=timeout)
 
         # TODO: Revisit this — currently writes rfq_info.json even in test_run.
         with open(info_marker_path, "w", encoding="utf-8") as f:

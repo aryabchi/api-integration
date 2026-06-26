@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     SEVEN_RIGHTS_API_KEY: str | None = Field(
         default=None, description="API ключ 7rights"
     )
+    SEVEN_RIGHTS_API_AWAIT_TIMEOUT: int = Field(
+        description="Таймаут ожидания ответа от API, сек"
+    )
 
     @property
     def SEVEN_RIGHTS_API_URL(self) -> str:

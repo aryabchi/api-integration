@@ -35,6 +35,7 @@ def main() -> None:
         dry_run=False,
         test_run=True,
         subfolder=TEST_MESSAGE_ID_FOR_REPLY,
+        timeout=settings.SEVEN_RIGHTS_API_AWAIT_TIMEOUT,
     )
 
     # 3. generate replies
