@@ -23,12 +23,12 @@ def main() -> None:
     password = settings.MAILBOX_APP_PASSWORD
 
     # 1. get emails and save attachments
-    fetch_mail(
-        imap_server=settings.IMAP_SERVER,
-        imap_port=settings.IMAP_PORT,
-        mailbox=mailbox,
-        password=password,
-    )
+    # fetch_mail(
+    #     imap_server=settings.IMAP_SERVER,
+    #     imap_port=settings.IMAP_PORT,
+    #     mailbox=mailbox,
+    #     password=password,
+    # )
 
     # 2. create RFQs
     create_rfqs(
@@ -38,19 +38,19 @@ def main() -> None:
     )
 
     # 3. generate replies
-    generate_replies()
+    # generate_replies()
 
     # 4. send replies
     # set subfolder name (mail title) to send reply to specific email
     # set dry_run=True to skip real work
-    send_replies(
-        smtp_server=settings.SMTP_SERVER,
-        smtp_port=settings.SMTP_PORT,
-        sender_email=mailbox,
-        sender_password=password,
-        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
-        dry_run=False,
-    )
+    # send_replies(
+    #     smtp_server=settings.SMTP_SERVER,
+    #     smtp_port=settings.SMTP_PORT,
+    #     sender_email=mailbox,
+    #     sender_password=password,
+    #     subfolder=TEST_MESSAGE_ID_FOR_REPLY,
+    #     dry_run=False,
+    # )
 
 
 if __name__ == "__main__":

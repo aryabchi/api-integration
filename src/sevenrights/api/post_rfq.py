@@ -1,3 +1,4 @@
+from re import U
 import sys
 from pathlib import Path
 import requests
@@ -45,7 +46,7 @@ def create_rfq(data: dict = None) -> dict:
 
     body = model.model_dump(mode="json", exclude_none=True)
 
-    url = f"{settings.SEVEN_RIGHTS_API_URL.rstrip('/')}/"
+    url = f"{settings.SEVEN_RIGHTS_API_URL.rstrip('/')}/rfq"
 
     headers = {
         "Authorization": f"Bearer {settings.SEVEN_RIGHTS_API_KEY}",
@@ -102,5 +103,10 @@ def create_rfq(data: dict = None) -> dict:
 
 
 if __name__ == "__main__":
-    result = create_rfq()
+    result = create_rfq(
+        data={
+            "title": "Тестовая закупка транспортных услуг",
+            "finish_datetime": "2026-07-01T18:00:00Z",
+        }
+    )
     print(result)
