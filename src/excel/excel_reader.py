@@ -243,4 +243,9 @@ if __name__ == "__main__":
         / "samples"
         / "excel"
     )
-    print(process_attachments(path))
+    merged_data = process_attachments(path)
+    validated = RfqCreateRequest.model_validate(merged_data)
+    print("\n=== Pydantic validation ===")
+    json_str = validated.model_dump_json(exclude_none=True, indent=2)
+    with open(path / "rfq_excel.json", "w", encoding="utf-8") as f:
+        f.write(json_str)
