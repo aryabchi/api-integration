@@ -30,14 +30,14 @@ class RfqCreateRequest(BaseModel):
 
     lot_template_id: int | None = None
 
-    participant_access_type: int | None = None
+    participant_access_type: Literal[0, 1, 2] | None = None
 
     freight_spend_of_event: int | None = 1
     freight_spend_currency_id: int | None = 1
 
     # обратная связь
-    type_view: Literal[1, 2, 3] | None = None
-    traffic_light_type: int | None = None
+    type_view: Literal[0, 1, 2, 3] | None = None
+    traffic_light_type: Literal[0, 1] | None = None
     show_best_price: bool | None = False
 
     prolongacia: bool = False

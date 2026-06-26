@@ -30,7 +30,7 @@ def _print_validation_errors(exc: ValidationError) -> None:
     print("=" * 80)
 
 
-def create_rfq(data: dict = None, timeout: int = 30) -> dict:
+def post_rfq(data: dict = None, timeout: int = 30) -> dict:
     settings = get_settings()
 
     payload_data = data if data is not None else TEST_RFQ_CREATE_BOILERPLATE
@@ -104,7 +104,7 @@ def create_rfq(data: dict = None, timeout: int = 30) -> dict:
 
 if __name__ == "__main__":
     start_time = time.perf_counter()
-    result = create_rfq(
+    result = post_rfq(
         timeout=180,
         data={
             "title": "АВТО - Артем - Хабаровский край - 08.07.2026 - 01.09.2026",
@@ -126,7 +126,7 @@ if __name__ == "__main__":
             # Поставщики PUT /rfq/{id} - "access_type": "groups" + "supplier_group_ids": [29, 36]
             # "access_type": "groups",  # отваливается с таймаутом соединения => потерян rfq_id
             # "supplier_group_ids": [29, 36],  # Авто FTL СНГ; Авто FTL РФ
-            "participant_access_type": 0,  # 0 - Прямой доступ, 1 - Доступ на опред условиях, 2 - Дсотуп после анкеты
+            "participant_access_type": 0,  # 0 - Прямой доступ, 1 - Доступ на опред условиях, 2 - Доступ после анкеты
             # "valutum_rate": 1, Какой-то курс перевода поле =1
             "freight_spend_of_event": 1,  # объем запроса предложений
             "freight_spend_currency_id": 1,  # выставляется в паре с объем запроса предложений

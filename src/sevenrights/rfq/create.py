@@ -13,7 +13,7 @@ from constants import (
     REPLY_SENT_MARKER,
     RFQ_INFO_MARKER,
 )
-from sevenrights.api.post_rfq import create_rfq
+from sevenrights.api.post_rfq import post_rfq
 
 
 def create_rfqs(
@@ -88,7 +88,7 @@ def create_rfqs(
             processed += 1
             continue
 
-        result = create_rfq(data=rfq_data, timeout=timeout)
+        result = post_rfq(data=rfq_data, timeout=timeout)
 
         # TODO: Revisit this — currently writes rfq_info.json even in test_run.
         with open(info_marker_path, "w", encoding="utf-8") as f:
