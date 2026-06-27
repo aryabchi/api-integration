@@ -24,12 +24,12 @@ def main() -> None:
     password = settings.MAILBOX_APP_PASSWORD
 
     # 1. get emails and save attachments
-    fetch_mail(
-        imap_server=settings.IMAP_SERVER,
-        imap_port=settings.IMAP_PORT,
-        mailbox=mailbox,
-        password=password,
-    )
+    # fetch_mail(
+    #     imap_server=settings.IMAP_SERVER,
+    #     imap_port=settings.IMAP_PORT,
+    #     mailbox=mailbox,
+    #     password=password,
+    # )
 
     # 2. process attachments
     process_attachments_wrapper(

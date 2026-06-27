@@ -23,9 +23,9 @@ IMAP_MAIL_SEARCH_TEMPLATE = (
     f'(SUBJECT "{SUBJECT_TEMPLATE}" HEADER "Content-Type" "multipart/mixed")'
 )
 
-# Desired email attachment extension
+# Accepted email attachment extensions supported by openpyxl
 # Set empty to allow all types of attachments, populate if save only desired e.g. xlsx
-ALLOWED_ATTACHMENT_FILE_EXTENSIONS = (".xlsx", ".xls", ".xlsm", ".xlsb")
+ALLOWED_ATTACHMENT_FILE_EXTENSIONS = (".xlsx", ".xlsm")
 
 # Required patterns in attachemnts
 ALLOWED_ATTACHMENT_LOT_TEMPLATE_TERMS = ("тз",)

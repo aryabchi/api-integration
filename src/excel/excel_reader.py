@@ -1,5 +1,6 @@
 import sys
 import json
+import warnings
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, List, Union
@@ -92,7 +93,7 @@ def process_attachments(
     try:
         templates = find_attachment_templates(directory, extensions)
         if not validate_attachment_templates(templates):
-            msg = "Attachment validation failed: each template type must have exactly one unique file"
+            msg = "Attachments validation failed: must be two unique attachment files of required types"
             print(msg)
             result["error"] = msg
             return result
@@ -144,7 +145,11 @@ def read_tender_excel(
         dict with str keys and str values, or {"error": "..."} if sheet is missing.
     """
 
-    wb = load_workbook(path, data_only=True)
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            action="ignore", message="Data Validation extension is not supported"
+        )
+        wb = load_workbook(path, data_only=True)
     if sheet_name not in wb.sheetnames:
         msg = f"Sheet '{sheet_name}' not found in {path}. Available sheets: {wb.sheetnames}"
         print(msg)
