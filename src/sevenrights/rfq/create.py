@@ -10,7 +10,6 @@ if src_path not in sys.path:
 from constants import (
     DOWNLOADS_DIR,
     RFQ_EXCEL_MARKER,
-    REPLY_SENT_MARKER,
     RFQ_INFO_MARKER,
 )
 from sevenrights.api.post_rfq import post_rfq
@@ -45,42 +44,50 @@ def create_rfqs(
 
     for folder_path in folders_to_process:
         excel_marker_path = os.path.join(folder_path, RFQ_EXCEL_MARKER)
-        sent_marker_path = os.path.join(folder_path, REPLY_SENT_MARKER)
         info_marker_path = os.path.join(folder_path, RFQ_INFO_MARKER)
 
-        if not test_run:
-            if not os.path.exists(excel_marker_path):
-                print(
-                    f"  -> Skipping (no {RFQ_EXCEL_MARKER}): {os.path.basename(folder_path)}"
-                )
-                skipped += 1
-                continue
+        # Check RFQ_EXCEL_MARKER existence
+        if not os.path.exists(excel_marker_path):
+            print(
+                f"  -> Skipping (no {RFQ_EXCEL_MARKER}): {os.path.basename(folder_path)}"
+            )
+            skipped += 1
+            continue
 
-            if os.path.exists(sent_marker_path):
-                print(
-                    f"  -> Skipping (reply already sent): {os.path.basename(folder_path)}"
-                )
-                skipped += 1
-                continue
-
+        # Read RFQ_EXCEL_MARKER and check for errors
         rfq_data = None
-        if not test_run and os.path.exists(excel_marker_path):
-            try:
-                with open(excel_marker_path, "r", encoding="utf-8") as f:
-                    rfq_data = json.load(f)
-            except (json.JSONDecodeError, ValueError) as e:
-                with open(info_marker_path, "w", encoding="utf-8") as f:
-                    json.dump(
-                        {"error": str(e), "rfq_id": None},
-                        f,
-                        ensure_ascii=False,
-                        indent=2,
-                    )
-                print(
-                    f"  ✗ invalid JSON in {RFQ_EXCEL_MARKER} for {os.path.basename(folder_path)}: {e}"
+        try:
+            with open(excel_marker_path, "r", encoding="utf-8") as f:
+                rfq_data = json.load(f)
+        except (json.JSONDecodeError, ValueError) as e:
+            with open(info_marker_path, "w", encoding="utf-8") as f:
+                json.dump(
+                    {"error": str(e), "rfq_id": None},
+                    f,
+                    ensure_ascii=False,
+                    indent=2,
                 )
-                skipped += 1
-                continue
+            print(
+                f"  ✗ invalid JSON in {RFQ_EXCEL_MARKER} for {os.path.basename(folder_path)}: {e}"
+            )
+            skipped += 1
+            continue
+
+        # Check if RFQ_EXCEL_MARKER has non-empty error
+        if rfq_data.get("error"):
+            print(
+                f"  -> Skipping ({RFQ_EXCEL_MARKER} has error): {os.path.basename(folder_path)}"
+            )
+            skipped += 1
+            continue
+
+        # Check RFQ_INFO_MARKER existence (unless test_run bypasses it)
+        if not test_run and os.path.exists(info_marker_path):
+            print(
+                f"  -> Skipping ({RFQ_INFO_MARKER} exists): {os.path.basename(folder_path)}"
+            )
+            skipped += 1
+            continue
 
         if dry_run:
             mode = "test-run" if test_run else "dry-run"
@@ -90,7 +97,6 @@ def create_rfqs(
 
         result = post_rfq(data=rfq_data, timeout=timeout)
 
-        # TODO: Revisit this — currently writes rfq_info.json even in test_run.
         with open(info_marker_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
 
