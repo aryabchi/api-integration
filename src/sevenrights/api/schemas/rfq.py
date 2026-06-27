@@ -64,3 +64,20 @@ class RfqCreateRequest(BaseModel):
 
     is_ban_on_price_increases_on_this_tour: bool | None = True
     is_invite_link_enabled: bool | None = True
+
+
+class RfqUpdateSupplierGroupIdsRequest(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    access_type: Literal["groups"] = "groups"
+    supplier_group_ids: List[int] = Field(default_factory=list)
+
+
+class RfqPatchOrganizerRequest(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    organizer_user_id: int

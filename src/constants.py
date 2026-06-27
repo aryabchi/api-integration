@@ -68,7 +68,11 @@ ERROR_REPLY_TEMPLATE = (
     "Агент Коля\n"
 )
 
+# Flag to skip very SLOW put_rfq_supplier_group_ids PUT
+# TODO: add to pipleine if adding suppliers really slows it down
+IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
 
+# Minimal required RFQ info for create (testing)
 TEST_RFQ_CREATE_BOILERPLATE = {
     "title": "Тестовая закупка транспортных услуг",
     "finish_datetime": "2026-07-01T18:00:00Z",
@@ -135,3 +139,7 @@ RFQ_TO_DEFAULTS_MAPPING = {
     "transport_type_ids": [1],  # ?
     "contacts": [108014],  # Тимофеева Анастасия
 }
+
+
+# Default organizer user_access_ids
+RFQ_DEFAULT_ORGANIZER_USER_ID = 108014
