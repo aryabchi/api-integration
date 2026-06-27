@@ -23,6 +23,7 @@ if src_path not in sys.path:
         RFQ_DEFAULT_LOT_TEMPLATE_ID,
     )
 from sevenrights.api.schemas.rfq import RfqCreateRequest
+from excel.lot import read_lot_excel
 
 
 @dataclass
@@ -66,26 +67,6 @@ def find_attachment_templates(
             rfq.append(path.name)
 
     return AttachmentTemplates(lot_template=lot, rfq_template=rfq)
-
-
-def read_lot_excel(
-    path: Union[str, Path], sheet_name: str = "Матрица ТЗ_РФ"
-) -> dict[str, Any]:
-    """
-    Reads lot template Excel file.
-    On success returns {"lot_template_id": RFQ_DEFAULT_LOT_TEMPLATE_ID}.
-    On failure returns {"error": "..."}.
-    """
-    try:
-        wb = load_workbook(path, data_only=True)
-        if sheet_name not in wb.sheetnames:
-            msg = f"Sheet '{sheet_name}' not found in {path}. Available sheets: {wb.sheetnames}"
-            print(msg)
-            return {"error": msg}
-        # TODO: extract lot-specific data from the sheet
-        return {"lot_template_id": RFQ_DEFAULT_LOT_TEMPLATE_ID}
-    except Exception as exc:
-        return {"error": str(exc)}
 
 
 def validate_attachment_templates(templates: AttachmentTemplates) -> bool:

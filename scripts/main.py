@@ -30,7 +30,10 @@ def main() -> None:
     #     password=password,
     # )
 
-    # 2. create RFQs
+    # 2. process attachments
+    # TODO: call process_attachments in a loop, spit rfq_excel.json
+
+    # 3. create RFQs
     create_rfqs(
         dry_run=False,
         test_run=True,
@@ -38,10 +41,10 @@ def main() -> None:
         timeout=settings.SEVEN_RIGHTS_API_AWAIT_TIMEOUT,
     )
 
-    # 3. generate replies
+    # 4. generate replies
     # generate_replies()
 
-    # 4. send replies
+    # 5. send replies
     # set subfolder name (mail title) to send reply to specific email
     # set dry_run=True to skip real work
     # send_replies(
