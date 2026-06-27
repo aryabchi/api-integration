@@ -120,10 +120,17 @@ flowchart TD
     AF --> AG
 ```
 
+## Настройки скрипта
+* `.env` - локальный файл с секретами для переменных окружения
+* `/config/trusted_recipients.json` - доверенные адресаты
+* `/src/constants.py` - константы, пути, шаблоны
+
+
 ## Среда исполнения
 * Python 3.11.9
 * pip install --upgrade pip 
 * pip install -r requirements.txt
+
 
 ## Как запустить скрипт
 
