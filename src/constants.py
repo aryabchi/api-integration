@@ -83,63 +83,116 @@ TEST_RFQ_CREATE_BOILERPLATE = {
 # to RfqCreateRequest properties
 EXCEL_TO_RFQ_MAPPING = {
     # Core Identification & Text
-    "Название": "title",  # Ok string
+    "Название": "title",  # string
     # "Площадка": "name_for_human",
     # "Направление": "name_for_human",
-    "Информация для поставщика услуг": "requirements",  # Ok string
+    "Информация для поставщика услуг": "requirements",  # string
     # Dates & Timelines
-    "Дата и время окончания": "finish_datetime",  # Ok string
-    # "Дата публикации": "late_submission_datetime",
-    "Срок действия ТКП от": "contract_start_date",  # Ok string
-    "Срок действия ТКП до": "contract_end_date",  # Ok string
+    "Дата и время окончания": "finish_datetime",  # string
+    # "Дата публикации": "published_at",
+    "Срок действия ТКП от": "contract_start_date",  # string
+    "Срок действия ТКП до": "contract_end_date",  # string
     # Access & Participants
-    "Прямой доступ": "access_type",  # ? enum: ["all", "selected", "groups"]
-    "Пригласить поставщиков": "supplier_company_ids",  # Ok array
-    "Полный доступ": "user_access_ids",  # Ok array
-    # "Отправлять ссылку-приглашение по email": "supplier_emails", # ?
-    "Контактное лицо": "contacts",  # Ok array
+    "Прямой доступ": "participant_access_type",
+    "Пригласить поставщиков": "supplier_group_ids",  # array
+    "Полный доступ": "user_access_ids",  # array
+    "Отправлять ссылку-приглашение по email": "is_invite_link_enabled",
+    "Контактное лицо": "contact_ids",  # array
     # Transport & Lots
-    "Вид транспорта": "transport_type_ids",  # Ok array
-    # "Объем запроса предложений": "income_id",  # ?
+    "Вид транспорта": "transport_type_ids",  # array
+    "Объем запроса предложений": "freight_spend_of_event",
     # Visibility & Traffic Light Settings
-    # "Показывать лучшую цену": "type_view",
-    # "Лучшая цена": "type_view", # ?
-    # "Светофор на основе": "traffic_light_type", # ?
-    # "Показывать светофор на основе цены": "traffic_light_type",
-    # "Зеленый сигнал светофора от": "traffic_light_type", # no match
-    # "Желтый сигнал светофора от": "traffic_light_type", # no match
-    # "Красный сигнал светофора от": "traffic_light_type", # no match
+    "Показывать лучшую цену": "show_best_price",
+    # "Лучшая цена": "zzz", # ??? Default - отключено
+    "Светофор на основе": "traffic_light_type",
+    # "Показывать светофор на основе цены": "xxx", # ???
+    # "Зеленый сигнал светофора от": "", # ???
+    # "Желтый сигнал светофора от": "", # ???
+    # "Красный сигнал светофора от": "", # ???
     # Prolongation & Rules
-    "Автоматическая пролонгация": "prolongacia",  # Ok boolean
+    "Автоматическая пролонгация": "prolongacia",  # boolean
     # "Время пролонгации": "max_date_prolongacia",  # ?
-    "Обратная связь для поставщиков": "type_view",  # ? enum: [1, 2, 3], 1 — рейтинг, 2 — лучшая цена, 3 — светофор
-    # "Повышение цен поставщиками": "can_questions",  # ?
+    "Обратная связь для поставщиков": "type_view",
+    "Повышение цен поставщиками": "is_ban_on_price_increases_on_this_tour",
 }
 
+# Mappings of excel RFQ template values "Значение по умолчанию"/"Значение" to 7rights API valid IDs
+EXCEL_TO_RFQ_VALUES_MAPPING = {
+    "is_invite_link_enabled": {
+        "Да": True,
+        "да": True,
+        "Нет": False,
+        "нет": False,
+    },
+    "transport_type_ids": {
+        "Авто, Полная FTL": [1],
+    },
+    "participant_access_type": {
+        "Да": 0,  # 0 - Прямой доступ, 1 - Доступ на опред условиях, 2 - Доступ после анкеты
+        "да": 0,
+        "Нет": 1,
+        "нет": 1,
+    },
+    "contact_ids": {
+        "Тимофеева Анастасия": [118],
+    },  # Тимофеева Анастасия
+    "user_access_ids": {
+        "Тимофеева Анастасия Николаевна": [108014],
+        "Слепян Анна Дмитриевна": [100511],
+        "Цуриков Константин Эдуардович": [108453],
+        "Набока Михаил Викторович": [114835],
+    },  # создатель с "полный доступ", остальные с "только чтение"
+    # Поставщики PUT /rfq/{id} - "access_type": "groups" + "supplier_group_ids": [29, 36]
+    "supplier_group_ids": {
+        "Авто FTL СНГ": [29],
+        "Авто FTL РФ": [36],
+    },  # Авто FTL СНГ; Авто FTL РФ
+    # "valutum_rate": 1, Какой-то курс перевода поле =1
+    # Обратная связь для поставщика:
+    "type_view": {
+        "Запрос данных, без обратной связи": 0,
+        "Обратная связь в виде числового рейтинга": 1,
+        "Обратная связь в виде светофора": 2,
+        "Обратная связь в виде числового рейтинга от наибольшей цены": 3,
+    },  #  0 - без обр связи, 1- рейтинг поставщика, 2- светофор, 3 - числовой рейтинг
+    "traffic_light_type": {
+        "светофор по целевому тарифу": 1,
+        "светофору по рейтингу": 0,
+    },  # 0 - по рейтингу, 1 - по цене
+    # нельзя настроить переключатель светофор на основе цены - лучшая, базовая, целевая (НЕТ ответа от 7Rights)
+    # "xxx": {
+    #     "Целевая цена": "x",
+    #     "Базовая цена": "y",
+    #     "Лучшая цена": "z",
+    # },
+    "show_best_price": {
+        "Не показывать лучшую цену": False,
+        "Отобразить лучшую цену": True,
+    },  # Обратная связь для поставщика - Не показывать лучшую цену (False), Отобразить (True)
+    "prolongacia": {
+        "Запрещено": False,
+        "Разрешено, при переходе из красной/желтой зоны в зеленую": True,
+        "Разрешено, при выходе из красной в желтую/зеленую зону": True,
+    },  # Условия автоматической пролонгации = Запрещено
+    # Повышение цен поставщиками в текущем туре
+    "is_ban_on_price_increases_on_this_tour": {
+        "Разрешено": False,
+        "Запрещено": True,
+        "Запрещено понижать": False,
+    },  # Повышение цен поставщиками в текущем туре = Запрещено (true), Разрешено (false)
+    # неясно какой параметр отвечает - Лучшая цена - отключено/включено???
+    # "zzz": {
+    #     "Включено": "x",
+    #     "Отключено": "y",
+    # },
+}
 
 # Hardcoded mappings from RfqCreateRequest properties to constant values
 RFQ_TO_DEFAULTS_MAPPING = {
     "lot_template_id": 12993,  # ID шаблона
-    "supplier_company_ids": [
-        1014358,
-        1013339,
-        1013160,
-        1012739,
-        1012407,
-    ],  # sampled from Авто FTL СНГ; Авто FTL РФ
-    "user_access_ids": [
-        108014,  # Тимофеева Анастасия Николаевна;
-        100511,  # Слепян Анна Дмитриевна;
-        108453,  # Цуриков Константин Эдуардович;
-        114835,  # Набока Михаил Викторович
-    ],
-    "access_type": "all",
-    "type_view": 3,  # ?
-    "prolongacia": False,
-    "transport_type_ids": [1],  # ?
-    "contacts": [108014],  # Тимофеева Анастасия
+    "access_type": "groups",  # отваливается с таймаутом соединения
+    "freight_spend_currency_id": 1,  # выставляется в паре с объемом запроса предложений
 }
-
 
 # Default organizer user_access_ids
 RFQ_DEFAULT_ORGANIZER_USER_ID = 108014
