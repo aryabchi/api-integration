@@ -13,13 +13,14 @@ src_path = str(Path(__file__).resolve().parent.parent)
 if src_path not in sys.path:
     sys.path.append(src_path)
 
-from constants import (
-    ALLOWED_ATTACHMENT_FILE_EXTENSIONS,
-    ALLOWED_ATTACHMENT_LOT_TEMPLATE_TERMS,
-    ALLOWED_ATTACHMENT_RFQ_TEMPLATE_TERMS,
-    EXCEL_TO_RFQ_MAPPING,
-    RFQ_TO_DEFAULTS_MAPPING,
-)
+    from constants import (
+        ALLOWED_ATTACHMENT_FILE_EXTENSIONS,
+        ALLOWED_ATTACHMENT_LOT_TEMPLATE_TERMS,
+        ALLOWED_ATTACHMENT_RFQ_TEMPLATE_TERMS,
+        EXCEL_TO_RFQ_MAPPING,
+        EXCEL_TO_RFQ_VALUES_MAPPING,
+        RFQ_TO_DEFAULTS_MAPPING,
+    )
 from sevenrights.api.schemas.rfq import RfqCreateRequest
 
 
@@ -105,6 +106,7 @@ def process_attachments(
         return data
 
     rfq_data = remap_excel_to_rfq_properties(data)
+    rfq_data = apply_excel_value_mappings(rfq_data)
     return merge_rfq_with_defaults(rfq_data)
 
 
@@ -147,6 +149,64 @@ def read_tender_excel(
 
         value = col_c if (col_c is not None and str(col_c).strip() != "") else col_b
         result[key_str] = str(value).strip() if value is not None else ""
+
+    return result
+
+
+def apply_excel_value_mappings(data: dict[str, str]) -> dict[str, Any]:
+    """
+    Converts raw Excel string values to API-valid types using EXCEL_TO_RFQ_VALUES_MAPPING.
+
+    For each key in data, if the key exists in EXCEL_TO_RFQ_VALUES_MAPPING and the value
+    matches a known Excel value, it is replaced with the corresponding API value.
+    If no exact match is found, the value is split by ';' and each part is mapped
+    individually (unmapped parts are excluded). If at least one part is mapped:
+    - all mapped values are lists -> flattened into a single list
+    - otherwise -> single value if one mapped part, else list of mapped values
+    If the input contains an 'error' key, returns a dict with only the error.
+
+    Args:
+        data: Dictionary with RFQ property names and raw Excel string values.
+
+    Returns:
+        Dictionary with converted values, or {'error': ...} if input contains an error.
+    """
+    if "error" in data:
+        return {"error": data["error"]}
+
+    result: dict[str, Any] = {}
+    for key, value in data.items():
+        if key not in EXCEL_TO_RFQ_VALUES_MAPPING:
+            result[key] = value
+            continue
+
+        mapping = EXCEL_TO_RFQ_VALUES_MAPPING[key]
+        if value in mapping:
+            result[key] = mapping[value]
+            continue
+
+        parts = [part.strip() for part in value.split(";")]
+        mapped_parts: list[Any] = []
+        for part in parts:
+            if part in mapping:
+                mapped_parts.append(mapping[part])
+
+        if not mapped_parts:
+            result[key] = value
+        else:
+            if all(isinstance(v, list) for v in mapped_parts):
+                result[key] = [item for sublist in mapped_parts for item in sublist]
+            else:
+                result[key] = (
+                    mapped_parts[0] if len(mapped_parts) == 1 else mapped_parts
+                )
+
+    # Type coercion for known numeric fields
+    if "freight_spend_of_event" in result and isinstance(
+        result["freight_spend_of_event"], str
+    ):
+        if result["freight_spend_of_event"].isdigit():
+            result["freight_spend_of_event"] = int(result["freight_spend_of_event"])
 
     return result
 
@@ -201,6 +261,8 @@ if __name__ == "__main__":
         / "samples"
         / "excel"
         / "Шаблон запроса создания тендера v1.3.xlsx"
+        # / "Шаблон запроса создания тендера v1.2.xlsx"
+        # / "Шаблон запроса создания тендера v1.3_remarks.xlsx"
     )
     file_path = Path(sys.argv[1]) if len(sys.argv) > 1 else default_path
 
@@ -214,6 +276,10 @@ if __name__ == "__main__":
 
     rfq_data = remap_excel_to_rfq_properties(data)
     print("\n=== Remapped RFQ properties ===")
+    print(json.dumps(rfq_data, ensure_ascii=False, indent=2))
+
+    rfq_data = apply_excel_value_mappings(rfq_data)
+    print("\n=== RFQ values converted ===")
     print(json.dumps(rfq_data, ensure_ascii=False, indent=2))
 
     merged_data = merge_rfq_with_defaults(rfq_data)
@@ -244,8 +310,7 @@ if __name__ == "__main__":
         / "excel"
     )
     merged_data = process_attachments(path)
-    validated = RfqCreateRequest.model_validate(merged_data)
-    print("\n=== Pydantic validation ===")
-    json_str = validated.model_dump_json(exclude_none=True, indent=2)
+    print("\n=== process_attachments result ===")
+    print(json.dumps(merged_data, ensure_ascii=False, indent=2))
     with open(path / "rfq_excel.json", "w", encoding="utf-8") as f:
-        f.write(json_str)
+        json.dump(merged_data, f, ensure_ascii=False, indent=2)
