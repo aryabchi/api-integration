@@ -20,6 +20,7 @@ if src_path not in sys.path:
         EXCEL_TO_RFQ_MAPPING,
         EXCEL_TO_RFQ_VALUES_MAPPING,
         RFQ_TO_DEFAULTS_MAPPING,
+        RFQ_DEFAULT_LOT_TEMPLATE_ID,
     )
 from sevenrights.api.schemas.rfq import RfqCreateRequest
 
@@ -67,6 +68,26 @@ def find_attachment_templates(
     return AttachmentTemplates(lot_template=lot, rfq_template=rfq)
 
 
+def read_lot_excel(
+    path: Union[str, Path], sheet_name: str = "Матрица ТЗ_РФ"
+) -> dict[str, Any]:
+    """
+    Reads lot template Excel file.
+    On success returns {"lot_template_id": RFQ_DEFAULT_LOT_TEMPLATE_ID}.
+    On failure returns {"error": "..."}.
+    """
+    try:
+        wb = load_workbook(path, data_only=True)
+        if sheet_name not in wb.sheetnames:
+            msg = f"Sheet '{sheet_name}' not found in {path}. Available sheets: {wb.sheetnames}"
+            print(msg)
+            return {"error": msg}
+        # TODO: extract lot-specific data from the sheet
+        return {"lot_template_id": RFQ_DEFAULT_LOT_TEMPLATE_ID}
+    except Exception as exc:
+        return {"error": str(exc)}
+
+
 def validate_attachment_templates(templates: AttachmentTemplates) -> bool:
     """
     Validates AttachmentTemplates:
@@ -81,36 +102,49 @@ def validate_attachment_templates(templates: AttachmentTemplates) -> bool:
 def process_attachments(
     directory: Union[str, Path],
     extensions: tuple[str, ...] = ALLOWED_ATTACHMENT_FILE_EXTENSIONS,
-    sheet_name: str = "TENDER",
 ) -> dict[str, Any]:
     """
-    End-to-end wrapper: find templates, validate, read RFQ Excel, remap, merge.
-    Skips lot_template processing for now (TODO).
+    End-to-end wrapper: find templates, validate, read lot and RFQ Excel, remap, merge.
     """
-    templates = find_attachment_templates(directory, extensions)
-    if not validate_attachment_templates(templates):
-        msg = "Attachment validation failed: each template type must have exactly one unique file"
-        print(msg)
-        return {"error": msg}
-
-    # TODO: implement lot_template processing
-
-    if not templates.rfq_template:
-        msg = "No RFQ template file found"
-        print(msg)
-        return {"error": msg}
+    result: dict[str, Any] = {"lot_template": None, "rfq_template": None, "error": None}
 
     try:
+        templates = find_attachment_templates(directory, extensions)
+        if not validate_attachment_templates(templates):
+            msg = "Attachment validation failed: each template type must have exactly one unique file"
+            print(msg)
+            result["error"] = msg
+            return result
+
+        if not templates.rfq_template:
+            msg = "No RFQ template file found"
+            print(msg)
+            result["error"] = msg
+            return result
+
+        if templates.lot_template:
+            lot_path = Path(directory) / templates.lot_template[0]
+            lot_result = read_lot_excel(lot_path)
+            if "error" in lot_result:
+                result["error"] = lot_result["error"]
+                result["lot_template"] = None
+            else:
+                result["lot_template"] = lot_result
+
         rfq_path = Path(directory) / templates.rfq_template[0]
-        data = read_tender_excel(rfq_path, sheet_name=sheet_name)
+        data = read_tender_excel(rfq_path)
         if "error" in data:
-            return data
+            result["error"] = data["error"]
+            return result
 
         rfq_data = remap_excel_to_rfq_properties(data)
         rfq_data = apply_excel_value_mappings(rfq_data)
-        return merge_rfq_with_defaults(rfq_data)
+        result["rfq_template"] = merge_rfq_with_defaults(rfq_data)
+
     except Exception as exc:
-        return {"error": str(exc)}
+        result["error"] = str(exc)
+
+    return result
 
 
 def read_tender_excel(
@@ -256,7 +290,8 @@ def merge_rfq_with_defaults(data: dict[str, str]) -> dict[str, str]:
     return merged
 
 
-if __name__ == "__main__":
+def test_excel_reader() -> None:
+    """Run all Excel reader tests and print statistics."""
     import sys
 
     default_path = (
@@ -273,47 +308,87 @@ if __name__ == "__main__":
         print(f"File not found: {file_path}")
         sys.exit(1)
 
+    stats: dict[str, Any] = {
+        "rfq_fields_read": 0,
+        "rfq_fields_mapped": 0,
+        "rfq_fields_converted": 0,
+        "rfq_template_valid": False,
+        "lot_template_ok": False,
+        "errors": [],
+    }
+
+    # === Testing RFQ template functions ===
+    print("=== Testing RFQ template functions ===")
     data = read_tender_excel(file_path)
-    print("=== Raw Excel data ===")
-    print(json.dumps(data, ensure_ascii=False, indent=2))
+    stats["rfq_fields_read"] = len(data)
+    print(f"Read {stats['rfq_fields_read']} fields from RFQ template")
 
     rfq_data = remap_excel_to_rfq_properties(data)
-    print("\n=== Remapped RFQ properties ===")
-    print(json.dumps(rfq_data, ensure_ascii=False, indent=2))
+    stats["rfq_fields_mapped"] = len(rfq_data)
+    print(f"Mapped to {stats['rfq_fields_mapped']} RFQ properties")
 
     rfq_data = apply_excel_value_mappings(rfq_data)
-    print("\n=== RFQ values converted ===")
-    print(json.dumps(rfq_data, ensure_ascii=False, indent=2))
+    stats["rfq_fields_converted"] = len(rfq_data)
+    print(f"Converted values for {stats['rfq_fields_converted']} properties")
 
     merged_data = merge_rfq_with_defaults(rfq_data)
-    print("\n=== Merged RFQ with defaults ===")
-    print(
-        json.dumps(
-            merged_data,
-            ensure_ascii=False,
-            indent=2,
-        )
-    )
+    print(f"Merged with defaults, total fields: {len(merged_data)}")
 
-    try:
-        validated = RfqCreateRequest.model_validate(merged_data)
-        print("\n=== Pydantic validation ===")
-        print("OK:", validated.model_dump(mode="json", exclude_none=True))
-    except Exception as exc:
-        print("\n=== Pydantic validation ===")
-        print("FAILED:", exc)
+    if "error" in merged_data:
+        stats["errors"].append(merged_data["error"])
+        print(f"RFQ template error: {merged_data['error']}")
+    else:
+        try:
+            validated = RfqCreateRequest.model_validate(merged_data)
+            stats["rfq_template_valid"] = True
+            print("Pydantic validation: PASSED")
+        except Exception as exc:
+            stats["rfq_template_valid"] = False
+            stats["errors"].append(str(exc))
+            print(f"Pydantic validation: FAILED - {exc}")
 
-    # test process_attachments
-    print("\n=== Attachments reading ===")
-    path = (
+    # === Testing lot template function ===
+    print("\n=== Testing lot template function ===")
+    lot_file_path = (
         Path(__file__).resolve().parent.parent.parent
-        # / "downloads"
-        # / "233431782309822@mail.yandex.ru"
         / "samples"
         / "excel"
+        / "Копия ТЗ Самсунг Артем перезакуп Хабаровский край 19.06.2026.xlsx"
     )
-    merged_data = process_attachments(path)
+    lot_data = read_lot_excel(lot_file_path)
+    if "error" in lot_data:
+        stats["errors"].append(lot_data["error"])
+        print(f"Lot template error: {lot_data['error']}")
+    else:
+        stats["lot_template_ok"] = True
+        print(f"Lot template processed: {lot_data}")
+
+    # === Testing end-to-end process_attachments pipeline ===
+    print("\n=== Testing end-to-end process_attachments pipeline ===")
+    samples_dir = Path(__file__).resolve().parent.parent.parent / "samples" / "excel"
+    merged_data = process_attachments(samples_dir)
+    print(f"lot_template: {'OK' if merged_data.get('lot_template') else 'None/Error'}")
+    print(f"rfq_template: {'OK' if merged_data.get('rfq_template') else 'None/Error'}")
+    print(f"error: {merged_data.get('error')}")
+
+    with open(samples_dir / "rfq_excel.json", "w", encoding="utf-8") as f:
+        json.dump(merged_data, f, ensure_ascii=False, indent=2)
+
     print("\n=== process_attachments result ===")
     print(json.dumps(merged_data, ensure_ascii=False, indent=2))
-    with open(path / "rfq_excel.json", "w", encoding="utf-8") as f:
-        json.dump(merged_data, f, ensure_ascii=False, indent=2)
+
+    # === Statistics summary ===
+    print("\n=== Test Statistics ===")
+    print(f"RFQ fields read: {stats['rfq_fields_read']}")
+    print(f"RFQ fields mapped: {stats['rfq_fields_mapped']}")
+    print(f"RFQ fields converted: {stats['rfq_fields_converted']}")
+    print(f"RFQ template valid: {stats['rfq_template_valid']}")
+    print(f"Lot template OK: {stats['lot_template_ok']}")
+    print(f"Errors: {len(stats['errors'])}")
+    if stats["errors"]:
+        for err in stats["errors"]:
+            print(f"  - {err}")
+
+
+if __name__ == "__main__":
+    test_excel_reader()

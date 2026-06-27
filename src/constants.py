@@ -116,6 +116,14 @@ EXCEL_TO_RFQ_MAPPING = {
     "Повышение цен поставщиками": "is_ban_on_price_increases_on_this_tour",
 }
 
+
+# Default organizer user_access_ids
+RFQ_DEFAULT_ORGANIZER_USER_ID: int = 108014
+
+# Default lot_template_id:
+RFQ_DEFAULT_LOT_TEMPLATE_ID: int = 12993
+
+
 # Mappings of excel RFQ template values "Значение по умолчанию"/"Значение" to 7rights API valid IDs
 EXCEL_TO_RFQ_VALUES_MAPPING = {
     "is_invite_link_enabled": {
@@ -189,10 +197,7 @@ EXCEL_TO_RFQ_VALUES_MAPPING = {
 
 # Hardcoded mappings from RfqCreateRequest properties to constant values
 RFQ_TO_DEFAULTS_MAPPING = {
-    "lot_template_id": 12993,  # ID шаблона
+    "lot_template_id": RFQ_DEFAULT_LOT_TEMPLATE_ID,  # ID шаблона
     "access_type": "groups",  # отваливается с таймаутом соединения
     "freight_spend_currency_id": 1,  # выставляется в паре с объемом запроса предложений
 }
-
-# Default organizer user_access_ids
-RFQ_DEFAULT_ORGANIZER_USER_ID = 108014
