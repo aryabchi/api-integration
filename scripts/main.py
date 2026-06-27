@@ -11,6 +11,7 @@ from mail.fetch import fetch_mail
 from mail.compose import generate_replies
 from mail.send import send_replies
 from sevenrights.rfq.create import create_rfqs
+from excel.convert import process_attachments_wrapper
 
 # === Test me ===
 TEST_MESSAGE_ID_FOR_REPLY = "26671782368771@mail.yandex.ru"
@@ -23,23 +24,27 @@ def main() -> None:
     password = settings.MAILBOX_APP_PASSWORD
 
     # 1. get emails and save attachments
-    # fetch_mail(
-    #     imap_server=settings.IMAP_SERVER,
-    #     imap_port=settings.IMAP_PORT,
-    #     mailbox=mailbox,
-    #     password=password,
-    # )
+    fetch_mail(
+        imap_server=settings.IMAP_SERVER,
+        imap_port=settings.IMAP_PORT,
+        mailbox=mailbox,
+        password=password,
+    )
 
     # 2. process attachments
-    # TODO: call process_attachments in a loop, spit rfq_excel.json
-
-    # 3. create RFQs
-    create_rfqs(
+    process_attachments_wrapper(
         dry_run=False,
         test_run=True,
-        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
-        timeout=settings.SEVEN_RIGHTS_API_AWAIT_TIMEOUT,
+        # subfolder=TEST_MESSAGE_ID_FOR_REPLY,
     )
+
+    # 3. create RFQs
+    # create_rfqs(
+    #     dry_run=False,
+    #     test_run=True,
+    #     subfolder=TEST_MESSAGE_ID_FOR_REPLY,
+    #     timeout=settings.SEVEN_RIGHTS_API_AWAIT_TIMEOUT,
+    # )
 
     # 4. generate replies
     # generate_replies()

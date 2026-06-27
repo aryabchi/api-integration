@@ -13,15 +13,15 @@ src_path = str(Path(__file__).resolve().parent.parent)
 if src_path not in sys.path:
     sys.path.append(src_path)
 
-    from constants import (
-        ALLOWED_ATTACHMENT_FILE_EXTENSIONS,
-        ALLOWED_ATTACHMENT_LOT_TEMPLATE_TERMS,
-        ALLOWED_ATTACHMENT_RFQ_TEMPLATE_TERMS,
-        EXCEL_TO_RFQ_MAPPING,
-        EXCEL_TO_RFQ_VALUES_MAPPING,
-        RFQ_TO_DEFAULTS_MAPPING,
-        RFQ_DEFAULT_LOT_TEMPLATE_ID,
-    )
+from constants import (
+    ALLOWED_ATTACHMENT_FILE_EXTENSIONS,
+    ALLOWED_ATTACHMENT_LOT_TEMPLATE_TERMS,
+    ALLOWED_ATTACHMENT_RFQ_TEMPLATE_TERMS,
+    EXCEL_TO_RFQ_MAPPING,
+    EXCEL_TO_RFQ_VALUES_MAPPING,
+    RFQ_TO_DEFAULTS_MAPPING,
+    RFQ_DEFAULT_LOT_TEMPLATE_ID,
+)
 from sevenrights.api.schemas.rfq import RfqCreateRequest
 from excel.lot import read_lot_excel
 

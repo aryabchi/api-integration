@@ -83,34 +83,34 @@ TEST_RFQ_CREATE_BOILERPLATE = {
 # to RfqCreateRequest properties
 EXCEL_TO_RFQ_MAPPING = {
     # Core Identification & Text
-    "Название": "title",  # string
+    "Название": "title",
     # "Площадка": "name_for_human",
     # "Направление": "name_for_human",
-    "Информация для поставщика услуг": "requirements",  # string
+    "Информация для поставщика услуг": "requirements",
     # Dates & Timelines
-    "Дата и время окончания": "finish_datetime",  # string
+    "Дата и время окончания": "finish_datetime",
     # "Дата публикации": "published_at",
-    "Срок действия ТКП от": "contract_start_date",  # string
-    "Срок действия ТКП до": "contract_end_date",  # string
+    "Срок действия ТКП от": "contract_start_date",
+    "Срок действия ТКП до": "contract_end_date",
     # Access & Participants
     "Прямой доступ": "participant_access_type",
-    "Пригласить поставщиков": "supplier_group_ids",  # array
-    "Полный доступ": "user_access_ids",  # array
+    "Пригласить поставщиков": "supplier_group_ids",
+    "Полный доступ": "user_access_ids",
     "Отправлять ссылку-приглашение по email": "is_invite_link_enabled",
-    "Контактное лицо": "contact_ids",  # array
+    "Контактное лицо": "contact_ids",
     # Transport & Lots
-    "Вид транспорта": "transport_type_ids",  # array
+    "Вид транспорта": "transport_type_ids",
     "Объем запроса предложений": "freight_spend_of_event",
     # Visibility & Traffic Light Settings
     "Показывать лучшую цену": "show_best_price",
-    # "Лучшая цена": "zzz", # ??? Default - отключено
+    # "Лучшая цена": "zzz", # ??? Default = отключено
     "Светофор на основе": "traffic_light_type",
     # "Показывать светофор на основе цены": "xxx", # ???
     # "Зеленый сигнал светофора от": "", # ???
     # "Желтый сигнал светофора от": "", # ???
     # "Красный сигнал светофора от": "", # ???
     # Prolongation & Rules
-    "Автоматическая пролонгация": "prolongacia",  # boolean
+    "Автоматическая пролонгация": "prolongacia",
     # "Время пролонгации": "max_date_prolongacia",  # ?
     "Обратная связь для поставщиков": "type_view",
     "Повышение цен поставщиками": "is_ban_on_price_increases_on_this_tour",
@@ -143,7 +143,8 @@ EXCEL_TO_RFQ_VALUES_MAPPING = {
     },
     "contact_ids": {
         "Тимофеева Анастасия": [118],
-    },  # Тимофеева Анастасия
+        "Тимофеева Анастасия Николаевна": [118],
+    },
     "user_access_ids": {
         "Тимофеева Анастасия Николаевна": [108014],
         "Слепян Анна Дмитриевна": [100511],
@@ -197,7 +198,7 @@ EXCEL_TO_RFQ_VALUES_MAPPING = {
 
 # Hardcoded mappings from RfqCreateRequest properties to constant values
 RFQ_TO_DEFAULTS_MAPPING = {
-    "lot_template_id": RFQ_DEFAULT_LOT_TEMPLATE_ID,  # ID шаблона
+    "lot_template_id": RFQ_DEFAULT_LOT_TEMPLATE_ID,  # ID шаблона, пересоздается
     "access_type": "groups",  # отваливается с таймаутом соединения
-    "freight_spend_currency_id": 1,  # выставляется в паре с объемом запроса предложений
+    "freight_spend_currency_id": 1,  # выставляется в паре с freight_spend_of_event
 }

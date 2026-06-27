@@ -21,7 +21,7 @@ def create_rfqs(
     exclude: tuple = ("junk",),
     subfolder: str = None,
     dry_run: bool = False,
-    test_run: bool = True,
+    test_run: bool = False,
     timeout: int = 30,
 ) -> int:
     processed = 0

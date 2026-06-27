@@ -225,5 +225,6 @@ docs/*
 downloads/*
 !downloads/.gitkeep
 
-# json samples for API test
+# json and excel samples for API test 
 samples/*
+!samples/.gitkeep
