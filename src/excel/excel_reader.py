@@ -21,7 +21,6 @@ from constants import (
     EXCEL_TO_RFQ_MAPPING,
     EXCEL_TO_RFQ_VALUES_MAPPING,
     RFQ_TO_DEFAULTS_MAPPING,
-    RFQ_DEFAULT_LOT_TEMPLATE_ID,
 )
 from sevenrights.api.schemas.rfq import RfqCreateRequest
 from excel.lot import read_lot_excel
