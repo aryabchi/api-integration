@@ -100,14 +100,17 @@ def process_attachments(
         print(msg)
         return {"error": msg}
 
-    rfq_path = Path(directory) / templates.rfq_template[0]
-    data = read_tender_excel(rfq_path, sheet_name=sheet_name)
-    if "error" in data:
-        return data
+    try:
+        rfq_path = Path(directory) / templates.rfq_template[0]
+        data = read_tender_excel(rfq_path, sheet_name=sheet_name)
+        if "error" in data:
+            return data
 
-    rfq_data = remap_excel_to_rfq_properties(data)
-    rfq_data = apply_excel_value_mappings(rfq_data)
-    return merge_rfq_with_defaults(rfq_data)
+        rfq_data = remap_excel_to_rfq_properties(data)
+        rfq_data = apply_excel_value_mappings(rfq_data)
+        return merge_rfq_with_defaults(rfq_data)
+    except Exception as exc:
+        return {"error": str(exc)}
 
 
 def read_tender_excel(
