@@ -24,7 +24,7 @@ def put_rfq_supplier_group_ids(rfq_id: int, data: dict, timeout: int = 30) -> di
         _print_validation_errors(exc)
         return {
             "error": f"ValidationError: {exc.errors()}",
-            "rfq_id": None,
+            "rfq_id": rfq_id,
         }
 
     body = model.model_dump(mode="json", exclude_none=True)
@@ -41,7 +41,7 @@ def put_rfq_supplier_group_ids(rfq_id: int, data: dict, timeout: int = 30) -> di
     except requests.RequestException as exc:
         return {
             "error": str(exc),
-            "rfq_id": None,
+            "rfq_id": rfq_id,
         }
 
     if response.status_code == 200:
@@ -50,7 +50,7 @@ def put_rfq_supplier_group_ids(rfq_id: int, data: dict, timeout: int = 30) -> di
         except ValueError:
             return {
                 "error": "Invalid JSON in success response",
-                "rfq_id": None,
+                "rfq_id": rfq_id,
             }
 
         return {
@@ -69,12 +69,12 @@ def put_rfq_supplier_group_ids(rfq_id: int, data: dict, timeout: int = 30) -> di
 
         return {
             "error": f"HTTP {response.status_code} ValidationError: {message} {errors}",
-            "rfq_id": None,
+            "rfq_id": rfq_id,
         }
 
     return {
         "error": f"HTTP {response.status_code}: {response.text}",
-        "rfq_id": None,
+        "rfq_id": rfq_id,
     }
 
 

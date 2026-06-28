@@ -13,6 +13,8 @@ from constants import (
     RFQ_INFO_MARKER,
 )
 from sevenrights.api.post_rfq import post_rfq
+from sevenrights.rfq.split_rfq_payload import split_rfq_payload
+from sevenrights.api.put_rfq_supplier_group_ids import put_rfq_supplier_group_ids
 
 
 def create_rfqs(
@@ -92,7 +94,20 @@ def create_rfqs(
             processed += 1
             continue
 
-        result = post_rfq(data=rfq_data, timeout=timeout)
+        payload = split_rfq_payload(rfq_data)
+        # TODO: use payload.lot_template for lot-related operations
+
+        result = post_rfq(data=payload.rfq_template, timeout=timeout)
+
+        # If RFQ created successfully and we have supplier data, call PUT
+        if result.get("error") is None and payload.rfq_suppliers is not None:
+            put_result = put_rfq_supplier_group_ids(
+                rfq_id=result["rfq_id"],
+                data=payload.rfq_suppliers,
+                timeout=timeout,
+            )
+            if put_result.get("error") is not None:
+                result = put_result
 
         with open(info_marker_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
