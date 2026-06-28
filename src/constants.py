@@ -73,6 +73,20 @@ ERROR_REPLY_TEMPLATE = (
     "Агент Коля\n"
 )
 
+PARTIAL_SUCCESS_REPLY_TEMPLATE = (
+    "Здравствуйте,\n"
+    "В ответ на Ваше письмо {subject_line} от {date}.\n\n"
+    "Мы автоматически создали RFQ: {message}. "
+    "\n\n"
+    "Предупреждение:\n"
+    "{warning}"
+    "\n\n"
+    "---- Original message ----\n{body_excerpt}\n"
+    "------------------------------------\n\n"
+    "С наилучшими пожеланиями,\n"
+    "Агент Коля\n"
+)
+
 # Flag to skip VERY SLOW put_rfq_supplier_group_ids PUT call
 # True - skip, False - execute
 IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True

@@ -1,9 +1,17 @@
 import os
 import json
+import sys
+from pathlib import Path
+
+src_path = str(Path(__file__).resolve().parent.parent)
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
+
 from constants import (
     DOWNLOADS_DIR,
     SUCCESS_REPLY_TEMPLATE,
     ERROR_REPLY_TEMPLATE,
+    PARTIAL_SUCCESS_REPLY_TEMPLATE,
     RFQ_INFO_MARKER,
     REPLY_BODY_MARKER,
 )
@@ -19,26 +27,33 @@ def _compose_reply_text(
     subject = meta.get("subject", "") or ""
     subject_line = f' "{subject}" ' if subject else " "
     """Fills in email templates depending on rfq_info fields content
-    TODO: consider case (and use 3rd template) when rfq_info "error" and "rfq_id" both not null 
 
     Returns:
         str: filled email template
     """
-    if not rfq_info:
+    error_message = rfq_info.get("error", "") if rfq_info else ""
+    rfq_id = rfq_info.get("rfq_id", 0) if rfq_info else 0
+
+    if error_message and rfq_id:
+        template = PARTIAL_SUCCESS_REPLY_TEMPLATE
+        message = get_rfq_draft_url(rfq_id)
+        warning = error_message
+        return template.format(
+            subject_line=subject_line,
+            date=meta.get("date", "unknown date"),
+            body_excerpt=body[:body_excerpt_chars].strip() or "(empty body)",
+            message=message,
+            warning=warning,
+        )
+    elif error_message:
+        template = ERROR_REPLY_TEMPLATE
+        message = error_message
+    elif rfq_id:
+        template = SUCCESS_REPLY_TEMPLATE
+        message = get_rfq_draft_url(rfq_id)
+    else:
         template = ERROR_REPLY_TEMPLATE
         message = "(unable to generate rfq link or error message)"
-    else:
-        error_message = rfq_info.get("error", "")
-        if error_message:
-            template = ERROR_REPLY_TEMPLATE
-            message = error_message
-        else:
-            template = SUCCESS_REPLY_TEMPLATE
-            rfq_id = rfq_info.get("rfq_id", 0)
-            if rfq_id:
-                message = get_rfq_draft_url(rfq_id)
-            else:
-                message = "(unable to generate valid RFQ link)"
 
     return template.format(
         # sender_name=_extract_sender_name(meta.get("from", "")),
@@ -167,3 +182,56 @@ def generate_replies(
     print(f"\nTotal replies generated: {generated}")
     print(f"Total replies skipped: {skipped}")
     return generated
+
+
+def _test_compose_reply_text():
+    meta = {
+        "subject": "Test RFQ Request",
+        "date": "2026-06-28",
+    }
+    body = "Original email body content here."
+
+    # Case 1: Both error and rfq_id -> PARTIAL_SUCCESS_REPLY_TEMPLATE
+    result1 = _compose_reply_text(
+        meta=meta,
+        body=body,
+        rfq_info={"error": "PUT request failed", "rfq_id": 12345},
+    )
+    assert "Мы автоматически создали RFQ:" in result1
+    assert "Предупреждение:" in result1
+    assert "PUT request failed" in result1
+    print("Case 1 (both error+rfq_id): PASSED")
+
+    # Case 2: Error only -> ERROR_REPLY_TEMPLATE
+    result2 = _compose_reply_text(
+        meta=meta,
+        body=body,
+        rfq_info={"error": "No RFQ template found", "rfq_id": None},
+    )
+    assert "Нам не удалось автоматически создать RFQ." in result2
+    assert "No RFQ template found" in result2
+    print("Case 2 (error only): PASSED")
+
+    # Case 3: RFQ ID only -> SUCCESS_REPLY_TEMPLATE
+    result3 = _compose_reply_text(
+        meta=meta,
+        body=body,
+        rfq_info={"error": None, "rfq_id": 12345},
+    )
+    assert "Мы автоматически создали RFQ:" in result3
+    assert "https://lk.7rights.ru/admin/newRfq/12345" in result3
+    print("Case 3 (rfq_id only): PASSED")
+
+    # Case 4: Neither (None) -> ERROR_REPLY_TEMPLATE with generic message
+    result4 = _compose_reply_text(
+        meta=meta,
+        body=body,
+        rfq_info=None,
+    )
+    assert "Нам не удалось автоматически создать RFQ." in result4
+    assert "(unable to generate rfq link or error message)" in result4
+    print("Case 4 (rfq_info=None): PASSED")
+
+
+if __name__ == "__main__":
+    _test_compose_reply_text()
