@@ -31,6 +31,9 @@ ALLOWED_ATTACHMENT_FILE_EXTENSIONS = (".xlsx", ".xlsm")
 ALLOWED_ATTACHMENT_LOT_TEMPLATE_TERMS = ("тз",)
 ALLOWED_ATTACHMENT_RFQ_TEMPLATE_TERMS = ("шаблон", "запрос", "тендер")
 
+# Name of the placeholder file that indicates a reply message has been composed
+REPLY_BODY_MARKER = "reply.txt"
+
 # Name of the placeholder file that indicates a reply has been successfully sent
 REPLY_SENT_MARKER = "reply_sent.txt"
 

@@ -45,15 +45,19 @@ def main() -> None:
     # )
 
     # 3. create RFQs
-    create_rfqs(
-        dry_run=True,
-        test_run=False,  # test_run = True bypasses checks and creates new RFQ
-        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
-        timeout=settings.SEVEN_RIGHTS_API_AWAIT_TIMEOUT,
-    )
+    # create_rfqs(
+    #     dry_run=True,
+    #     test_run=False,  # test_run = True bypasses checks and creates new RFQ
+    #     subfolder=TEST_MESSAGE_ID_FOR_REPLY,
+    #     timeout=settings.SEVEN_RIGHTS_API_AWAIT_TIMEOUT,
+    # )
 
     # 4. generate replies
-    # generate_replies()
+    generate_replies(
+        dry_run=False,
+        test_run=False,  # test_run = True bypasses checks and composeses new reply
+        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
+    )
 
     # 5. send replies
     # set subfolder name (mail title) to send reply to specific email

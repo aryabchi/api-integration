@@ -5,6 +5,7 @@ from constants import (
     SUCCESS_REPLY_TEMPLATE,
     ERROR_REPLY_TEMPLATE,
     RFQ_INFO_MARKER,
+    REPLY_BODY_MARKER,
 )
 from mail.utils import get_rfq_draft_url
 
@@ -59,6 +60,10 @@ def _compose_reply_text(
 def generate_replies(
     download_dir: str = DOWNLOADS_DIR,
     body_excerpt_chars: int = 500,
+    exclude: tuple = ("junk",),
+    subfolder: str = None,
+    dry_run: bool = False,
+    test_run: bool = False,
 ) -> int:
     """Generate a ``reply.txt`` inside every email subfolder using a template.
     Skips generation if ``reply.txt`` already exists in the subfolder.
@@ -72,37 +77,60 @@ def generate_replies(
         {date}, {body_excerpt}. Defaults to DEFAULT_REPLY_TEMPLATE.
     body_excerpt_chars:
         How many characters of the original body to include in the template.
+    exclude:
+        Tuple of folder names to exclude from processing.
+    subfolder:
+        Process only this specific subfolder instead of all folders.
+    dry_run:
+        If True, print actions without writing files.
+    test_run:
+        If True, overwrite existing reply file. If False, skip existing.
     """
-    if not os.path.isdir(download_dir):
-        print(f"Download directory not found: {download_dir}")
-        return 0
+    if subfolder:
+        folder_path = os.path.join(download_dir, subfolder)
+        if not os.path.isdir(folder_path):
+            print(f"✗ Subfolder not found: {folder_path}")
+            return 0
+        folders_to_process = [folder_path]
+    else:
+        if not os.path.isdir(download_dir):
+            print(f"Download directory not found: {download_dir}")
+            return 0
+        folders_to_process = [
+            os.path.join(download_dir, entry)
+            for entry in sorted(os.listdir(download_dir))
+            if os.path.isdir(os.path.join(download_dir, entry)) and entry not in exclude
+        ]
 
     generated = 0
     skipped = 0
 
-    for entry in sorted(os.listdir(download_dir)):
-        folder_path = os.path.join(download_dir, entry)
-        if not os.path.isdir(folder_path):
-            continue
+    for folder_path in folders_to_process:
+        entry = os.path.basename(folder_path)
 
         meta_path = os.path.join(folder_path, "email_meta.json")
         body_path = os.path.join(folder_path, "email_body.txt")
-        reply_path = os.path.join(folder_path, "reply.txt")
+        reply_path = os.path.join(folder_path, REPLY_BODY_MARKER)
 
         if not os.path.exists(meta_path):
             continue
 
-        # --- Skip if reply file already exists ---
-        if os.path.exists(reply_path):
-            print(f"  -> Skipping (reply.txt already exists): {entry}")
+        # Skip if reply file already exists (unless test_run mode)
+        if os.path.exists(reply_path) and not test_run:
+            print(f"  -> Skipping (reply already exists): {entry}")
             skipped += 1
             continue
 
-        # --- Skip if RFQ marker is missing in this email directory ---
+        # Skip if RFQ marker is missing in this email directory
         marker_path = os.path.join(folder_path, RFQ_INFO_MARKER)
         if not os.path.exists(marker_path):
             print(f"  -> Skipping (no RFQ info marker): {entry}")
             skipped += 1
+            continue
+
+        if dry_run:
+            print(f"  [dry-run] would generate reply for: {entry}")
+            generated += 1
             continue
 
         with open(meta_path, "r", encoding="utf-8") as f:
@@ -132,5 +160,5 @@ def generate_replies(
         generated += 1
 
     print(f"\nTotal replies generated: {generated}")
-    print(f"Total replies skipped (already exist): {skipped}")
+    print(f"Total replies skipped: {skipped}")
     return generated
