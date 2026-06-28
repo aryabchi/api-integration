@@ -26,7 +26,7 @@ class Settings(BaseSettings):
 
     MAILBOX_NAME: str = Field(description="Имя почтового ящика автологиста")
     MAILBOX_APP_PASSWORD: str = Field(
-        default=None, description="Секретный app-пароль почтового ящика для скрипта"
+        description="Секретный app-пароль почтового ящика для скрипта"
     )
     IMAP_SERVER: str = Field(default="imap.yandex.ru", description="IMAP сервер")
     IMAP_PORT: int = Field(default=993, description="IMAP порт")
@@ -36,9 +36,7 @@ class Settings(BaseSettings):
 
     SEVEN_RIGHTS_API_BASE_URL: AnyHttpUrl = Field(description="Базовый URL API 7rights")
     SEVEN_RIGHTS_API_VERSION: str = Field(description="Суффикс с версией API 7rights")
-    SEVEN_RIGHTS_API_KEY: str | None = Field(
-        default=None, description="API ключ 7rights"
-    )
+    SEVEN_RIGHTS_API_KEY: str = Field(description="API ключ 7rights")
     SEVEN_RIGHTS_API_AWAIT_TIMEOUT: int = Field(
         description="Таймаут ожидания ответа от API, сек"
     )
