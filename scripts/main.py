@@ -53,23 +53,24 @@ def main() -> None:
     # )
 
     # 4. generate replies
-    generate_replies(
-        dry_run=False,
-        test_run=False,  # test_run = True bypasses checks and composeses new reply
-        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
-    )
+    # generate_replies(
+    #     dry_run=False,
+    #     test_run=False,  # test_run = True bypasses checks and composeses new reply
+    #     subfolder=TEST_MESSAGE_ID_FOR_REPLY,
+    # )
 
     # 5. send replies
     # set subfolder name (mail title) to send reply to specific email
     # set dry_run=True to skip real work
-    # send_replies(
-    #     smtp_server=settings.SMTP_SERVER,
-    #     smtp_port=settings.SMTP_PORT,
-    #     sender_email=mailbox,
-    #     sender_password=password,
-    #     subfolder=TEST_MESSAGE_ID_FOR_REPLY,
-    #     dry_run=False,
-    # )
+    send_replies(
+        smtp_server=settings.SMTP_SERVER,
+        smtp_port=settings.SMTP_PORT,
+        sender_email=mailbox,
+        sender_password=password,
+        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
+        dry_run=True,
+        test_run=False,
+    )
 
 
 if __name__ == "__main__":
