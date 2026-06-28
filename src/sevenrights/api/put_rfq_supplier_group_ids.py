@@ -81,7 +81,7 @@ def put_rfq_supplier_group_ids(rfq_id: int, data: dict, timeout: int = 30) -> di
 if __name__ == "__main__":
     start_time = time.perf_counter()
     result = put_rfq_supplier_group_ids(
-        rfq_id=9839,
+        rfq_id=9842,
         timeout=180,
         data={
             "access_type": "groups",

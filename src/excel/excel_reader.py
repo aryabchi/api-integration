@@ -92,7 +92,12 @@ def process_attachments(
     try:
         templates = find_attachment_templates(directory, extensions)
         if not validate_attachment_templates(templates):
-            msg = "Attachments validation failed: must be two unique attachment files of required types"
+            exts = ", ".join(extensions)
+            msg = (
+                f"Attachments validation failed: must be two unique {exts} files. "
+                f"Lot template filename should include one of: {', '.join(ALLOWED_ATTACHMENT_LOT_TEMPLATE_TERMS)}. "
+                f"RFQ template filename should include one of: {', '.join(ALLOWED_ATTACHMENT_RFQ_TEMPLATE_TERMS)}."
+            )
             print(msg)
             result["error"] = msg
             return result

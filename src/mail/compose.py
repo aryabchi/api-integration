@@ -18,7 +18,12 @@ def _compose_reply_text(
 ) -> str:
     subject = meta.get("subject", "") or ""
     subject_line = f' "{subject}" ' if subject else " "
+    """Fills in email templates depending on rfq_info fields content
+    TODO: consider case (and use 3rd template) when rfq_info "error" and "rfq_id" both not null 
 
+    Returns:
+        str: filled email template
+    """
     if not rfq_info:
         template = ERROR_REPLY_TEMPLATE
         message = "(unable to generate rfq link or error message)"

@@ -26,8 +26,8 @@ IMAP_MAIL_SEARCH_TEMPLATE = (
     f'(SUBJECT "{SUBJECT_TEMPLATE}" HEADER "Content-Type" "multipart/mixed")'
 )
 
-# Accepted email attachment extensions supported by **openpyxl**
-ALLOWED_ATTACHMENT_FILE_EXTENSIONS = (".xlsx", ".xlsm")
+# Accepted email attachment extensions supported by openpyxl, e.g. .xlsx, .xlsm, but NOT .xls
+ALLOWED_ATTACHMENT_FILE_EXTENSIONS = (".xlsx",)
 
 # Required patterns in attachemnt file names
 ALLOWED_ATTACHMENT_LOT_TEMPLATE_TERMS = ("тз",)
@@ -74,7 +74,7 @@ ERROR_REPLY_TEMPLATE = (
 )
 
 # Flag to skip VERY SLOW put_rfq_supplier_group_ids PUT call
-# TODO: add to pipleine if adding suppliers really slows it down
+# True - skip, False - execute
 IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
 
 # Minimal required RFQ info for create (testing)

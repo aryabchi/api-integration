@@ -13,14 +13,14 @@ from mail.send import send_replies
 from sevenrights.rfq.create import create_rfqs
 from excel.convert import process_attachments_wrapper
 
-# ============ Example subfolders to testing ============
+# ============ Example subfolders for testing ============
 # Use only ONE of these per run - select the appropriate test message ID
 PASS_TEST_MESSAGE_ID_FOR_REPLY = (
     "26671782368771@mail.yandex.ru"  # trusted recipient, valid excel attachments
 )
-# FAIL_TEST_MESSAGE_ID_FOR_REPLY = (
-#     "87311782287117@mail.yandex.ru"  # trusted recipient, insufficient attachments)
-# )
+FAIL_TEST_MESSAGE_ID_FOR_REPLY = (
+    "87311782287117@mail.yandex.ru"  # trusted recipient, insufficient attachments
+)
 
 
 # ============================================================
@@ -37,7 +37,7 @@ SUBFOLDER = PASS_TEST_MESSAGE_ID_FOR_REPLY
 # dry_run=True skips actual execution (safe mode, no side effects)
 DRY_RUN = False
 # test_run=True forces execution (use with caution, may overwrite data)
-TEST_RUN = False  # <--
+TEST_RUN = False
 
 
 def main(
