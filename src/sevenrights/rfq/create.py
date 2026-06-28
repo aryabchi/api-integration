@@ -54,27 +54,24 @@ def create_rfqs(
             skipped += 1
             continue
 
-        # Read RFQ_EXCEL_MARKER and check for errors
-        rfq_data = None
-        try:
-            with open(excel_marker_path, "r", encoding="utf-8") as f:
-                rfq_data = json.load(f)
-        except (json.JSONDecodeError, ValueError) as e:
-            with open(info_marker_path, "w", encoding="utf-8") as f:
-                json.dump(
-                    {"error": str(e), "rfq_id": None},
-                    f,
-                    ensure_ascii=False,
-                    indent=2,
-                )
-            print(
-                f"  ✗ invalid JSON in {RFQ_EXCEL_MARKER} for {os.path.basename(folder_path)}: {e}"
-            )
-            skipped += 1
-            continue
+        # Read RFQ_EXCEL_MARKER directly (no JSON error handling)
+        with open(excel_marker_path, "r", encoding="utf-8") as f:
+            rfq_data = json.load(f)
 
-        # Check if RFQ_EXCEL_MARKER has non-empty error
+        # Check if RFQ_EXCEL_MARKER has non-empty error - pass downstream conditionally
+        # TODO: consider better ways of error propagation
         if rfq_data.get("error"):
+            if (not test_run and not os.path.exists(info_marker_path)) or test_run:
+                with open(info_marker_path, "w", encoding="utf-8") as f:
+                    json.dump(
+                        {"error": rfq_data["error"], "rfq_id": None},
+                        f,
+                        ensure_ascii=False,
+                        indent=2,
+                    )
+                print(
+                    f"  -> Propagated error from {RFQ_EXCEL_MARKER} to {RFQ_INFO_MARKER}: {os.path.basename(folder_path)}"
+                )
             print(
                 f"  -> Skipping ({RFQ_EXCEL_MARKER} has error): {os.path.basename(folder_path)}"
             )

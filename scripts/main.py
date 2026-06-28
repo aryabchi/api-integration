@@ -14,7 +14,7 @@ from sevenrights.rfq.create import create_rfqs
 from excel.convert import process_attachments_wrapper
 
 # === Test me ===
-TEST_MESSAGE_ID_FOR_REPLY = "26671782368771@mail.yandex.ru"
+TEST_MESSAGE_ID_FOR_REPLY = "26671782368771@mail.yandex.ru"  # (correct excel) # "87311782287117@mail.yandex.ru" (excel with errors)
 
 # WARNING: test_run=True bypasses all conditional checks and execute actions
 # potentially overwriting historical results. Use it
@@ -46,7 +46,7 @@ def main() -> None:
 
     # 3. create RFQs
     create_rfqs(
-        dry_run=False,
+        dry_run=True,
         test_run=False,  # test_run = True bypasses checks and creates new RFQ
         subfolder=TEST_MESSAGE_ID_FOR_REPLY,
         timeout=settings.SEVEN_RIGHTS_API_AWAIT_TIMEOUT,

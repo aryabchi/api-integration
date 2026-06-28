@@ -15,6 +15,7 @@ from sevenrights.api.utils import _print_validation_errors
 
 
 def post_rfq(data: dict = None, timeout: int = 30) -> dict:
+
     settings = get_settings()
 
     payload_data = data if data is not None else TEST_RFQ_CREATE_BOILERPLATE
