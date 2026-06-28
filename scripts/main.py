@@ -13,65 +13,111 @@ from mail.send import send_replies
 from sevenrights.rfq.create import create_rfqs
 from excel.convert import process_attachments_wrapper
 
-# === Test me ===
-TEST_MESSAGE_ID_FOR_REPLY = "26671782368771@mail.yandex.ru"  # (correct excel) # "87311782287117@mail.yandex.ru" (excel with errors)
+# ============ Example subfolders to testing ============
+# Use only ONE of these per run - select the appropriate test message ID
+PASS_TEST_MESSAGE_ID_FOR_REPLY = (
+    "26671782368771@mail.yandex.ru"  # trusted recipient, valid excel attachments
+)
+# FAIL_TEST_MESSAGE_ID_FOR_REPLY = (
+#     "87311782287117@mail.yandex.ru"  # trusted recipient, insufficient attachments)
+# )
 
-# WARNING: test_run=True bypasses all conditional checks and execute actions
-# potentially overwriting historical results. Use it
+
+# ============================================================
+# Common parameters for the entire pipeline (used in all steps)
+# ============================================================
+# WARNING: test_run=True bypasses all conditional checks and tries to execute
+# actions potentially overwriting historical results. Use it:
 # - With caution
 # - For debugging
-# - In conjunction with subfolder arg
+# - In conjunction with subfolder argument
+
+# Target message ID or subfolder name for processing specific email thread
+SUBFOLDER = PASS_TEST_MESSAGE_ID_FOR_REPLY
+# dry_run=True skips actual execution (safe mode, no side effects)
+DRY_RUN = False
+# test_run=True forces execution (use with caution, may overwrite data)
+TEST_RUN = False  # <--
 
 
-def main() -> None:
-    # 0. get settings
+def main(
+    subfolder: str = SUBFOLDER,
+    dry_run: bool = DRY_RUN,
+    test_run: bool = TEST_RUN,
+) -> None:
+    """Execute the mail processing pipeline.
+
+    Args:
+        subfolder: Target message ID or subfolder name to process.
+        dry_run: If True, skip actual write/send operations (safe mode).
+        test_run: If True, bypass conditional checks and overwrite historical results.
+    """
+
     settings = get_settings()
     mailbox = settings.MAILBOX_NAME
     password = settings.MAILBOX_APP_PASSWORD
 
+    # Print pipeline configuration
+    print("=== Mail processing pipeline ===")
+    print(f"subfolder={subfolder}, dry_run={dry_run}, test_run={test_run}")
+
     # 1. get emails, save attachments
+    print("\n>>> Step 1: Fetching emails and saving attachments")
     fetch_mail(
         imap_server=settings.IMAP_SERVER,
         imap_port=settings.IMAP_PORT,
         mailbox=mailbox,
         password=password,
     )
+    print("<<< Step 1 completed: Fetch mail")
 
     # 2. process attachments
+    print("\n>>> Step 2: Processing attachments")
     process_attachments_wrapper(
-        dry_run=False,
-        test_run=True,  # test_run = True bypasses checks and overwrites attachments json
-        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
+        dry_run=dry_run,
+        test_run=test_run,
+        subfolder=subfolder,
     )
+    print("<<< Step 2 completed: Process attachments")
 
     # 3. create RFQs
+    print("\n>>> Step 3: Creating RFQs")
     create_rfqs(
-        dry_run=True,
-        test_run=False,  # test_run = True bypasses checks and creates new RFQ
-        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
+        dry_run=dry_run,
+        test_run=test_run,
+        subfolder=subfolder,
         timeout=settings.SEVEN_RIGHTS_API_AWAIT_TIMEOUT,
     )
+    print("<<< Step 3 completed: Create RFQs")
 
     # 4. generate replies
+    print("\n>>> Step 4: Generating replies")
     generate_replies(
-        dry_run=False,
-        test_run=False,  # test_run = True bypasses checks and composeses new reply
-        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
+        dry_run=dry_run,
+        test_run=test_run,
+        subfolder=subfolder,
     )
+    print("<<< Step 4 completed: Generate replies")
 
     # 5. send replies
-    # set subfolder name (mail title) to send reply to specific email
-    # set dry_run=True to skip real work
+    print("\n>>> Step 5: Sending replies")
     send_replies(
         smtp_server=settings.SMTP_SERVER,
         smtp_port=settings.SMTP_PORT,
         sender_email=mailbox,
         sender_password=password,
-        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
-        dry_run=True,
-        test_run=False,
+        subfolder=subfolder,
+        dry_run=dry_run,
+        test_run=test_run,
     )
+    print("<<< Step 5 completed: Send replies")
+
+    print("\n=== Pipeline execution completed ===")
 
 
 if __name__ == "__main__":
-    main()
+    main(
+        subfolder=SUBFOLDER,
+        dry_run=DRY_RUN,
+        test_run=TEST_RUN,
+    )
