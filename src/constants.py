@@ -73,7 +73,7 @@ ERROR_REPLY_TEMPLATE = (
     "Агент Коля\n"
 )
 
-# Flag to skip very SLOW put_rfq_supplier_group_ids PUT
+# Flag to skip VERY SLOW put_rfq_supplier_group_ids PUT call
 # TODO: add to pipleine if adding suppliers really slows it down
 IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
 
