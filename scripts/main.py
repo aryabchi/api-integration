@@ -1,8 +1,8 @@
-import os
 import sys
+from pathlib import Path
 
 # Path to the 'src' directory relative to this script
-src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
+src_path = str(Path(__file__).resolve().parent.parent / "src")
 if src_path not in sys.path:
     sys.path.insert(0, src_path)
 
@@ -30,34 +30,34 @@ def main() -> None:
     password = settings.MAILBOX_APP_PASSWORD
 
     # 1. get emails, save attachments
-    # fetch_mail(
-    #     imap_server=settings.IMAP_SERVER,
-    #     imap_port=settings.IMAP_PORT,
-    #     mailbox=mailbox,
-    #     password=password,
-    # )
+    fetch_mail(
+        imap_server=settings.IMAP_SERVER,
+        imap_port=settings.IMAP_PORT,
+        mailbox=mailbox,
+        password=password,
+    )
 
     # 2. process attachments
-    # process_attachments_wrapper(
-    #     dry_run=False,
-    #     test_run=True, # test_run = True bypasses checks and overwrites attachments json
-    #     subfolder=TEST_MESSAGE_ID_FOR_REPLY,
-    # )
+    process_attachments_wrapper(
+        dry_run=False,
+        test_run=True,  # test_run = True bypasses checks and overwrites attachments json
+        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
+    )
 
     # 3. create RFQs
-    # create_rfqs(
-    #     dry_run=True,
-    #     test_run=False,  # test_run = True bypasses checks and creates new RFQ
-    #     subfolder=TEST_MESSAGE_ID_FOR_REPLY,
-    #     timeout=settings.SEVEN_RIGHTS_API_AWAIT_TIMEOUT,
-    # )
+    create_rfqs(
+        dry_run=True,
+        test_run=False,  # test_run = True bypasses checks and creates new RFQ
+        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
+        timeout=settings.SEVEN_RIGHTS_API_AWAIT_TIMEOUT,
+    )
 
     # 4. generate replies
-    # generate_replies(
-    #     dry_run=False,
-    #     test_run=False,  # test_run = True bypasses checks and composeses new reply
-    #     subfolder=TEST_MESSAGE_ID_FOR_REPLY,
-    # )
+    generate_replies(
+        dry_run=False,
+        test_run=False,  # test_run = True bypasses checks and composeses new reply
+        subfolder=TEST_MESSAGE_ID_FOR_REPLY,
+    )
 
     # 5. send replies
     # set subfolder name (mail title) to send reply to specific email

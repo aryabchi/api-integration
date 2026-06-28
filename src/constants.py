@@ -8,11 +8,14 @@ project_root = Path(__file__).resolve().parent.parent
 # Local directory with json samples for API requests
 SAMPLES_DIR = f"{project_root}/samples"
 
-# Local directory to save attachments
+# Local directory for imcoming emails, attachments and interim precessing flags
 DOWNLOADS_DIR = f"{project_root}/downloads"
 
+# Local directory for user-level json configurations
+CONFIG_DIR = f"{project_root}/config"
+
 # Config dir for trusted recipients
-TRUSTED_RECIPIENTS_FILE = f"{project_root}/config/trusted_recipients.json"
+TRUSTED_RECIPIENTS_FILE = f"{CONFIG_DIR}/trusted_recipients.json"
 
 # The subject template to search for (IMAP does a substring match)
 SUBJECT_TEMPLATE = "*"
@@ -23,15 +26,14 @@ IMAP_MAIL_SEARCH_TEMPLATE = (
     f'(SUBJECT "{SUBJECT_TEMPLATE}" HEADER "Content-Type" "multipart/mixed")'
 )
 
-# Accepted email attachment extensions supported by openpyxl
-# Set empty to allow all types of attachments, populate if save only desired e.g. xlsx
+# Accepted email attachment extensions supported by **openpyxl**
 ALLOWED_ATTACHMENT_FILE_EXTENSIONS = (".xlsx", ".xlsm")
 
-# Required patterns in attachemnts
+# Required patterns in attachemnt file names
 ALLOWED_ATTACHMENT_LOT_TEMPLATE_TERMS = ("тз",)
 ALLOWED_ATTACHMENT_RFQ_TEMPLATE_TERMS = ("шаблон", "запрос", "тендер")
 
-# Name of the placeholder file that indicates a reply message has been composed
+# Name of the placeholder file that indicates a reply message body has been composed
 REPLY_BODY_MARKER = "reply.txt"
 
 # Name of the placeholder file that indicates a reply has been successfully sent
@@ -73,7 +75,7 @@ ERROR_REPLY_TEMPLATE = (
 
 # Flag to skip very SLOW put_rfq_supplier_group_ids PUT
 # TODO: add to pipleine if adding suppliers really slows it down
-IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
+IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
 
 # Minimal required RFQ info for create (testing)
 TEST_RFQ_CREATE_BOILERPLATE = {
