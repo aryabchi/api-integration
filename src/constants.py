@@ -91,7 +91,8 @@ PARTIAL_SUCCESS_REPLY_TEMPLATE = (
 # True - skip, False - execute
 IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
 
-# Minimal required RFQ info for create (testing)
+# TODO: rm after testing
+# Minimal required RFQ info for create
 TEST_RFQ_CREATE_BOILERPLATE = {
     "title": "Тестовая закупка транспортных услуг",
     "finish_datetime": "2026-07-01T18:00:00Z",
@@ -160,6 +161,9 @@ EXCEL_TO_RFQ_VALUES_MAPPING = {
         "Нет": 1,
         "нет": 1,
     },  # 0 = Прямой доступ, 1 = Доступ на опред условиях, 2 = Доступ после анкеты
+    #  Сопутствующие поля:
+    # participant_access_type = 1 → gate_requirement (обязательно), is_need_transporter_file (опционально)
+    # participant_access_type = 2 → questionnaire_form_id (обязательно); справочник: GET /rfq/questionnaire-forms
     "contact_ids": {
         "Тимофеева Анастасия": [118],
         "Тимофеева Анастасия Николаевна": [118],
@@ -170,7 +174,7 @@ EXCEL_TO_RFQ_VALUES_MAPPING = {
         "Цуриков Константин Эдуардович": [108453],
         "Набока Михаил Викторович": [114835],
     },  # создатель с "полный доступ", остальные с "только чтение"
-    # Поставщики PUT /rfq/{id} - "access_type": "groups" + "supplier_group_ids": [29, 36]
+    # Поставщики -> PUT /rfq/{id} - "access_type": "groups" + "supplier_group_ids": [29, 36]
     "supplier_group_ids": {
         "Авто FTL СНГ": [29],
         "Авто FTL РФ": [36],
