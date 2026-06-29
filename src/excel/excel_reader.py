@@ -350,20 +350,20 @@ def test_excel_reader() -> None:
             print(f"Pydantic validation: FAILED - {exc}")
 
     # === Testing lot template function ===
-    # print("\n=== Testing lot template function ===")
-    # lot_file_path = (
-    #     Path(__file__).resolve().parent.parent.parent
-    #     / "samples"
-    #     / "excel"
-    #     / "Копия ТЗ Самсунг Артем перезакуп Хабаровский край 19.06.2026.xlsx"
-    # )
-    # lot_data = read_lot_excel(lot_file_path)
-    # if "error" in lot_data:
-    #     stats["errors"].append(lot_data["error"])
-    #     print(f"Lot template error: {lot_data['error']}")
-    # else:
-    #     stats["lot_template_ok"] = True
-    #     print(f"Lot template processed: {lot_data}")
+    print("\n=== Testing lot template function ===")
+    lot_file_path = (
+        Path(__file__).resolve().parent.parent.parent
+        / "samples"
+        / "excel"
+        / "Копия ТЗ Самсунг Артем перезакуп Хабаровский край 19.06.2026.xlsx"
+    )
+    lot_data = read_lot_excel(lot_file_path)
+    if "error" in lot_data:
+        stats["errors"].append(lot_data["error"])
+        print(f"Lot template error: {lot_data['error']}")
+    else:
+        stats["lot_template_ok"] = True
+        print(f"Lot template processed: {lot_data}")
 
     # === Testing end-to-end process_attachments pipeline ===
     print("\n=== Testing end-to-end process_attachments pipeline ===")

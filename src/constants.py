@@ -119,7 +119,7 @@ EXCEL_TO_RFQ_MAPPING = {
     # Access & Participants
     "Прямой доступ": "participant_access_type",
     "Пригласить поставщиков": "supplier_group_ids",
-    "Полный доступ": "user_access_ids",
+    "Полный доступ": "user_access",
     "Отправлять ссылку-приглашение по email": "is_invite_link_enabled",
     "Контактное лицо": "contact_ids",
     # Transport & Lots
@@ -172,12 +172,18 @@ EXCEL_TO_RFQ_VALUES_MAPPING = {
         "Тимофеева Анастасия": [118],
         "Тимофеева Анастасия Николаевна": [118],
     },
-    "user_access_ids": {
-        "Тимофеева Анастасия Николаевна": [108014],
-        "Слепян Анна Дмитриевна": [100511],
-        "Цуриков Константин Эдуардович": [108453],
-        "Набока Михаил Викторович": [114835],
-    },  # создатель с "полный доступ", остальные с "только чтение"
+    # "user_access_ids": {
+    #     "Тимофеева Анастасия Николаевна": [108014],
+    #     "Слепян Анна Дмитриевна": [100511],
+    #     "Цуриков Константин Эдуардович": [108453],
+    #     "Набока Михаил Викторович": [114835],
+    # },  # obsolete: создатель с "полный доступ", остальные с "только чтение"
+    "user_access": {
+        "Тимофеева Анастасия Николаевна": [{"user_id": 108014, "access_type": 2}],
+        "Слепян Анна Дмитриевна": [{"user_id": 100511, "access_type": 2}],
+        "Цуриков Константин Эдуардович": [{"user_id": 108453, "access_type": 2}],
+        "Набока Михаил Викторович": [{"user_id": 114835, "access_type": 2}],
+    },
     # Поставщики -> PUT /rfq/{id} - "access_type": "groups" + "supplier_group_ids": [29, 36]
     "supplier_group_ids": {
         "Авто FTL СНГ": [29],
@@ -195,7 +201,7 @@ EXCEL_TO_RFQ_VALUES_MAPPING = {
         "светофор по целевому тарифу": 1,
         "светофору по рейтингу": 0,
     },  # 0 = по рейтингу, 1 = по цене
-    # актуально при traffic_light_type=1
+    # при traffic_light_type=1: price_green_finish_percent, price_yellow_finish_percent
     # при traffic_light_type=0: rating_green_finish_value, rating_yellow_finish_value
     "traffic_light_price_type": {
         "Целевая цена": 2,  # <-- needed
@@ -228,4 +234,5 @@ RFQ_TO_DEFAULTS_MAPPING = {
     "lot_template_id": RFQ_DEFAULT_LOT_TEMPLATE_ID,  # ID шаблона, пересоздается
     "access_type": "groups",  # отваливается с таймаутом соединения
     "freight_spend_currency_id": 1,  # выставляется в паре с freight_spend_of_event
+    # "is_for_all": False,  # тендер создаётся как черновик без приглашённых поставщиков
 }
