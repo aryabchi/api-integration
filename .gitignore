@@ -220,6 +220,7 @@ __marimo__/
 # docs stuff
 docs/*
 !docs/*.yaml
+!docs/business_workflow.png
 
 # downloads
 downloads/*

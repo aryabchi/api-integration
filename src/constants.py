@@ -89,7 +89,7 @@ PARTIAL_SUCCESS_REPLY_TEMPLATE = (
 
 # Flag to skip VERY SLOW put_rfq_supplier_group_ids PUT call
 # True - skip, False - execute
-IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
+IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
 
 # Flag to do/skip RFQ search (by title) before creation attempt
 # True for production, False for testing
