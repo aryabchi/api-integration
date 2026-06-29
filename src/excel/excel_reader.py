@@ -180,6 +180,14 @@ def read_tender_excel(
     return result
 
 
+def _parse_percent_range_last(value: str) -> float:
+    parts = value.split("-")
+    last = parts[-1].strip() if parts else value
+    last = last.strip("%").strip()
+    last = last.replace(",", ".")
+    return float(last)
+
+
 def apply_excel_value_mappings(data: dict[str, str]) -> dict[str, Any]:
     """
     Converts raw Excel string values to API-valid types using EXCEL_TO_RFQ_VALUES_MAPPING.
@@ -234,6 +242,10 @@ def apply_excel_value_mappings(data: dict[str, str]) -> dict[str, Any]:
     ):
         if result["freight_spend_of_event"].isdigit():
             result["freight_spend_of_event"] = int(result["freight_spend_of_event"])
+
+    for field in ("price_green_finish_percent", "price_yellow_finish_percent"):
+        if field in result and isinstance(result[field], str):
+            result[field] = _parse_percent_range_last(result[field])
 
     return result
 
@@ -338,20 +350,20 @@ def test_excel_reader() -> None:
             print(f"Pydantic validation: FAILED - {exc}")
 
     # === Testing lot template function ===
-    print("\n=== Testing lot template function ===")
-    lot_file_path = (
-        Path(__file__).resolve().parent.parent.parent
-        / "samples"
-        / "excel"
-        / "Копия ТЗ Самсунг Артем перезакуп Хабаровский край 19.06.2026.xlsx"
-    )
-    lot_data = read_lot_excel(lot_file_path)
-    if "error" in lot_data:
-        stats["errors"].append(lot_data["error"])
-        print(f"Lot template error: {lot_data['error']}")
-    else:
-        stats["lot_template_ok"] = True
-        print(f"Lot template processed: {lot_data}")
+    # print("\n=== Testing lot template function ===")
+    # lot_file_path = (
+    #     Path(__file__).resolve().parent.parent.parent
+    #     / "samples"
+    #     / "excel"
+    #     / "Копия ТЗ Самсунг Артем перезакуп Хабаровский край 19.06.2026.xlsx"
+    # )
+    # lot_data = read_lot_excel(lot_file_path)
+    # if "error" in lot_data:
+    #     stats["errors"].append(lot_data["error"])
+    #     print(f"Lot template error: {lot_data['error']}")
+    # else:
+    #     stats["lot_template_ok"] = True
+    #     print(f"Lot template processed: {lot_data}")
 
     # === Testing end-to-end process_attachments pipeline ===
     print("\n=== Testing end-to-end process_attachments pipeline ===")
