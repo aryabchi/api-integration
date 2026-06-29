@@ -145,7 +145,7 @@ EXCEL_TO_RFQ_MAPPING = {
 RFQ_DEFAULT_ORGANIZER_USER_ID: int = 108014
 
 # Default lot_template_id:
-RFQ_DEFAULT_LOT_TEMPLATE_ID: int = 12993
+RFQ_DEFAULT_LOT_TEMPLATE_ID: int = None  # 12993
 
 
 # Mappings of excel RFQ template values "Значение по умолчанию"/"Значение" to 7rights API IDs

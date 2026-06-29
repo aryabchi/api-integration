@@ -37,7 +37,7 @@ SUBFOLDER = PASS_TEST_MESSAGE_ID_FOR_REPLY
 # dry_run=True skips actual execution (safe mode, no side effects)
 DRY_RUN = False
 # test_run=True forces execution (use with caution, may overwrite data)
-TEST_RUN = True
+TEST_RUN = False
 
 # In constants.py
 # set IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS to skip adding suppliers (slow PUT)

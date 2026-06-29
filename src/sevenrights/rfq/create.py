@@ -126,7 +126,7 @@ def create_rfqs(
         print("  -> Creaitng RFQ...")
         result = post_rfq(data=payload.rfq_template, timeout=timeout)
 
-        # If RFQ created successfully and we have supplier data, call PUT
+        # If RFQ created successfully and we have supplier data, add them
         if result.get("error") is None and payload.rfq_suppliers is not None:
             print("  -> Adding supplier groups to RFQ...")
             put_result = put_rfq_supplier_group_ids(
