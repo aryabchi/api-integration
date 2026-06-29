@@ -120,6 +120,14 @@ flowchart TD
     AF --> AG
 ```
 
+
+## Среда исполнения
+* Python >= 3.11.9
+* virtual env of your choice
+* pip install --upgrade pip 
+* pip install -r requirements.txt
+
+
 ## Настройки скрипта
 
 Для пользователя
@@ -128,13 +136,6 @@ flowchart TD
 
 Для программиста также
 * `/src/constants.py` - константы, пути, шаблоны, etc.
-
-
-## Среда исполнения
-* Python 3.11.9
-* pip install --upgrade pip 
-* pip install -r requirements.txt
-
 
 ## Как запустить скрипт
 
