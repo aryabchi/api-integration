@@ -11,6 +11,8 @@ from config import get_settings
 
 
 def search_rfq(title: str, timeout: int = 30) -> dict:
+    """Searches for existing RFQs by title (API restriction).
+    TODO: Very rude. Needs improvement"""
     settings = get_settings()
 
     url = f"{settings.SEVEN_RIGHTS_API_URL.rstrip('/')}/rfq"

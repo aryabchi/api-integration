@@ -91,6 +91,10 @@ PARTIAL_SUCCESS_REPLY_TEMPLATE = (
 # True - skip, False - execute
 IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
 
+# Flag to do/skip RFQ search (by title) before creation attempt
+# True for production, False for testing
+IS_SEARCH_EXISTING_RFQ_BEFORE_POST = False
+
 # TODO: rm after testing
 # Minimal required RFQ info for create
 TEST_RFQ_CREATE_BOILERPLATE = {

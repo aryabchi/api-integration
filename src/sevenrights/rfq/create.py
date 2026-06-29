@@ -9,10 +9,12 @@ if src_path not in sys.path:
 
 from constants import (
     DOWNLOADS_DIR,
+    IS_SEARCH_EXISTING_RFQ_BEFORE_POST,
     RFQ_EXCEL_MARKER,
     RFQ_INFO_MARKER,
 )
 from sevenrights.api.post_rfq import post_rfq
+from sevenrights.api.search_rfq import search_rfq
 from sevenrights.rfq.split_rfq_payload import split_rfq_payload
 from sevenrights.api.put_rfq_supplier_group_ids import put_rfq_supplier_group_ids
 
@@ -97,6 +99,30 @@ def create_rfqs(
         payload = split_rfq_payload(rfq_data)
         # TODO: use payload.lot_template for lot-related operations
 
+        # Prevent duplicate RFQ creation: search by title before posting (guarded)
+        # If a matching RFQ exists, skip creation and record its id in the error result
+        if IS_SEARCH_EXISTING_RFQ_BEFORE_POST:
+            search_title = (payload.rfq_template or {}).get("title")
+            if search_title:
+                search_result = search_rfq(search_title, timeout=timeout)
+                if (
+                    search_result.get("error") is None
+                    and search_result.get("rfq_id") is not None
+                ):
+                    existing_id = search_result["rfq_id"]
+                    result = {
+                        "error": f"RFQ '{search_title}' already exists with id={existing_id}",
+                        "rfq_id": None,
+                    }
+                    with open(info_marker_path, "w", encoding="utf-8") as f:
+                        json.dump(result, f, ensure_ascii=False, indent=2)
+                    print(
+                        f"  ✗ duplicate RFQ '{search_title}' (existing id {existing_id}) for {os.path.basename(folder_path)}"
+                    )
+                    skipped += 1
+                    continue
+
+        # No duplicates found by title, can create RFQ
         result = post_rfq(data=payload.rfq_template, timeout=timeout)
 
         # If RFQ created successfully and we have supplier data, call PUT
