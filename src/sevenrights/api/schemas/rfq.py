@@ -49,8 +49,10 @@ class RfqCreateRequest(BaseModel):
     traffic_light_type: Literal[0, 1] | None = None
     traffic_light_price_type: Literal[0, 1, 2] | None = None
     show_best_price: bool | None = False
-    price_green_finish_percent: int | None = Field(default=None, ge=0, le=100)
-    price_yellow_finish_percent: int | None = Field(default=None, ge=0, le=100)
+    price_green_finish_percent: float | None = Field(default=None, ge=0, le=100)
+    price_yellow_finish_percent: float | None = Field(default=None, ge=0, le=100)
+    rating_green_finish_value: float | None = Field(default=None, ge=0, le=100)
+    rating_yellow_finish_value: float | None = Field(default=None, ge=0, le=100)
 
     prolongacia: bool = False
     max_date_prolongacia: datetime | None = None
@@ -77,6 +79,10 @@ class RfqCreateRequest(BaseModel):
 
     is_ban_on_price_increases_on_this_tour: bool | None = True
     is_invite_link_enabled: bool | None = True
+    is_for_all: bool | None = Field(
+        default=None,
+        description="Тендер создаётся как черновик без приглашённых поставщиков",
+    )
 
 
 class RfqUpdateSupplierGroupIdsRequest(BaseModel):

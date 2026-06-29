@@ -89,7 +89,7 @@ PARTIAL_SUCCESS_REPLY_TEMPLATE = (
 
 # Flag to skip VERY SLOW put_rfq_supplier_group_ids PUT call
 # True - skip, False - execute
-IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
+IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
 
 # Flag to do/skip RFQ search (by title) before creation attempt
 # True for production, False for testing
@@ -204,7 +204,7 @@ EXCEL_TO_RFQ_VALUES_MAPPING = {
     # при traffic_light_type=1: price_green_finish_percent, price_yellow_finish_percent
     # при traffic_light_type=0: rating_green_finish_value, rating_yellow_finish_value
     "traffic_light_price_type": {
-        "Целевая цена": 2,  # <-- needed
+        "Целевая цена": 2,
         "Базовая цена": 1,
         "Лучшая цена": 0,
     },

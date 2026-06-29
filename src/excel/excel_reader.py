@@ -180,12 +180,12 @@ def read_tender_excel(
     return result
 
 
-def _parse_percent_range_last(value: str) -> int:
+def _parse_percent_range_last(value: str) -> float:
     parts = value.split("-")
     last = parts[-1].strip() if parts else value
     last = last.strip("%").strip()
     last = last.replace(",", ".")
-    return int(last)
+    return float(last)
 
 
 def apply_excel_value_mappings(data: dict[str, str]) -> dict[str, Any]:
@@ -243,7 +243,12 @@ def apply_excel_value_mappings(data: dict[str, str]) -> dict[str, Any]:
         if result["freight_spend_of_event"].isdigit():
             result["freight_spend_of_event"] = int(result["freight_spend_of_event"])
 
-    for field in ("price_green_finish_percent", "price_yellow_finish_percent"):
+    for field in (
+        "price_green_finish_percent",
+        "price_yellow_finish_percent",
+        "rating_green_finish_value",
+        "rating_yellow_finish_value",
+    ):
         if field in result and isinstance(result[field], str):
             result[field] = _parse_percent_range_last(result[field])
 

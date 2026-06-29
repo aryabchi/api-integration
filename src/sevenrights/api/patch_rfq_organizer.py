@@ -1,3 +1,75 @@
+"""Not currently used
+
+Смена организатора
+
+Эндпоинт:
+
+Смена организатора
+
+Эндпоинт:
+
+PATCH /api/v1/rfq/{id}/organizer
+
+Authorization: Bearer {token}
+
+Content-Type: application/json
+
+Тело:
+
+{
+
+"user_id": 100407
+
+}
+
+user_id — активный пользователь вашей команды (справочник: GET /api/v1/rfq/team-users).
+
+Ответ:
+
+{
+
+"id": 9798,
+
+"creator_user": { "id": 100407, "name": "..." },
+
+"organizer_name": "...",
+
+"message": "Организатор успешно изменён"
+
+}
+
+PATCH /api/v1/rfq/{id}/organizer
+
+Authorization: Bearer {token}
+
+Content-Type: application/json
+
+Тело:
+
+{
+
+"user_id": 100407
+
+}
+
+user_id — активный пользователь вашей команды (справочник: GET /api/v1/rfq/team-users).
+
+Ответ:
+
+{
+
+"id": 9798,
+
+"creator_user": { "id": 100407, "name": "..." },
+
+"organizer_name": "...",
+
+"message": "Организатор успешно изменён"
+
+}
+
+"""
+
 import sys
 import time
 from pathlib import Path
