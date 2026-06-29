@@ -88,6 +88,7 @@ def post_rfq(data: dict = None, timeout: int = 30) -> dict:
 
 
 if __name__ == "__main__":
+
     start_time = time.perf_counter()
     result = post_rfq(
         timeout=30,
@@ -103,11 +104,16 @@ if __name__ == "__main__":
                 118
             ],  # Тимофеева Анастасия невозможно установить контакты ни в contacts[], ни в contact_ids[]; контакт != пользователь; нет enpoint получения контактов
             "lot_template_id": 12993,  # каждый раз создается новый id
-            "user_access_ids": [
-                108014,
-                100511,
-                108453,
-            ],  # создатель с "полный доступ", остальные с "только чтение"
+            # "user_access_ids": [
+            #     108014,
+            #     100511,
+            #     108453,
+            # ],  # создатель с "полный доступ", остальные с "только чтение"
+            "user_access": [
+                {"user_id": 108014, "access_type": 2},
+                {"user_id": 100511, "access_type": 2},
+                {"user_id": 108453, "access_type": 2},
+            ],
             # Поставщики PUT /rfq/{id} - "access_type": "groups" + "supplier_group_ids": [29, 36]
             # "access_type": "groups",  # отваливается с таймаутом соединения => потерян rfq_id
             # "supplier_group_ids": [29, 36],  # Авто FTL СНГ; Авто FTL РФ
@@ -125,6 +131,9 @@ if __name__ == "__main__":
             # Повышение цен поставщиками в текущем туре
             "is_ban_on_price_increases_on_this_tour": True,  # Повышение цен поставщиками в текущем туре = Запрещено (false), Разрешено (true)
             # неясно какой параметр отвечает - Лучшая цена - отключено/включено??? Default - отключено
+            "traffic_light_price_type": 2,
+            "price_green_finish_percent": 93,
+            "price_yellow_finish_percent": 85,
         },
     )
     end_time = time.perf_counter()

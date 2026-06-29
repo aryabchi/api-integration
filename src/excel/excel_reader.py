@@ -180,12 +180,12 @@ def read_tender_excel(
     return result
 
 
-def _parse_percent_range_last(value: str) -> float:
+def _parse_percent_range_last(value: str) -> int:
     parts = value.split("-")
     last = parts[-1].strip() if parts else value
     last = last.strip("%").strip()
     last = last.replace(",", ".")
-    return float(last)
+    return int(last)
 
 
 def apply_excel_value_mappings(data: dict[str, str]) -> dict[str, Any]:

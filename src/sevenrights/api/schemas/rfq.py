@@ -4,7 +4,16 @@ from typing import List, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 
+class UserAccessItem(BaseModel):
+    """Validation model for user_access RFQ property"""
+
+    user_id: int = Field(..., description="The unique identifier for the user")
+    access_type: int = Field(..., description="The type level of access granted")
+
+
 class RfqCreateRequest(BaseModel):
+    """Validation model for RFQ"""
+
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
@@ -40,8 +49,8 @@ class RfqCreateRequest(BaseModel):
     traffic_light_type: Literal[0, 1] | None = None
     traffic_light_price_type: Literal[0, 1, 2] | None = None
     show_best_price: bool | None = False
-    price_green_finish_percent: float | None = Field(default=None, ge=0.0, le=100.0)
-    price_yellow_finish_percent: float | None = Field(default=None, ge=0.0, le=100.0)
+    price_green_finish_percent: int | None = Field(default=None, ge=0, le=100)
+    price_yellow_finish_percent: int | None = Field(default=None, ge=0, le=100)
 
     prolongacia: bool = False
     max_date_prolongacia: datetime | None = None
@@ -60,10 +69,11 @@ class RfqCreateRequest(BaseModel):
 
     contact_ids: List[int] = Field(default_factory=list)
 
-    user_access_ids: List[int] = Field(
-        default_factory=list,
-        description="Users allowed to edit the RFQ",
-    )
+    # user_access_ids: List[int] = Field(
+    #     default_factory=list,
+    #     description="Users allowed to edit the RFQ",
+    # ) # obsolete, replace with user_access
+    user_access: list[UserAccessItem]
 
     is_ban_on_price_increases_on_this_tour: bool | None = True
     is_invite_link_enabled: bool | None = True
