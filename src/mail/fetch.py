@@ -189,7 +189,7 @@ def fetch_mail(
                     print(f"    -> Saved attachment: {os.path.basename(filepath)}")
                     attachments_saved += 1
 
-        print(f"\nDone! Total attachments saved: {attachments_saved}")
+        print(f"\nTotal attachments saved: {attachments_saved}")
         print(f"Total emails skipped (already processed): {emails_skipped}")
 
     except imaplib.IMAP4.error as e:

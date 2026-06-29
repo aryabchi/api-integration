@@ -56,6 +56,6 @@ def process_attachments_wrapper(
 
         processed += 1
 
-    print(f"\nTotal processed: {processed}")
-    print(f"Total skipped: {skipped}")
+    print(f"\nTotal emails processed: {processed}")
+    print(f"Total emails skipped: {skipped}")
     return processed
