@@ -81,8 +81,9 @@ if __name__ == "__main__":
     print(f"Request took {total_time:.6f} seconds to run")
 
     start_time = time.perf_counter()
-    print("\nExample: searching another rfq...")
-    res2 = search_rfq("test non existing rfq title 123")
+    query = "test non existing rfq title 123"
+    print(f"\nSearching for: {query}")
+    res2 = search_rfq(query)
     end_time = time.perf_counter()
     total_time = end_time - start_time
     print(res2)
