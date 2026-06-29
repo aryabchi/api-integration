@@ -127,12 +127,12 @@ EXCEL_TO_RFQ_MAPPING = {
     "Объем запроса предложений": "freight_spend_of_event",
     # Visibility & Traffic Light Settings
     "Показывать лучшую цену": "show_best_price",
-    # "Лучшая цена": "zzz", # ??? Default = отключено
+    # "Лучшая цена": "zzz", # комбинация {type_view = 1, show_best_price (true/false)}
     "Светофор на основе": "traffic_light_type",
-    # "Показывать светофор на основе цены": "xxx", # ???
-    # "Зеленый сигнал светофора от": "", # ???
-    # "Желтый сигнал светофора от": "", # ???
-    # "Красный сигнал светофора от": "", # ???
+    "Показывать светофор на основе цены": "traffic_light_price_type",
+    "Зеленый сигнал светофора от": "price_green_finish_percent",  # lower bound only
+    "Желтый сигнал светофора от": "price_yellow_finish_percent",  # lower bound only
+    # "Красный сигнал светофора от": "", # unused
     # Prolongation & Rules
     "Автоматическая пролонгация": "prolongacia",
     # "Время пролонгации": "max_date_prolongacia", # skip
@@ -195,12 +195,13 @@ EXCEL_TO_RFQ_VALUES_MAPPING = {
         "светофор по целевому тарифу": 1,
         "светофору по рейтингу": 0,
     },  # 0 = по рейтингу, 1 = по цене
-    # нельзя настроить переключатель светофор на основе цены - лучшая, базовая, целевая (НЕТ ответа от 7Rights)
-    # "xxx": {
-    #     "Целевая цена": "x", # <-- needed
-    #     "Базовая цена": "y",
-    #     "Лучшая цена": "z",
-    # },
+    # актуально при traffic_light_type=1
+    # при traffic_light_type=0: rating_green_finish_value, rating_yellow_finish_value
+    "traffic_light_price_type": {
+        "Целевая цена": 2,  # <-- needed
+        "Базовая цена": 1,
+        "Лучшая цена": 0,
+    },
     "show_best_price": {
         "Не показывать лучшую цену": False,
         "Отобразить лучшую цену": True,

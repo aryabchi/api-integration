@@ -38,7 +38,10 @@ class RfqCreateRequest(BaseModel):
     # обратная связь
     type_view: Literal[0, 1, 2, 3] | None = None
     traffic_light_type: Literal[0, 1] | None = None
+    traffic_light_price_type: Literal[0, 1, 2] | None = None
     show_best_price: bool | None = False
+    price_green_finish_percent: float | None = Field(default=None, ge=0.0, le=100.0)
+    price_yellow_finish_percent: float | None = Field(default=None, ge=0.0, le=100.0)
 
     prolongacia: bool = False
     max_date_prolongacia: datetime | None = None
