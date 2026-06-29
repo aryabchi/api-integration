@@ -127,7 +127,7 @@ EXCEL_TO_RFQ_MAPPING = {
     "Объем запроса предложений": "freight_spend_of_event",
     # Visibility & Traffic Light Settings
     "Показывать лучшую цену": "show_best_price",
-    # "Лучшая цена": "zzz", # комбинация {type_view = 1, show_best_price (true/false)}
+    # "Лучшая цена": "zzz", # skip комбинация {type_view = 1, show_best_price (true/false)}
     "Светофор на основе": "traffic_light_type",
     "Показывать светофор на основе цены": "traffic_light_price_type",
     "Зеленый сигнал светофора от": "price_green_finish_percent",  # lower bound only
@@ -216,7 +216,7 @@ EXCEL_TO_RFQ_VALUES_MAPPING = {
         "Запрещено": True,
         "Запрещено понижать": False,
     },  # Повышение цен поставщиками в текущем туре - Запрещено = true, Разрешено = false
-    # неясно какой параметр отвечает - Лучшая цена - отключено/включено???
+    # неясно какой параметр отвечает - вероятно type_view = 1 + show_best_price
     # "zzz": {
     #     "Включено": "x",
     #     "Отключено": "y",
