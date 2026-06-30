@@ -2,7 +2,7 @@ import os
 import json
 
 from constants import DOWNLOADS_DIR, RFQ_EXCEL_MARKER
-from excel.excel_reader import process_attachments
+from excel.excel_pipeline import process_attachments
 
 
 def process_attachments_wrapper(
