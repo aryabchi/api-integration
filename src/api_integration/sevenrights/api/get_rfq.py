@@ -136,11 +136,11 @@ if __name__ == "__main__":
     # Example usage:
     # Python
     #
-    # python ./src/sevenrights/api/get_rfq.py --base-url https://lk.7rights.ru/ --rfq-id 9785 --token "xxx"
+    # python ./src/sevenrights/api/get_rfq.py --base-url https://lk.7rights.ru/ --rfq-id 0000 --token "xxx"
     #
     # Curl
     #
-    # curl "https://lk.7rights.ru/api/v1/rfq/9785" -H "Authorization: Bearer ххх" -H "Accept: application/json"
+    # curl "https://lk.7rights.ru/api/v1/rfq/0000" -H "Authorization: Bearer ххх" -H "Accept: application/json"
 
     import argparse
 
