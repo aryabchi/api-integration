@@ -136,7 +136,7 @@ if __name__ == "__main__":
     settings = get_settings()
     get_rfq_lot(
         base_url=settings.SEVEN_RIGHTS_API_URL,
-        rfq_id=9876,
+        rfq_id=9883,
         bearer_token=settings.SEVEN_RIGHTS_API_KEY,
         company_id=None,
         is_actual=1,
