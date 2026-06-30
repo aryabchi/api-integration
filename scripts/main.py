@@ -1,3 +1,5 @@
+""" "End-to-end processing pipeline"""
+
 import sys
 from pathlib import Path
 

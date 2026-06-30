@@ -188,7 +188,7 @@ def _parse_percent_range_last(value: str) -> float:
     return float(last)
 
 
-def apply_excel_value_mappings(data: dict[str, str]) -> dict[str, Any]:
+def apply_excel_value_mappings(data: dict[str, str], sep: str = ";") -> dict[str, Any]:
     """
     Converts raw Excel string values to API-valid types using EXCEL_TO_RFQ_VALUES_MAPPING.
 
@@ -202,6 +202,7 @@ def apply_excel_value_mappings(data: dict[str, str]) -> dict[str, Any]:
 
     Args:
         data: Dictionary with RFQ property names and raw Excel string values.
+        sep: multi-valued Excel string values separator
 
     Returns:
         Dictionary with converted values, or {'error': ...} if input contains an error.
@@ -220,7 +221,7 @@ def apply_excel_value_mappings(data: dict[str, str]) -> dict[str, Any]:
             result[key] = mapping[value]
             continue
 
-        parts = [part.strip() for part in value.split(";")]
+        parts = [part.strip() for part in value.split(sep)]
         mapped_parts: list[Any] = []
         for part in parts:
             if part in mapping:
