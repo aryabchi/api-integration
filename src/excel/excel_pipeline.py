@@ -56,6 +56,8 @@ def find_attachment_templates(
     for path in sorted(base.iterdir()):
         if not path.is_file():
             continue
+        if path.name.startswith("~$"):
+            continue
         if path.suffix.lower().lstrip(".") not in normalized_exts:
             continue
         name = path.name.lower()
