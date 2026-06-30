@@ -35,6 +35,7 @@ FAIL_TEST_MESSAGE_ID_FOR_REPLY = (
 # - In conjunction with subfolder argument
 
 # Target message ID or subfolder name for processing specific email thread
+# None runs pipeline for all emails
 SUBFOLDER = PASS_TEST_MESSAGE_ID_FOR_REPLY
 # dry_run=True skips actual execution (safe mode, no side effects)
 DRY_RUN = False
