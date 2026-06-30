@@ -1,19 +1,11 @@
-""" "End-to-end processing pipeline"""
+"""End-to-end processing pipeline"""
 
-import sys
-from pathlib import Path
-
-# Path to the 'src' directory relative to this script
-src_path = str(Path(__file__).resolve().parent.parent / "src")
-if src_path not in sys.path:
-    sys.path.insert(0, src_path)
-
-from config import get_settings
-from mail.fetch import fetch_mail
-from mail.compose import generate_replies
-from mail.send import send_replies
-from sevenrights.rfq.create import create_rfqs
-from excel.convert import process_attachments_wrapper
+from api_integration.config import get_settings
+from api_integration.mail.fetch import fetch_mail
+from api_integration.mail.compose import generate_replies
+from api_integration.mail.send import send_replies
+from api_integration.sevenrights.rfq.create import create_rfqs
+from api_integration.excel.convert import process_attachments_wrapper
 
 # ============ Example subfolders for testing ============
 # Use only ONE of these per run - select the appropriate test message ID

@@ -121,24 +121,81 @@ flowchart TD
 ```
 
 
-## Среда исполнения
-* Python >= 3.11.9
-* virtual env of your choice
-* pip install --upgrade pip 
-* pip install -r requirements.txt
+## Настройка среды исполнения
+
+### 1. Клонирование репозитория
+
+```bash
+git clone <repository-url>
+cd api-integration
+```
+
+### 2. Создание виртуального окружения
+
+**Windows:**
+```bash
+python -m venv venv
+.\venv\Scripts\activate
+```
+
+**Linux/Mac:**
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
+### 3. Установка зависимостей
+
+```bash
+pip install --upgrade pip
+pip install -e .
+```
+
+### 4. Настройка конфигурации
+
+Скопируйте файл с примером конфигурации и заполните его:
+
+```bash
+cp .env.example .env
+```
+
+Отредактируйте `.env` файл, указав:
+- `MAILBOX_NAME` - имя почтового ящика
+- `MAILBOX_APP_PASSWORD` - пароль приложения для почты
+- `IMAP_SERVER` / `IMAP_PORT` - параметры IMAP
+- `SMTP_SERVER` / `SMTP_PORT` - параметры SMTP
+- `SEVEN_RIGHTS_API_BASE_URL` / `SEVEN_RIGHTS_API_VERSION` / `SEVEN_RIGHTS_API_KEY` - параметры API 7Rights
+
+Создайте файл с доверенными адресатами:
+
+```bash
+# Создайте config/trusted_recipients.json
+# с списком доверенных email адресов
+```
+
+### 5. Проверка установки
+
+```bash
+python -c "import api_integration; print('OK')"
+```
+
+### 6. Запуск скрипта
+
+```bash
+python ./scripts/main.py
+```
+
+**Опциональные параметры запуска:**
+- `subfolder` - ID конкретного письма для обработки
+- `dry_run=True` - тестовый режим без записи/отправки
+- `test_run=True` - принудительная обработка (игнорирует флаги)
 
 
-## Настройки скрипта
+## Где смотреть настройки скрипта
 
 Для пользователя
 * `.env` - локальный файл с секретами для переменных окружения (необходимо **создать** в корне и заполнить ключи значениями по шаблону `.env.example`)
 * `/config/trusted_recipients.json` - доверенные адресаты 
 
-Для программиста также (назначение объяснено в комментарии к каждой переменной)
-* `/src/constants.py` - константы, пути, шаблоны, etc.
-
-## Как запустить скрипт
-
-```
-python ./scripts/main.py
-```
+Для программиста также 
+* `/src/constants.py` - константы, пути, шаблоны, etc. (назначение объяснено в комментарии к каждой переменной)

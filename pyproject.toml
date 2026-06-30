@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "api_integration"
+version = "0.1.0"
+description = "API integration for 7rights RFQ automation"
+authors = [
+    {name = "Anton Ryabchikov", email = "ryabchikovap@bsc.sibur.ru"},
+]
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic==2.11.10",
+    "pydantic-settings==2.10.1",
+    "requests==2.33.0",
+    "openpyxl==3.1.5",
+]
+
+[project.optional-dependencies]
+dev = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
