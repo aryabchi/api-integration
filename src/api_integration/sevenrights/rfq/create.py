@@ -8,12 +8,9 @@ from api_integration.constants import (
     RFQ_EXCEL_MARKER,
     RFQ_INFO_MARKER,
 )
-from api_integration.sevenrights.api.post_rfq import post_rfq
 from api_integration.sevenrights.api.search_rfq import search_rfq
-from api_integration.sevenrights.rfq.split_rfq_payload import split_rfq_payload
-from api_integration.sevenrights.api.put_rfq_supplier_group_ids import (
-    put_rfq_supplier_group_ids,
-)
+from api_integration.sevenrights.rfq.utils import split_rfq_payload
+from api_integration.sevenrights.rfq.create_rfq_pipeline import create_rfq
 
 
 def create_rfqs(
@@ -94,7 +91,6 @@ def create_rfqs(
             continue
 
         payload = split_rfq_payload(rfq_data)
-        # TODO: use payload.lot_template for lot-related operations
 
         # Prevent duplicate RFQ creation: search by title before posting (guarded)
         # If a matching RFQ exists, skip creation and record its id in the error result
@@ -119,20 +115,7 @@ def create_rfqs(
                     skipped += 1
                     continue
 
-        # No duplicates found by title, can create RFQ
-        print("  -> Creaitng RFQ...")
-        result = post_rfq(data=payload.rfq_template, timeout=timeout)
-
-        # If RFQ created successfully and we have supplier data, add them
-        if result.get("error") is None and payload.rfq_suppliers is not None:
-            print("  -> Adding supplier groups to RFQ...")
-            put_result = put_rfq_supplier_group_ids(
-                rfq_id=result["rfq_id"],
-                data=payload.rfq_suppliers,
-                timeout=timeout,
-            )
-            if put_result.get("error") is not None:
-                result = put_result
+        result = create_rfq(rfq_data, timeout=timeout)
 
         with open(info_marker_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
