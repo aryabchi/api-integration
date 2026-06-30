@@ -6,7 +6,7 @@ import traceback
 from email.header import decode_header
 from email.utils import parseaddr
 from api_integration.mail.sanitizers import sanitize_filename
-from api_integration.mail.trusted import is_trusted_email
+from api_integration.mail.utils import is_trusted_email
 
 from api_integration.constants import (
     DOWNLOADS_DIR,
