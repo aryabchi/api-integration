@@ -89,13 +89,13 @@ PARTIAL_SUCCESS_REPLY_TEMPLATE = (
 
 # Flag to skip adding put_rfq_supplier_group_ids (PUT call was too slow in the past)
 # True - skip, False - execute
-IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
+IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
 
 # Flag to do/skip RFQ search (by title) before creation attempt
 # True for production, False for testing
 IS_SEARCH_EXISTING_RFQ_BEFORE_POST = False
 
-# TODO: rm after testing
+# TODO: rm after testing, USED somewhere
 # Minimal required RFQ info for create
 TEST_RFQ_CREATE_BOILERPLATE = {
     "title": "Тестовая закупка транспортных услуг",
@@ -142,10 +142,11 @@ EXCEL_TO_RFQ_MAPPING = {
 
 
 # Default organizer user_access_ids
+# TODO: rm UNUSED
 RFQ_DEFAULT_ORGANIZER_USER_ID: int = 108014
 
 # Default lot_template_id:
-RFQ_DEFAULT_LOT_TEMPLATE_ID: int = None  # 12993
+RFQ_DEFAULT_LOT_TEMPLATE_ID: int = 12993
 
 
 # Mappings of excel RFQ template values "Значение по умолчанию"/"Значение" to 7rights API IDs
