@@ -64,6 +64,9 @@ def read_tender_excel(
 
 
 def _parse_percent_range_last(value: str) -> float:
+    """
+    Extract the last numeric value from a percent range string and parse it to float.
+    """
     parts = value.split("-")
     last = parts[-1].strip() if parts else value
     last = last.strip("%").strip()
