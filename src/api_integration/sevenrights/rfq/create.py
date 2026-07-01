@@ -57,7 +57,7 @@ def create_rfqs(
             rfq_data = json.load(f)
 
         # Check if RFQ_EXCEL_MARKER has non-empty error - pass downstream conditionally
-        # TODO: consider better ways of error propagation
+        # TODO: do not propagate this way, make mail.compose read RFQ_EXCEL_MARKER
         if rfq_data.get("error"):
             if (not test_run and not os.path.exists(info_marker_path)) or test_run:
                 with open(info_marker_path, "w", encoding="utf-8") as f:

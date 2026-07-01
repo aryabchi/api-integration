@@ -7,9 +7,20 @@ from api_integration.constants import (
     ERROR_REPLY_TEMPLATE,
     PARTIAL_SUCCESS_REPLY_TEMPLATE,
     RFQ_INFO_MARKER,
+    RFQ_EXCEL_MARKER,
     REPLY_BODY_MARKER,
 )
 from api_integration.mail.utils import get_rfq_draft_url
+
+
+def _extract_requirements(rfq_excel: dict = None) -> str:
+    """Extract 'requirements' from rfq_excel nested structure."""
+    if not rfq_excel or not isinstance(rfq_excel, dict):
+        return ""
+    rfq_template = rfq_excel.get("rfq_template")
+    if not rfq_template or not isinstance(rfq_template, dict):
+        return ""
+    return rfq_template.get("requirements", "")
 
 
 def _compose_reply_text(
@@ -17,6 +28,7 @@ def _compose_reply_text(
     body: str,
     body_excerpt_chars: int = 500,
     rfq_info: dict = None,
+    extra_on_success: str = "",
 ) -> str:
     subject = meta.get("subject", "") or ""
     subject_line = f' "{subject}" ' if subject else " "
@@ -38,6 +50,7 @@ def _compose_reply_text(
             body_excerpt=body[:body_excerpt_chars].strip() or "(empty body)",
             message=message,
             warning=warning,
+            extra_on_success=extra_on_success,
         )
     elif error_message:
         template = ERROR_REPLY_TEMPLATE
@@ -55,6 +68,7 @@ def _compose_reply_text(
         date=meta.get("date", "unknown date"),
         body_excerpt=body[:body_excerpt_chars].strip() or "(empty body)",
         message=message,
+        extra_on_success=extra_on_success if rfq_id else "",
     )
 
 
@@ -160,11 +174,18 @@ def generate_replies(
             with open(marker_path, "r", encoding="utf-8") as f:
                 rfq_info = json.load(f)
 
+        rfq_excel = None
+        rfq_excel_path = os.path.join(folder_path, RFQ_EXCEL_MARKER)
+        if os.path.exists(rfq_excel_path):
+            with open(rfq_excel_path, "r", encoding="utf-8") as f:
+                rfq_excel = json.load(f)
+
         reply_text = _compose_reply_text(
             meta=meta,
             body=body,
             body_excerpt_chars=body_excerpt_chars,
             rfq_info=rfq_info,
+            extra_on_success=_extract_requirements(rfq_excel),
         )
 
         with open(reply_path, "w", encoding="utf-8") as f:
@@ -194,7 +215,19 @@ def _test_compose_reply_text():
     assert "Мы автоматически создали RFQ:" in result1
     assert "Предупреждение:" in result1
     assert "PUT request failed" in result1
+    assert "Extra info" not in result1  # default extra_on_success is ""
     print("Case 1 (both error+rfq_id): PASSED")
+
+    # Case 5: extra_on_success from rfq_excel
+    result5 = _compose_reply_text(
+        meta=meta,
+        body=body,
+        rfq_info={"error": None, "rfq_id": 12345},
+        extra_on_success="Требования из Excel",
+    )
+    assert "Требования из Excel" in result5
+    assert "Мы автоматически создали RFQ:" in result5
+    print("Case 5 (extra_on_success): PASSED")
 
     # Case 2: Error only -> ERROR_REPLY_TEMPLATE
     result2 = _compose_reply_text(
@@ -214,6 +247,7 @@ def _test_compose_reply_text():
     )
     assert "Мы автоматически создали RFQ:" in result3
     assert "https://lk.7rights.ru/admin/newRfq/12345" in result3
+    assert "Extra info" not in result3  # default extra_on_success is ""
     print("Case 3 (rfq_id only): PASSED")
 
     # Case 4: Neither (None) -> ERROR_REPLY_TEMPLATE with generic message
@@ -224,6 +258,7 @@ def _test_compose_reply_text():
     )
     assert "Нам не удалось автоматически создать RFQ." in result4
     assert "(unable to generate rfq link or error message)" in result4
+    assert "Extra info" not in result4  # default extra_on_success is ""
     print("Case 4 (rfq_info=None): PASSED")
 
 

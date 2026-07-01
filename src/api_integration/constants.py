@@ -50,46 +50,48 @@ RFQ_DRAFT_URL = "https://lk.7rights.ru/admin/newRfq/{rfq_id}"
 
 # Reply email templates
 SUCCESS_REPLY_TEMPLATE = (
-    "Здравствуйте,\n"
-    "В ответ на Ваше письмо {subject_line} от {date}.\n\n"
-    "Мы автоматически создали RFQ: {message}. "
-    "\n\n"
-    "---- Original message ----\n{body_excerpt}\n"
-    "------------------------------------\n\n"
-    "С наилучшими пожеланиями,\n"
-    "Агент Коля\n"
+    "Здравствуйте,<br>"
+    "В ответ на Ваше письмо {subject_line} от {date}.<br><br>"
+    "Мы автоматически создали RFQ: {message}. <br><br>"
+    "{extra_on_success}"
+    "<br><br>"
+    "---- Original message ----<br>{body_excerpt}<br>"
+    "------------------------------------<br><br>"
+    "С наилучшими пожеланиями,<br>"
+    "Агент Коля<br>"
 )
 
 ERROR_REPLY_TEMPLATE = (
-    "Здравствуйте,\n"
-    "В ответ на Ваше письмо {subject_line} от {date}.\n\n"
-    "Нам не удалось автоматически создать RFQ.\n\n"
-    "Описание причины:\n"
+    "Здравствуйте,<br>"
+    "В ответ на Ваше письмо {subject_line} от {date}.<br><br>"
+    "Нам не удалось автоматически создать RFQ.<br><br>"
+    "Описание причины:<br>"
     "{message}"
-    "\n\n"
-    "---- Original message ----\n{body_excerpt}\n"
-    "------------------------------------\n\n"
-    "С наилучшими пожеланиями,\n"
-    "Агент Коля\n"
+    "<br><br>"
+    "---- Original message ----<br>{body_excerpt}<br>"
+    "------------------------------------<br><br>"
+    "С наилучшими пожеланиями,<br>"
+    "Агент Коля<br>"
 )
 
 PARTIAL_SUCCESS_REPLY_TEMPLATE = (
-    "Здравствуйте,\n"
-    "В ответ на Ваше письмо {subject_line} от {date}.\n\n"
-    "Мы автоматически создали RFQ: {message}. "
-    "\n\n"
-    "Предупреждение:\n"
+    "Здравствуйте,<br>"
+    "В ответ на Ваше письмо {subject_line} от {date}.<br><br>"
+    "Мы автоматически создали RFQ: {message}. <br><br>"
+    "{extra_on_success}"
+    "<br><br>"
+    "Предупреждение:<br>"
     "{warning}"
-    "\n\n"
-    "---- Original message ----\n{body_excerpt}\n"
-    "------------------------------------\n\n"
-    "С наилучшими пожеланиями,\n"
-    "Агент Коля\n"
+    "<br><br>"
+    "---- Original message ----<br>{body_excerpt}<br>"
+    "------------------------------------<br><br>"
+    "С наилучшими пожеланиями,<br>"
+    "Агент Коля<br>"
 )
 
 # Flag to skip adding put_rfq_supplier_group_ids (PUT call was too slow in the past)
 # True - skip, False - execute
-IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
+IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
 
 # Flag to do/skip RFQ search (by title) before creation attempt
 # True for production, False for testing

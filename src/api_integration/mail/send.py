@@ -17,6 +17,11 @@ def _extract_email_address(field: str) -> str:
     return m.group(1) if m else (field or "").strip()
 
 
+def _is_html(text: str) -> bool:
+    """Check if text contains HTML tags."""
+    return bool(re.search(r"<[a-z][a-z0-9]*\b[^>]*>", text, re.IGNORECASE))
+
+
 def send_replies(
     smtp_server: str,
     smtp_port: int,
@@ -102,7 +107,8 @@ def send_replies(
             msg["In-Reply-To"] = meta["message_id"]
             msg["References"] = meta["message_id"]
 
-        msg.attach(MIMEText(reply_text, "plain", "utf-8"))
+        subtype = "html" if _is_html(reply_text) else "plain"
+        msg.attach(MIMEText(reply_text, subtype, "utf-8"))
 
         if dry_run:
             print(
