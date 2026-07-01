@@ -74,6 +74,53 @@ def _parse_percent_range_last(value: str) -> float:
     return float(last)
 
 
+def _copy_price_rating_values(result: dict[str, Any]) -> None:
+    """
+    Ensure that all four traffic-light threshold fields are present in the result.
+    If only one pair (price fields or rating fields) has values, copy them to the
+    missing pair. Pre-existing values are never overwritten.
+
+    Args:
+        result: Dictionary with RFQ values, may contain some of the four fields.
+    """
+    price_green = result.get("price_green_finish_percent")
+    price_yellow = result.get("price_yellow_finish_percent")
+    rating_green = result.get("rating_green_finish_value")
+    rating_yellow = result.get("rating_yellow_finish_value")
+
+    has_price_values = price_green is not None or price_yellow is not None
+    has_rating_values = rating_green is not None or rating_yellow is not None
+
+    if has_price_values:
+        # Price fields have values, ensure both exist and copy to rating fields
+        if price_green is None:
+            price_green = 0.0
+        if price_yellow is None:
+            price_yellow = 0.0
+
+        result["price_green_finish_percent"] = price_green
+        result["price_yellow_finish_percent"] = price_yellow
+
+        if rating_green is None:
+            result["rating_green_finish_value"] = price_green
+        if rating_yellow is None:
+            result["rating_yellow_finish_value"] = price_yellow
+    elif has_rating_values:
+        # Rating fields have values, ensure both exist and copy to price fields
+        if rating_green is None:
+            rating_green = 0.0
+        if rating_yellow is None:
+            rating_yellow = 0.0
+
+        result["rating_green_finish_value"] = rating_green
+        result["rating_yellow_finish_value"] = rating_yellow
+
+        if price_green is None:
+            result["price_green_finish_percent"] = rating_green
+        if price_yellow is None:
+            result["price_yellow_finish_percent"] = rating_yellow
+
+
 def apply_excel_value_mappings(data: dict[str, str], sep: str = ";") -> dict[str, Any]:
     """
     Converts raw Excel string values to API-valid types using EXCEL_TO_RFQ_VALUES_MAPPING.
@@ -138,6 +185,8 @@ def apply_excel_value_mappings(data: dict[str, str], sep: str = ";") -> dict[str
     ):
         if field in result and isinstance(result[field], str):
             result[field] = _parse_percent_range_last(result[field])
+
+    _copy_price_rating_values(result)
 
     return result
 

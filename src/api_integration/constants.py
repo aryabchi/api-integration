@@ -89,7 +89,7 @@ PARTIAL_SUCCESS_REPLY_TEMPLATE = (
 
 # Flag to skip VERY SLOW put_rfq_supplier_group_ids PUT call
 # True - skip, False - execute
-IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
+IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
 
 # Flag to do/skip RFQ search (by title) before creation attempt
 # True for production, False for testing
@@ -232,9 +232,7 @@ EXCEL_TO_RFQ_VALUES_MAPPING = {
 # Hardcoded mappings from RfqCreateRequest properties to constant values
 RFQ_TO_DEFAULTS_MAPPING = {
     "lot_template_id": RFQ_DEFAULT_LOT_TEMPLATE_ID,  # ID шаблона, пересоздается
-    "access_type": "groups",  # отваливается с таймаутом соединения
+    "access_type": "groups",  # paired with supplier_group_ids
     "freight_spend_currency_id": 1,  # выставляется в паре с freight_spend_of_event
     # "is_for_all": False,  # тендер создаётся как черновик без приглашённых поставщиков
-    "rating_green_finish_value": 10,  # Tmp workaround API bug
-    "rating_yellow_finish_value": 20,  # Tmp workaround API bug
 }
