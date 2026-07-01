@@ -87,7 +87,7 @@ PARTIAL_SUCCESS_REPLY_TEMPLATE = (
     "Агент Коля\n"
 )
 
-# Flag to skip VERY SLOW put_rfq_supplier_group_ids PUT call
+# Flag to skip adding put_rfq_supplier_group_ids (PUT call was too slow in the past)
 # True - skip, False - execute
 IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
 
