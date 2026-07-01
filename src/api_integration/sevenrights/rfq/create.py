@@ -115,6 +115,7 @@ def create_rfqs(
                     skipped += 1
                     continue
 
+        # No duplicated RFQs found, can proceed to FRQ creation
         result = create_rfq(rfq_data, timeout=timeout)
 
         with open(info_marker_path, "w", encoding="utf-8") as f:
