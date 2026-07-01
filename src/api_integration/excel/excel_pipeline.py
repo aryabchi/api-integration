@@ -1,12 +1,9 @@
-import os
 import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Union
 
 from api_integration.constants import (
-    DOWNLOADS_DIR,
-    RFQ_EXCEL_MARKER,
     ALLOWED_ATTACHMENT_FILE_EXTENSIONS,
     ALLOWED_ATTACHMENT_LOT_TEMPLATE_TERMS,
     ALLOWED_ATTACHMENT_RFQ_TEMPLATE_TERMS,
@@ -132,8 +129,9 @@ def process_attachments(
 def test_excel_pipeline() -> None:
     """Run process_attachments pipeline tests and print statistics."""
     import sys
+    from api_integration.constants import SAMPLES_DIR
 
-    samples_dir = Path(__file__).resolve().parent.parent.parent / "samples" / "excel"
+    samples_dir = Path(SAMPLES_DIR) / "excel"
     if not samples_dir.exists():
         print(f"Samples directory not found: {samples_dir}")
         sys.exit(1)
