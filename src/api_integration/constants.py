@@ -6,7 +6,7 @@ project_root = Path(__file__).resolve().parent.parent.parent
 
 # Flag to skip calling put_rfq_supplier_group_ids (PUT call may slow pipe down)
 # True - skip, False - execute
-IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
+IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
 
 # Flag to do/skip RFQ search (by title) before creation attempt
 # True for production, False for testing
