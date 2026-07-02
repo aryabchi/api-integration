@@ -82,6 +82,7 @@ def create_rfqs(
 
         # Prevent duplicate RFQ creation: search by title before posting (guarded)
         # If a matching RFQ exists, skip creation and record its id in the error result
+        # TODO: refactor
         if IS_SEARCH_EXISTING_RFQ_BEFORE_POST:
             search_title = (payload.rfq_template or {}).get("title")
             if search_title:
