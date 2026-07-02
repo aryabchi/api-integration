@@ -234,6 +234,6 @@ EXCEL_TO_RFQ_VALUES_MAPPING = {
 RFQ_TO_DEFAULTS_MAPPING = {
     "lot_template_id": RFQ_DEFAULT_LOT_TEMPLATE_ID,  # ID шаблона, пересоздается
     "access_type": "groups",  # paired with supplier_group_ids
-    "freight_spend_currency_id": 1,  # выставляется в паре с freight_spend_of_event
+    "freight_spend_currency_id": 1,  # Валюта RUB: freight_spend_currency_id: 1 идет вместе с freight_spend_of_event
     # "is_for_all": False,  # optional, тендер создаётся как черновик без приглашённых поставщиков
 }

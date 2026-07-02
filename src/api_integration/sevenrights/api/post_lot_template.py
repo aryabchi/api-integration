@@ -1,18 +1,35 @@
-"""Не поддерживается API v1
+"""Импорт матрицы лота
 
-### Первый шаг — создание шаблона в ЛК
+Файл Excel в формате 7RightsMatrix.xlsx (шаблон: /ваш путь/matrix-lot.xlsx).
 
-Первый шаг сценария — подготовка шаблона лота (customed_rfq_lots) в личном кабинете, раздел «Шаблоны»:
+POST /api/v1/rfq/lot-templates/import
 
-    «+ Добавить шаблон» — визуальный конструктор (структура листов, столбцов, строк, типы колонок).
-    «Импорт Excel» — загрузка Excel в шаблон (**POST /admin/customedRfqLots/importing**);
-    создаётся запись шаблона с разобранной структурой и исходными значениями ячеек.
+Authorization: Bearer {token}
 
-На текущий момент создание и редактирование шаблона через API v1 не предусмотрено — только через ЛК (или внутренние web-эндпоинты).
-API работает с уже существующими шаблонами.
+Content-Type: multipart/form-data
+
+
+file: matrix-lot.xlsx
+
+Ответ:
+
+{
+
+"data": {
+
+"id": ХХХХХ,
+
+"lot_template_id": ХХХХХ,
+
+"title": "matrix-lot.xlsx"
+
+}
+
+}
+
+Сохраните lot_template_id — он понадобится при создании RFQ.
 """
 
-import sys
 from pathlib import Path
 import json
 import requests
@@ -24,47 +41,62 @@ from api_integration.config import get_settings
 def post_lot_template(
     base_url: str,
     bearer_token: str,
-    lot_data: dict,
+    file_path: str | Path,
     output_root: str = SAMPLES_DIR,
     timeout: int = 30,
 ):
     """
-    Post lot data as a new lot template.
-    Implements POST /api/v1/rfq/lot-templates
+    Post an Excel file as a new lot template via multipart/form-data upload.
+    Implements POST /api/v1/rfq/lot-templates/import
     """
-    url = f"{base_url.rstrip('/')}/rfq/lot-templates"
+    file_path = Path(file_path)
+    if not file_path.exists():
+        print(f"ERROR: File not found: {file_path}")
+        return None
+
+    url = f"{base_url.rstrip('/')}/rfq/lot-templates/import"
 
     headers = {
         "Authorization": f"Bearer {bearer_token}",
-        "Content-Type": "application/json",
     }
 
     print("=" * 80)
     print(f"Request URL : {url}")
-    print(f"Payload size: {len(json.dumps(lot_data, ensure_ascii=False))} chars")
+    print(f"Upload file : {file_path.name} ({file_path.stat().st_size} bytes)")
     print("=" * 80)
 
     try:
-        response = requests.post(
-            url,
-            headers=headers,
-            json=lot_data,
-            timeout=timeout,
-        )
-
+        with open(file_path, "rb") as f:
+            files = {
+                "file": (
+                    file_path.name,
+                    f,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                )
+            }
+            response = requests.post(
+                url,
+                headers=headers,
+                files=files,
+                timeout=timeout,
+            )
     except requests.exceptions.Timeout:
         print("ERROR: Request timed out.")
-        sys.exit(1)
+        return None
 
     except requests.exceptions.ConnectionError as e:
         print("ERROR: Connection failed.")
         print(str(e))
-        sys.exit(1)
+        return None
 
     except requests.exceptions.RequestException as e:
         print("ERROR: Unexpected request failure.")
         print(str(e))
-        sys.exit(1)
+        return None
+
+    except OSError as e:
+        print(f"ERROR: Failed to read file: {e}")
+        return None
 
     print(f"HTTP Status: {response.status_code}")
 
@@ -78,7 +110,7 @@ def post_lot_template(
         response_file = tmp_dir / "response_detail.html"
         with open(response_file, "w", encoding="utf-8") as f:
             f.write(response.text)
-            sys.exit(1)
+        return None
 
     if response.status_code in (200, 201):
         print("SUCCESS: Lot template posted.")
@@ -115,7 +147,7 @@ def post_lot_template(
     print(response_file.resolve())
 
     if not response.ok:
-        sys.exit(1)
+        return None
 
     return response_json
 
@@ -123,18 +155,10 @@ def post_lot_template(
 if __name__ == "__main__":
     settings = get_settings()
 
-    rfq_id = 9876
-    lot_json_path = Path(SAMPLES_DIR) / str(rfq_id) / "lot_detail.json"
-
-    if not lot_json_path.exists():
-        print(f"ERROR: Lot JSON not found at {lot_json_path}")
-        sys.exit(1)
-
-    with open(lot_json_path, "r", encoding="utf-8") as f:
-        lot_data = json.load(f)
+    file_path = Path(SAMPLES_DIR) / "excel" / "20260701_1701_example_matrix-lot.xlsx"
 
     post_lot_template(
         base_url=settings.SEVEN_RIGHTS_API_URL,
         bearer_token=settings.SEVEN_RIGHTS_API_KEY,
-        lot_data=lot_data,
+        file_path=file_path,
     )
