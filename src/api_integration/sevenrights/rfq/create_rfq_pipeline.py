@@ -1,3 +1,4 @@
+from typing import Any
 from api_integration.sevenrights.api.post_rfq import post_rfq
 from api_integration.sevenrights.api.post_lot_template import post_lot_template
 from api_integration.sevenrights.api.post_rfq_lot import post_rfq_lot
@@ -7,7 +8,7 @@ from api_integration.sevenrights.api.put_rfq_supplier_group_ids import (
 )
 
 
-def create_rfq(rfq_data, timeout: int = 30):
+def create_rfq(rfq_data, timeout: int = 30) -> dict[str, Any]:
     """
     Implements complete RFQ creation piplene:
     - split payload
@@ -15,7 +16,13 @@ def create_rfq(rfq_data, timeout: int = 30):
     - update draft with suppliers
     - load lot template
     - bind template to RFQ draft
+
+    TODO:
+    * declare returned dict keys
+    * accumulate errors in "error", don't overwrite
+    * pass payload.lot_template to post_lot_template
     """
+
     payload = split_rfq_payload(rfq_data)
     print("  -> Creaitng RFQ draft...")
     result = post_rfq(data=payload.rfq_template, timeout=timeout)
