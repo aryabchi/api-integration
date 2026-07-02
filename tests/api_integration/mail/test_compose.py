@@ -29,7 +29,7 @@ def test_case_2_error_only():
         rfq_excel=None,
         extra_on_success_rfq_excel_key_path="",
     )
-    assert "Нам не удалось автоматически создать RFQ." in result
+    assert "Нам не удалось автоматически создать RFQ" in result
     assert "No RFQ template found" in result
 
 
@@ -60,7 +60,7 @@ def test_case_4_neither_none():
         rfq_excel=None,
         extra_on_success_rfq_excel_key_path="",
     )
-    assert "Нам не удалось автоматически создать RFQ." in result
+    assert "Нам не удалось автоматически создать RFQ" in result
     assert "(unable to generate rfq link or error message)" in result
     assert "Extra info" not in result  # default extra_on_success is ""
 
