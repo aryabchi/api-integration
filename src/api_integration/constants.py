@@ -6,7 +6,7 @@ project_root = Path(__file__).resolve().parent.parent.parent
 
 # Flag to skip calling put_rfq_supplier_group_ids (PUT call may slow pipe down)
 # True - skip, False - execute
-IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
+IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
 
 # Flag to do/skip RFQ search (by title) before creation attempt
 # True for production, False for testing
@@ -45,7 +45,7 @@ ALLOWED_ATTACHMENT_FILE_EXTENSIONS = (".xlsx",)
 
 # Required patterns in attachemnt file names
 ALLOWED_ATTACHMENT_LOT_TEMPLATE_TERMS = ("тз",)
-ALLOWED_ATTACHMENT_RFQ_TEMPLATE_TERMS = ("шаблон", "запрос", "тендер")
+ALLOWED_ATTACHMENT_RFQ_TEMPLATE_TERMS = ("шаблон", "запрос", "тендер", "параметры")
 
 # Name of the placeholder file that indicates a reply message body has been composed
 REPLY_BODY_MARKER = "reply.txt"
