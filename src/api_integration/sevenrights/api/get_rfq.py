@@ -4,6 +4,7 @@ import json
 import requests
 
 from api_integration.constants import SAMPLES_DIR
+from api_integration.config import get_settings
 
 
 def get_rfq(
@@ -14,7 +15,7 @@ def get_rfq(
     timeout: int = 30,
 ):
     """Get existing RFQ. Implements getRfq API contract"""
-    url = f"{base_url.rstrip('/')}/api/v1/rfq/{rfq_id}"
+    url = f"{base_url.rstrip('/')}/rfq/{rfq_id}"
 
     headers = {
         "Authorization": f"Bearer {bearer_token}",
@@ -132,51 +133,11 @@ def get_rfq(
 
 
 if __name__ == "__main__":
-    #
-    # Example usage:
-    # Python
-    #
-    # python ./src/sevenrights/api/get_rfq.py --base-url https://lk.7rights.ru/ --rfq-id 0000 --token "xxx"
-    #
-    # Curl
-    #
-    # curl "https://lk.7rights.ru/api/v1/rfq/0000" -H "Authorization: Bearer ххх" -H "Accept: application/json"
-
-    import argparse
-
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--base-url",
-        required=True,
-        help="API base URL",
-    )
-
-    parser.add_argument(
-        "--rfq-id",
-        required=True,
-        type=int,
-        help="RFQ ID",
-    )
-
-    parser.add_argument(
-        "--token",
-        required=True,
-        help="Bearer token",
-    )
-
-    parser.add_argument(
-        "--output-dir",
-        required=False,
-        default=SAMPLES_DIR,
-        help="Root output directory",
-    )
-
-    args = parser.parse_args()
+    settings = get_settings()
+    rfq_id = 9924
 
     get_rfq(
-        base_url=args.base_url,
-        rfq_id=args.rfq_id,
-        bearer_token=args.token,
-        output_root=args.output_dir,
+        base_url=settings.SEVEN_RIGHTS_API_URL,
+        rfq_id=rfq_id,
+        bearer_token=settings.SEVEN_RIGHTS_API_KEY,
     )
