@@ -14,7 +14,8 @@ IS_SEARCH_EXISTING_RFQ_BEFORE_POST = False
 
 # Default lot_template_id (unless brand new created first)
 # 12993 -> Копия ТЗ Самсунг Артем перезакуп Хабаровский край 19.06.2026.xlsx
-13200  # -> "ТЗ Малино-Смоленск.xlsx"
+# 13200 -> "ТЗ Малино-Смоленск.xlsx"
+# None -> correct value as template_id is not know ariory
 RFQ_DEFAULT_LOT_TEMPLATE_ID: int = None
 
 
@@ -235,7 +236,6 @@ EXCEL_TO_RFQ_VALUES_MAPPING = {
 
 # Hardcoded mappings from RfqCreateRequest properties to constant values
 RFQ_TO_DEFAULTS_MAPPING = {
-    "lot_template_id": RFQ_DEFAULT_LOT_TEMPLATE_ID,  # ID шаблона, пересоздается
     "access_type": "groups",  # paired with supplier_group_ids
     "freight_spend_currency_id": 1,  # Валюта RUB: freight_spend_currency_id: 1 идет вместе с freight_spend_of_event
     # "is_for_all": False,  # optional, тендер создаётся как черновик без приглашённых поставщиков

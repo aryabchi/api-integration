@@ -114,6 +114,10 @@ def create_rfqs(
             print(
                 f"  ✓ created RFQ {result.get('rfq_id')} for {os.path.basename(folder_path)}"
             )
+        elif result.get("rfq_id") is not None:
+            print(
+                f"  ✓ incomplete RFQ {result.get('rfq_id')} for {os.path.basename(folder_path)}"
+            )
         else:
             print(
                 f"  ✗ failed to create RFQ for {os.path.basename(folder_path)}: {result.get('error')}"

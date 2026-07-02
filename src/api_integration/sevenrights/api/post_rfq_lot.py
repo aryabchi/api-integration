@@ -44,7 +44,10 @@ def post_rfq_lot(
     """
     Bind a lot template to an existing RFQ.
     Implements POST /api/v1/rfq/{rfq_id}/lot
+    Returns:
+        dict {customed_lot_id, error}
     """
+
     settings = get_settings()
 
     url = f"{settings.SEVEN_RIGHTS_API_URL.rstrip('/')}/rfq/{rfq_id}/lot"

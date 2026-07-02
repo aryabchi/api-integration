@@ -7,13 +7,13 @@ POST /api/v1/rfq/lot-templates/import
 Authorization: Bearer {token}
 Content-Type: multipart/form-data
 file: matrix-lot.xlsx
-Ответ:
+response sample:
 {
-    "data": {
-    "id": ХХХХХ,
-    "lot_template_id": ХХХХХ,
-    "title": "matrix-lot.xlsx"
-    }
+  "data": {
+    "id": 13197,
+    "lot_template_id": 13197,
+    "title": "20260701_1701_example_matrix-lot.xlsx"
+  }
 }
 Сохраните lot_template_id — он понадобится при создании RFQ.
 """
@@ -32,7 +32,10 @@ def post_lot_template(
     """
     Post an Excel file as a new lot template via multipart/form-data upload.
     Implements POST /api/v1/rfq/lot-templates/import
+    Returns:
+        dict {lot_template_id, error}
     """
+
     settings = get_settings()
 
     file_path = Path(file_path)

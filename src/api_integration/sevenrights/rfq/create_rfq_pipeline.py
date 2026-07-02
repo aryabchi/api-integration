@@ -1,36 +1,56 @@
-import time
-
 from api_integration.sevenrights.api.post_rfq import post_rfq
+from api_integration.sevenrights.api.post_lot_template import post_lot_template
+from api_integration.sevenrights.api.post_rfq_lot import post_rfq_lot
 from api_integration.sevenrights.rfq.utils import split_rfq_payload
 from api_integration.sevenrights.api.put_rfq_supplier_group_ids import (
     put_rfq_supplier_group_ids,
 )
 
 
-def create_rfq(rfq_data, timeout: int = 30, debug: bool = False):
-    """Split payload, post RFQ template, and attach supplier groups if available."""
+def create_rfq(rfq_data, timeout: int = 30):
+    """
+    Implements complete RFQ creation piplene:
+    - split payload
+    - post RFQ draft
+    - update draft with suppliers
+    - load lot template
+    - bind template to RFQ draft
+    """
     payload = split_rfq_payload(rfq_data)
-    # TODO: use payload.lot_template for lot-related operations
-
     print("  -> Creaitng RFQ...")
-    start_time = time.time() if debug else None
     result = post_rfq(data=payload.rfq_template, timeout=timeout)
-    if debug:
-        elapsed = time.time() - start_time
-        print(f"     post_rfq execution time: {elapsed:.2f}s")
 
     if result.get("error") is None and payload.rfq_suppliers is not None:
         print("  -> Adding supplier groups to RFQ...")
-        start_time = time.time() if debug else None
         put_result = put_rfq_supplier_group_ids(
             rfq_id=result["rfq_id"],
             data=payload.rfq_suppliers,
             timeout=timeout,
         )
-        if debug:
-            elapsed = time.time() - start_time
-            print(f"     put_rfq_supplier_group_ids execution time: {elapsed:.2f}s")
         if put_result.get("error") is not None:
-            result = put_result
+            result["error"] = put_result["error"]
+
+    # Handle lot template if present in payload (only if RFQ was created)
+    if result.get("rfq_id") is not None and payload.lot_template:
+        # Upload lot template (function decides: upload file or use default ID)
+        lot_result = post_lot_template(
+            file_path=payload.lot_template["path"],
+            default_lot_template_id=payload.lot_template["lot_template_id"],
+            timeout=timeout,
+        )
+        if lot_result.get("error") is not None:
+            result["error"] = lot_result["error"]
+            return result
+        lot_template_id = lot_result["lot_template_id"]
+
+        # Bind lot template to RFQ (only if we have a valid ID)
+        if lot_template_id is not None:
+            lot_bind_result = post_rfq_lot(
+                rfq_id=result["rfq_id"],
+                lot_template_id=lot_template_id,
+                timeout=timeout,
+            )
+            if lot_bind_result.get("error") is not None:
+                result["error"] = lot_bind_result["error"]
 
     return result
