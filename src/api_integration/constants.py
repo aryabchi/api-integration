@@ -4,6 +4,20 @@ from pathlib import Path
 
 project_root = Path(__file__).resolve().parent.parent.parent
 
+# Flag to skip calling put_rfq_supplier_group_ids (PUT call may slow pipe down)
+# True - skip, False - execute
+IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
+
+# Flag to do/skip RFQ search (by title) before creation attempt
+# True for production, False for testing
+IS_SEARCH_EXISTING_RFQ_BEFORE_POST = False
+
+# Default lot_template_id (unless brand new created first):
+RFQ_DEFAULT_LOT_TEMPLATE_ID: int = 12993
+
+# Default organizer user_access_ids
+# TODO: rm UNUSED
+RFQ_DEFAULT_ORGANIZER_USER_ID: int = 108014
 
 # Local directory with json samples for API requests
 SAMPLES_DIR = f"{project_root}/samples"
@@ -89,14 +103,6 @@ PARTIAL_SUCCESS_REPLY_TEMPLATE = (
     "Агент Коля<br>"
 )
 
-# Flag to skip calling put_rfq_supplier_group_ids (PUT call is slow)
-# True - skip, False - execute
-IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
-
-# Flag to do/skip RFQ search (by title) before creation attempt
-# True for production, False for testing
-IS_SEARCH_EXISTING_RFQ_BEFORE_POST = False
-
 # TODO: rm after testing, USED somewhere
 # Minimal required RFQ info for create
 TEST_RFQ_CREATE_BOILERPLATE = {
@@ -141,14 +147,6 @@ EXCEL_TO_RFQ_MAPPING = {
     "Обратная связь для поставщиков": "type_view",
     "Повышение цен поставщиками": "is_ban_on_price_increases_on_this_tour",
 }
-
-
-# Default organizer user_access_ids
-# TODO: rm UNUSED
-RFQ_DEFAULT_ORGANIZER_USER_ID: int = 108014
-
-# Default lot_template_id:
-RFQ_DEFAULT_LOT_TEMPLATE_ID: int = 12993
 
 
 # Mappings of excel RFQ template values "Значение по умолчанию"/"Значение" to 7rights API IDs
@@ -237,5 +235,5 @@ RFQ_TO_DEFAULTS_MAPPING = {
     "lot_template_id": RFQ_DEFAULT_LOT_TEMPLATE_ID,  # ID шаблона, пересоздается
     "access_type": "groups",  # paired with supplier_group_ids
     "freight_spend_currency_id": 1,  # выставляется в паре с freight_spend_of_event
-    # "is_for_all": False,  # тендер создаётся как черновик без приглашённых поставщиков
+    # "is_for_all": False,  # optional, тендер создаётся как черновик без приглашённых поставщиков
 }
