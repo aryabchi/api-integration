@@ -5,14 +5,9 @@
 POST /api/v1/rfq/lot-templates/import
 
 Authorization: Bearer {token}
-
 Content-Type: multipart/form-data
-
-
 file: matrix-lot.xlsx
-
 Ответ:
-
 {
     "data": {
     "id": ХХХХХ,
@@ -20,7 +15,6 @@ file: matrix-lot.xlsx
     "title": "matrix-lot.xlsx"
     }
 }
-
 Сохраните lot_template_id — он понадобится при создании RFQ.
 """
 

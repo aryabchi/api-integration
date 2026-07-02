@@ -14,7 +14,8 @@ IS_SEARCH_EXISTING_RFQ_BEFORE_POST = False
 
 # Default lot_template_id (unless brand new created first)
 # 12993 -> Копия ТЗ Самсунг Артем перезакуп Хабаровский край 19.06.2026.xlsx
-RFQ_DEFAULT_LOT_TEMPLATE_ID: int = 13200  # -> "ТЗ Малино-Смоленск.xlsx"
+13200  # -> "ТЗ Малино-Смоленск.xlsx"
+RFQ_DEFAULT_LOT_TEMPLATE_ID: int = None
 
 
 # Default organizer user_access_ids
