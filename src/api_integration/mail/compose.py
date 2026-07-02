@@ -13,14 +13,34 @@ from api_integration.constants import (
 from api_integration.mail.utils import get_rfq_draft_url
 
 
-def _extract_requirements(rfq_excel: dict = None) -> str:
-    """Extract 'requirements' from rfq_excel nested structure."""
-    if not rfq_excel or not isinstance(rfq_excel, dict):
+def _extract_nested_value(data: dict = None, key_path: str = "") -> str:
+    """Safely extract a value from nested dict using slash-separated path.
+
+    Args:
+        data: Dictionary to extract from
+        key_path: Slash-separated path (e.g., "rfq_template/requirements")
+
+    Returns:
+        str: Extracted value converted to string, or empty string if path invalid
+    """
+    if not data or not isinstance(data, dict) or not key_path:
         return ""
-    rfq_template = rfq_excel.get("rfq_template")
-    if not rfq_template or not isinstance(rfq_template, dict):
+
+    keys = key_path.split("/")
+    current = data
+
+    for key in keys[:-1]:
+        if not isinstance(current, dict):
+            return ""
+        current = current.get(key)
+        if current is None:
+            return ""
+
+    if not isinstance(current, dict):
         return ""
-    return rfq_template.get("requirements", "")
+
+    value = current.get(keys[-1], "")
+    return str(value) if value is not None else ""
 
 
 def _compose_reply_text(
@@ -28,17 +48,23 @@ def _compose_reply_text(
     body: str,
     body_excerpt_chars: int = 500,
     rfq_info: dict = None,
-    extra_on_success: str = "",
+    rfq_excel: dict = None,
+    extra_on_success_rfq_excel_key_path: str = "",
 ) -> str:
-    subject = meta.get("subject", "") or ""
-    subject_line = f' "{subject}" ' if subject else " "
     """Fills in email templates depending on rfq_info fields content
 
     Returns:
         str: filled email template
     """
+    subject = meta.get("subject", "") or ""
+    subject_line = f' "{subject}" ' if subject else " "
     error_message = rfq_info.get("error", "") if rfq_info else ""
     rfq_id = rfq_info.get("rfq_id", 0) if rfq_info else 0
+
+    # Extract extra value from rfq_excel using the provided key path
+    extra_on_success = _extract_nested_value(
+        rfq_excel, extra_on_success_rfq_excel_key_path
+    )
 
     if error_message and rfq_id:
         template = PARTIAL_SUCCESS_REPLY_TEMPLATE
@@ -153,17 +179,22 @@ def generate_replies(
         marker_path = os.path.join(folder_path, RFQ_INFO_MARKER)
         rfq_excel_path = os.path.join(folder_path, RFQ_EXCEL_MARKER)
 
-        # Check RFQ_INFO_MARKER first (regular case with rfq_id from search_rfq/create_rfq)
+        # Initialize variables
         rfq_info = None
+        rfq_excel = None
+
+        # Check RFQ_INFO_MARKER first (regular case with rfq_id from search_rfq/create_rfq)
         if os.path.exists(marker_path):
             with open(marker_path, "r", encoding="utf-8") as f:
                 rfq_info = json.load(f)
-        # If no RFQ_INFO_MARKER, check RFQ_EXCEL_MARKER for errors (avoid creating intermediate marker)
-        elif os.path.exists(rfq_excel_path):
+
+        # Read RFQ_EXCEL_MARKER if it exists (needed for requirements extraction and error checking)
+        if os.path.exists(rfq_excel_path):
             with open(rfq_excel_path, "r", encoding="utf-8") as f:
-                rfq_excel_data = json.load(f)
-            if rfq_excel_data.get("error"):
-                rfq_info = {"error": rfq_excel_data["error"], "rfq_id": None}
+                rfq_excel = json.load(f)
+            # Use error from rfq_excel only if no RFQ_INFO_MARKER present
+            if rfq_excel.get("error") and rfq_info is None:
+                rfq_info = {"error": rfq_excel["error"], "rfq_id": None}
 
         # If still no rfq_info (neither marker exists or excel has no error), skip
         if rfq_info is None:
@@ -184,17 +215,13 @@ def generate_replies(
             with open(body_path, "r", encoding="utf-8") as f:
                 body = f.read()
 
-        rfq_excel = None
-        if os.path.exists(rfq_excel_path):
-            with open(rfq_excel_path, "r", encoding="utf-8") as f:
-                rfq_excel = json.load(f)
-
         reply_text = _compose_reply_text(
             meta=meta,
             body=body,
             body_excerpt_chars=body_excerpt_chars,
             rfq_info=rfq_info,
-            extra_on_success=_extract_requirements(rfq_excel),
+            rfq_excel=rfq_excel,
+            extra_on_success_rfq_excel_key_path="rfq_template/requirements",
         )
 
         with open(reply_path, "w", encoding="utf-8") as f:

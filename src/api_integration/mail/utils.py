@@ -37,13 +37,3 @@ def is_trusted_email(email: str, filename: str = TRUSTED_RECIPIENTS_FILE) -> boo
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         return False
-
-
-if __name__ == "__main__":
-    # Test cases
-    test_email = "ADMIN@example.com "
-
-    if is_trusted_email(test_email):
-        print("Access granted.")
-    else:
-        print("Access denied.")

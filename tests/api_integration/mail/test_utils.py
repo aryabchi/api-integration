@@ -3,7 +3,6 @@ Usage: pytest -v tests/
 """
 
 import json
-import pytest
 
 from api_integration.mail.utils import get_rfq_draft_url, is_trusted_email
 
