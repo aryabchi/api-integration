@@ -6,14 +6,16 @@ project_root = Path(__file__).resolve().parent.parent.parent
 
 # Flag to skip calling put_rfq_supplier_group_ids (PUT call may slow pipe down)
 # True - skip, False - execute
-IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
+IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = True
 
 # Flag to do/skip RFQ search (by title) before creation attempt
 # True for production, False for testing
 IS_SEARCH_EXISTING_RFQ_BEFORE_POST = False
 
-# Default lot_template_id (unless brand new created first):
-RFQ_DEFAULT_LOT_TEMPLATE_ID: int = 12993
+# Default lot_template_id (unless brand new created first)
+# 12993 -> Копия ТЗ Самсунг Артем перезакуп Хабаровский край 19.06.2026.xlsx
+RFQ_DEFAULT_LOT_TEMPLATE_ID: int = 13200  # -> "ТЗ Малино-Смоленск.xlsx"
+
 
 # Default organizer user_access_ids
 # TODO: rm UNUSED
@@ -66,7 +68,7 @@ RFQ_DRAFT_URL = "https://lk.7rights.ru/admin/newRfq/{rfq_id}"
 SUCCESS_REPLY_TEMPLATE = (
     "Здравствуйте,<br>"
     "В ответ на Ваше письмо {subject_line} от {date}.<br><br>"
-    "Мы автоматически создали RFQ: {message}. <br><br>"
+    "Мы автоматически создали RFQ: {message} <br><br>"
     "{extra_on_success}"
     "<br><br>"
     "---- Original message ----<br>{body_excerpt}<br>"
@@ -78,7 +80,7 @@ SUCCESS_REPLY_TEMPLATE = (
 ERROR_REPLY_TEMPLATE = (
     "Здравствуйте,<br>"
     "В ответ на Ваше письмо {subject_line} от {date}.<br><br>"
-    "Нам не удалось автоматически создать RFQ.<br><br>"
+    "Нам не удалось автоматически создать RFQ <br><br>"
     "Описание причины:<br>"
     "{message}"
     "<br><br>"
@@ -91,7 +93,7 @@ ERROR_REPLY_TEMPLATE = (
 PARTIAL_SUCCESS_REPLY_TEMPLATE = (
     "Здравствуйте,<br>"
     "В ответ на Ваше письмо {subject_line} от {date}.<br><br>"
-    "Мы автоматически создали RFQ: {message}. <br><br>"
+    "Мы автоматически создали RFQ: {message} <br><br>"
     "{extra_on_success}"
     "<br><br>"
     "Предупреждение:<br>"

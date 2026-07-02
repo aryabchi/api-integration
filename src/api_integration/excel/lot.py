@@ -20,8 +20,11 @@ def read_lot_excel(
             msg = f"Sheet '{sheet_name}' not found in {path}. Available sheets: {wb.sheetnames}"
             print(msg)
             return {"error": msg}
-        # TODO: extract lot-specific data from the sheet
-        return {"lot_template_id": RFQ_DEFAULT_LOT_TEMPLATE_ID}
+        # TODO: add data validation logic
+        return {
+            "lot_template_id": RFQ_DEFAULT_LOT_TEMPLATE_ID,
+            "path": str(path),
+        }
     except Exception as exc:
         return {"error": str(exc)}
 
