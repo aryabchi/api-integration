@@ -151,7 +151,22 @@ def generate_replies(
 
         # Skip if RFQ marker is missing in this email directory
         marker_path = os.path.join(folder_path, RFQ_INFO_MARKER)
-        if not os.path.exists(marker_path):
+        rfq_excel_path = os.path.join(folder_path, RFQ_EXCEL_MARKER)
+
+        # Check RFQ_INFO_MARKER first (regular case with rfq_id from search_rfq/create_rfq)
+        rfq_info = None
+        if os.path.exists(marker_path):
+            with open(marker_path, "r", encoding="utf-8") as f:
+                rfq_info = json.load(f)
+        # If no RFQ_INFO_MARKER, check RFQ_EXCEL_MARKER for errors (avoid creating intermediate marker)
+        elif os.path.exists(rfq_excel_path):
+            with open(rfq_excel_path, "r", encoding="utf-8") as f:
+                rfq_excel_data = json.load(f)
+            if rfq_excel_data.get("error"):
+                rfq_info = {"error": rfq_excel_data["error"], "rfq_id": None}
+
+        # If still no rfq_info (neither marker exists or excel has no error), skip
+        if rfq_info is None:
             print(f"  -> Skipping (no RFQ info marker): {entry}")
             skipped += 1
             continue
@@ -169,13 +184,7 @@ def generate_replies(
             with open(body_path, "r", encoding="utf-8") as f:
                 body = f.read()
 
-        rfq_info = None
-        if os.path.exists(marker_path):
-            with open(marker_path, "r", encoding="utf-8") as f:
-                rfq_info = json.load(f)
-
         rfq_excel = None
-        rfq_excel_path = os.path.join(folder_path, RFQ_EXCEL_MARKER)
         if os.path.exists(rfq_excel_path):
             with open(rfq_excel_path, "r", encoding="utf-8") as f:
                 rfq_excel = json.load(f)
