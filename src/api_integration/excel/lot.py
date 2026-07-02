@@ -1,10 +1,7 @@
 from typing import Any, Union
 from pathlib import Path
 
-try:
-    from openpyxl import load_workbook
-except ImportError as exc:
-    raise ImportError("openpyxl is required to read Excel files") from exc
+from openpyxl import load_workbook
 
 from api_integration.constants import RFQ_DEFAULT_LOT_TEMPLATE_ID
 

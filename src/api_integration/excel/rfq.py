@@ -3,10 +3,7 @@ import warnings
 from pathlib import Path
 from typing import Any, Union
 
-try:
-    from openpyxl import load_workbook
-except ImportError as exc:
-    raise ImportError("openpyxl is required to read Excel files") from exc
+from openpyxl import load_workbook
 
 from api_integration.constants import (
     EXCEL_TO_RFQ_MAPPING,
