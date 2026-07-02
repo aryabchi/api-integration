@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "api_integration"
 version = "0.1.0"
 description = "API integration for 7rights RFQ automation"
+readme = "README.md"
 authors = [
     {name = "Anton Ryabchikov", email = "ryabchikovap@bsc.sibur.ru"},
 ]
