@@ -115,7 +115,7 @@ def generate_replies(
     download_dir: str = DOWNLOADS_DIR,
     body_excerpt_chars: int = 500,
     exclude: tuple = ("junk",),
-    subfolder: str = None,
+    subfolder: str | None = None,
     dry_run: bool = False,
     test_run: bool = False,
 ) -> int:

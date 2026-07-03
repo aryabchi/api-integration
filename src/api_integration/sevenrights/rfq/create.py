@@ -15,7 +15,7 @@ from api_integration.sevenrights.rfq.create_rfq_pipeline import create_rfq
 def create_rfqs(
     download_dir: str = DOWNLOADS_DIR,
     exclude: tuple = ("junk",),
-    subfolder: str = None,
+    subfolder: str | None = None,
     dry_run: bool = False,
     test_run: bool = False,
     timeout: int = 30,

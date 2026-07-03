@@ -8,7 +8,7 @@ from api_integration.excel.excel_pipeline import process_attachments
 def process_attachments_wrapper(
     download_dir: str = DOWNLOADS_DIR,
     exclude: tuple = ("junk",),
-    subfolder: str = None,
+    subfolder: str | None = None,
     dry_run: bool = False,
     test_run: bool = False,
 ) -> int:

@@ -3,11 +3,13 @@ import requests
 from pathlib import Path
 
 from api_integration.config import get_settings
+from api_integration.sevenrights.api.schemas.api_results import RfqResult
 
 
-def search_rfq(title: str, timeout: int = 30) -> dict:
+def search_rfq(title: str, timeout: int = 30) -> RfqResult:
     """Searches for existing RFQs by title (API restriction).
-    TODO: Very rude. Needs improvement"""
+    TODO: Very rude. Needs improvement
+    """
     settings = get_settings()
 
     url = f"{settings.SEVEN_RIGHTS_API_URL.rstrip('/')}/rfq"
