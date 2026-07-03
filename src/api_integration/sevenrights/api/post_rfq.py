@@ -9,10 +9,11 @@ import json
 from api_integration.constants import TEST_RFQ_CREATE_BOILERPLATE
 from api_integration.config import get_settings
 from api_integration.sevenrights.api.schemas.rfq import RfqCreateRequest
+from api_integration.sevenrights.api.schemas.api_results import RfqResult
 from api_integration.sevenrights.api.utils import _print_validation_errors
 
 
-def post_rfq(data: dict = None, timeout: int = 30) -> dict:
+def post_rfq(data: dict = None, timeout: int = 30) -> RfqResult:
 
     settings = get_settings()
 

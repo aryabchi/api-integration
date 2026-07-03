@@ -6,9 +6,10 @@ from api_integration.sevenrights.rfq.utils import split_rfq_payload
 from api_integration.sevenrights.api.put_rfq_supplier_group_ids import (
     put_rfq_supplier_group_ids,
 )
+from api_integration.sevenrights.api.schemas.api_results import RfqResult
 
 
-def create_rfq(rfq_data, timeout: int = 30) -> dict[str, Any]:
+def create_rfq(rfq_data, timeout: int = 30) -> RfqResult:
     """
     Implements complete RFQ creation piplene:
     - split payload
@@ -18,9 +19,7 @@ def create_rfq(rfq_data, timeout: int = 30) -> dict[str, Any]:
     - bind template to RFQ draft
 
     TODO:
-    * declare returned dict keys
     * accumulate errors in "error", don't overwrite
-    * pass payload.lot_template to post_lot_template
     """
 
     payload = split_rfq_payload(rfq_data)
