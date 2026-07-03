@@ -28,7 +28,7 @@ def create_rfq(rfq_data, timeout: int = 30) -> dict[str, Any]:
     result = post_rfq(data=payload.rfq_template, timeout=timeout)
 
     if result.get("error") is None and payload.rfq_suppliers is not None:
-        print("    -> Adding supplier groups to RFQ...")
+        print(f"    -> [{result["rfq_id"]}] Adding supplier groups to RFQ...")
         put_result = put_rfq_supplier_group_ids(
             rfq_id=result["rfq_id"],
             data=payload.rfq_suppliers,
@@ -40,7 +40,7 @@ def create_rfq(rfq_data, timeout: int = 30) -> dict[str, Any]:
     # Handle lot template if present in payload (only if RFQ was created)
     if result.get("rfq_id") is not None and payload.lot_template:
         # Upload lot template (function decides: upload file or use default ID)
-        print("    -> Importing lot template...")
+        print(f"    -> [{result["rfq_id"]}] Importing lot template...")
         lot_result = post_lot_template(
             data=payload.lot_template,
             timeout=timeout,
@@ -52,7 +52,7 @@ def create_rfq(rfq_data, timeout: int = 30) -> dict[str, Any]:
 
         # Bind lot template to RFQ (only if we have a valid ID)
         if lot_template_id is not None:
-            print("    -> Binding lot template to RFQ...")
+            print(f"    -> [{result["rfq_id"]}] Binding lot template to RFQ...")
             lot_bind_result = post_rfq_lot(
                 rfq_id=result["rfq_id"],
                 lot_template_id=lot_template_id,
