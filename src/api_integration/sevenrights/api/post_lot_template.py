@@ -19,14 +19,15 @@ response sample:
 """
 
 from pathlib import Path
+from typing import Any
+
 import requests
 
 from api_integration.config import get_settings
 
 
 def post_lot_template(
-    file_path: str | Path,
-    default_lot_template_id: int | None = None,
+    data: dict[str, Any] | None = None,
     timeout: int = 30,
 ):
     """
@@ -38,7 +39,14 @@ def post_lot_template(
 
     settings = get_settings()
 
-    file_path = Path(file_path)
+    if not data:
+        return {
+            "error": "Missing lot_template data",
+            "lot_template_id": None,
+        }
+
+    file_path = Path(data.get("path", ""))
+    default_lot_template_id = data.get("lot_template_id")
     if not file_path.exists():
         return {
             "error": f"File not found: {file_path}",

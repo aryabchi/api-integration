@@ -7,7 +7,7 @@ from api_integration.sevenrights.api.schemas.rfq import RfqUpdateSupplierGroupId
 
 @dataclass
 class RfqPayload:
-    lot_template: dict[str, Any]
+    lot_template: dict[str, Any] | None
     rfq_template: dict[str, Any]
     rfq_suppliers: dict[str, Any] | None
 

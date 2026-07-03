@@ -42,8 +42,7 @@ def create_rfq(rfq_data, timeout: int = 30) -> dict[str, Any]:
         # Upload lot template (function decides: upload file or use default ID)
         print("    -> Importing lot template...")
         lot_result = post_lot_template(
-            file_path=payload.lot_template["path"],
-            default_lot_template_id=payload.lot_template["lot_template_id"],
+            data=payload.lot_template,
             timeout=timeout,
         )
         if lot_result.get("error") is not None:
