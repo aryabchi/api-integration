@@ -40,6 +40,11 @@ class Settings(BaseSettings):
     SEVEN_RIGHTS_API_AWAIT_TIMEOUT: int = Field(
         description="Таймаут ожидания ответа от API 7rights, сек"
     )
+    APP_ENV: str = Field(
+        default="dev",
+        pattern="^(dev|prod)$",
+        description="Режим запуска (для логирования)",
+    )
 
     @property
     def SEVEN_RIGHTS_API_URL(self) -> str:
