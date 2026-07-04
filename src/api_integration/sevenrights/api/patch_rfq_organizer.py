@@ -77,7 +77,9 @@ from pydantic import ValidationError
 
 from api_integration.constants import RFQ_DEFAULT_ORGANIZER_USER_ID
 from api_integration.config import get_settings
-from api_integration.sevenrights.api.schemas.rfq import RfqPatchOrganizerRequest
+from api_integration.sevenrights.api.schemas.api_requests import (
+    RfqPatchOrganizerRequest,
+)
 from api_integration.sevenrights.api.utils import _print_validation_errors
 
 

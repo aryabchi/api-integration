@@ -10,7 +10,7 @@ from api_integration.constants import (
     EXCEL_TO_RFQ_VALUES_MAPPING,
     RFQ_TO_DEFAULTS_MAPPING,
 )
-from api_integration.sevenrights.api.schemas.rfq import RfqCreateRequest
+from api_integration.sevenrights.api.schemas.api_requests import RfqCreateRequest
 
 
 def read_tender_excel(

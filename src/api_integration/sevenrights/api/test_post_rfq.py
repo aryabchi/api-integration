@@ -9,7 +9,7 @@ from api_integration.constants import (
     SAMPLES_DIR,
     TEST_RFQ_CREATE_TEMPLATE,
 )
-from api_integration.sevenrights.api.schemas.rfq import RfqCreateRequest
+from api_integration.sevenrights.api.schemas.api_requests import RfqCreateRequest
 from api_integration.sevenrights.api.utils import _print_validation_errors
 
 if __name__ == "__main__":

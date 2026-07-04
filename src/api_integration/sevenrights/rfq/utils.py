@@ -2,7 +2,9 @@ from dataclasses import dataclass
 from typing import Any
 
 from api_integration.constants import IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS
-from api_integration.sevenrights.api.schemas.rfq import RfqUpdateSupplierGroupIdsRequest
+from api_integration.sevenrights.api.schemas.api_requests import (
+    RfqUpdateSupplierGroupIdsRequest,
+)
 
 
 @dataclass

@@ -8,7 +8,7 @@ import json
 
 from api_integration.constants import TEST_RFQ_CREATE_BOILERPLATE
 from api_integration.config import get_settings
-from api_integration.sevenrights.api.schemas.rfq import RfqCreateRequest
+from api_integration.sevenrights.api.schemas.api_requests import RfqCreateRequest
 from api_integration.sevenrights.api.schemas.api_results import RfqApiResult
 from api_integration.sevenrights.api.utils import _print_validation_errors
 
