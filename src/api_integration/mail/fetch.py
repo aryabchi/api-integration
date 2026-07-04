@@ -38,7 +38,7 @@ def fetch_mail(
     password: str,
     imap_mail_search_template: str = IMAP_MAIL_SEARCH_TEMPLATE,
     download_dir: str = DOWNLOADS_DIR,
-    allowed_attachment_extensions: tuple = None,
+    disallowed_attachment_extensions: tuple = (".json",),
     junk_subdir: str = "junk",
 ) -> None:
     """Connects to mailbox, searches for relevant emails and saves their
@@ -170,8 +170,8 @@ def fetch_mail(
 
                     base, ext = os.path.splitext(filename)
                     if (
-                        allowed_attachment_extensions is not None
-                        and ext.lower() not in allowed_attachment_extensions
+                        disallowed_attachment_extensions is not None
+                        and ext.lower() in disallowed_attachment_extensions
                     ):
                         continue  # skip off-topic attachment
 

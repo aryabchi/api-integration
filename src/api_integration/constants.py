@@ -16,7 +16,7 @@ IS_SEARCH_EXISTING_RFQ_BEFORE_POST = False
 # 12993 -> Копия ТЗ Самсунг Артем перезакуп Хабаровский край 19.06.2026.xlsx
 # 13200 -> "ТЗ Малино-Смоленск.xlsx"
 # None -> MUST BE value as template_id is not know apriori
-RFQ_DEFAULT_LOT_TEMPLATE_ID: int = 13200
+RFQ_DEFAULT_LOT_TEMPLATE_ID: int | None = None
 
 
 # Default organizer user_access_ids

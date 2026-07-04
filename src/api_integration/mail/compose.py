@@ -13,6 +13,17 @@ from api_integration.constants import (
 from api_integration.mail.utils import get_rfq_draft_url
 
 
+def _normalize_error(error) -> list[str]:
+    """Normalize error field to list[str] format (backward compat)."""
+    if error is None:
+        return []
+    if isinstance(error, str):
+        return [error]
+    if isinstance(error, list):
+        return error
+    return [str(error)]
+
+
 def _extract_nested_value(data: dict = None, key_path: str = "") -> str:
     """Safely extract a value from nested dict using slash-separated path.
 
@@ -58,7 +69,8 @@ def _compose_reply_text(
     """
     subject = meta.get("subject", "") or ""
     subject_line = f' "{subject}" ' if subject else " "
-    error_message = rfq_info.get("error", "") if rfq_info else ""
+    error_list = _normalize_error(rfq_info.get("error")) if rfq_info else []
+    error_message = "; ".join(error_list)
     rfq_id = rfq_info.get("rfq_id", 0) if rfq_info else 0
 
     # Extract extra value from rfq_excel using the provided key path
@@ -192,9 +204,15 @@ def generate_replies(
         if os.path.exists(rfq_excel_path):
             with open(rfq_excel_path, "r", encoding="utf-8") as f:
                 rfq_excel = json.load(f)
+            # Normalize error field (backward compat: old files may have str or None)
+            if "error" in rfq_excel:
+                rfq_excel["error"] = _normalize_error(rfq_excel["error"])
             # Use error from rfq_excel only if no RFQ_INFO_MARKER present
             if rfq_excel.get("error") and rfq_info is None:
-                rfq_info = {"error": rfq_excel["error"], "rfq_id": None}
+                rfq_info = {
+                    "error": rfq_excel["error"],
+                    "rfq_id": None,
+                }
 
         # If still no rfq_info (neither marker exists or excel has no error), skip
         if rfq_info is None:

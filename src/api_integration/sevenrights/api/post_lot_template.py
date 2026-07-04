@@ -24,18 +24,18 @@ from typing import Any
 import requests
 
 from api_integration.config import get_settings
-from api_integration.sevenrights.api.schemas.api_results import LotTemplateResult
+from api_integration.sevenrights.api.schemas.api_results import LotTemplateApiResult
 
 
 def post_lot_template(
     data: dict[str, Any] | None = None,
     timeout: int = 30,
-) -> LotTemplateResult:
+) -> LotTemplateApiResult:
     """
     Post an Excel file as a new lot template via multipart/form-data upload.
     Implements POST /api/v1/rfq/lot-templates/import
     Returns:
-        LotTemplateResult: dict with keys "error" and "lot_template_id"
+        LotTemplateApiResult: dict with keys "error" and "lot_template_id"
     """
 
     settings = get_settings()
@@ -97,6 +97,13 @@ def post_lot_template(
             lot_template_id = lot_template_id_from_response
         else:
             lot_template_id = default_lot_template_id
+
+        if lot_template_id is None:
+            return {
+                "error": "Missing lot_template_id in response and no default provided",
+                "lot_template_id": None,
+            }
+
         return {
             "error": None,
             "lot_template_id": lot_template_id,

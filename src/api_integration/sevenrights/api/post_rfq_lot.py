@@ -34,19 +34,19 @@ POST /api/v1/rfq/{id}/lot { lot_template_id }
 import requests
 
 from api_integration.config import get_settings
-from api_integration.sevenrights.api.schemas.api_results import LotBindingResult
+from api_integration.sevenrights.api.schemas.api_results import LotBindingApiResult
 
 
 def post_rfq_lot(
     rfq_id: int,
     lot_template_id: int,
     timeout: int = 30,
-) -> LotBindingResult:
+) -> LotBindingApiResult:
     """
     Bind a lot template to an existing RFQ.
     Implements POST /api/v1/rfq/{rfq_id}/lot
     Returns:
-        LotBindingResult: dict with keys "error" and "customed_lot_id"
+        LotBindingApiResult: dict with keys "error" and "customed_lot_id"
     """
 
     settings = get_settings()

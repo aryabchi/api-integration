@@ -9,11 +9,11 @@ import json
 from api_integration.constants import TEST_RFQ_CREATE_BOILERPLATE
 from api_integration.config import get_settings
 from api_integration.sevenrights.api.schemas.rfq import RfqCreateRequest
-from api_integration.sevenrights.api.schemas.api_results import RfqResult
+from api_integration.sevenrights.api.schemas.api_results import RfqApiResult
 from api_integration.sevenrights.api.utils import _print_validation_errors
 
 
-def post_rfq(data: dict = None, timeout: int = 30) -> RfqResult:
+def post_rfq(data: dict = None, timeout: int = 30) -> RfqApiResult:
 
     settings = get_settings()
 
@@ -37,10 +37,6 @@ def post_rfq(data: dict = None, timeout: int = 30) -> RfqResult:
         "Content-Type": "application/json",
     }
 
-    # with open(
-    #     f"{datetime.now().strftime('%Y%m%d-%H%M%S')}.json", "w", encoding="utf-8"
-    # ) as f:
-    #     json.dump(body, f, indent=2, ensure_ascii=False)
     try:
         response = requests.post(url, headers=headers, json=body, timeout=timeout)
     except requests.RequestException as exc:
