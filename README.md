@@ -228,9 +228,9 @@ python ./scripts/main.py
 
 ## Сборка и распространение приложения (build/install)
 
-- [BUILD_WHEEL.md](BUILD_WHEEL.md) — как собрать wheel проекта
-- [INSTALL_FROM_WHEEL.md](INSTALL_FROM_WHEEL.md) — как установить wheel на целевую машину
-- [VERIFICATION.md](VERIFICATION.md) - как установить wheel и проверить скрипт на целевой машине (`prod mode`)
+- [BUILD_WHEEL.md](docs/BUILD_WHEEL.md) — как собрать wheel проекта
+- [INSTALL_FROM_WHEEL.md](docs/INSTALL_FROM_WHEEL.md) — как установить wheel на целевую машину
+- [VERIFICATION.md](docs/VERIFICATION.md) - как установить wheel и проверить скрипт на целевой машине (`prod mode`)
 
 
 ## Где смотреть настройки скрипта
