@@ -49,6 +49,7 @@ def main(
     test_run: bool = TEST_RUN,
 ) -> None:
     """Execute the mail processing pipeline.
+    TODO: Move into package, import here
 
     Args:
         subfolder: Target message ID or subfolder name to process.
