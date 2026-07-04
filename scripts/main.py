@@ -1,11 +1,15 @@
 """End-to-end processing pipeline"""
 
+import sys
+import msvcrt
+
 from api_integration.config import get_settings
 from api_integration.mail.fetch import fetch_mail
 from api_integration.mail.compose import generate_replies
 from api_integration.mail.send import send_replies
 from api_integration.sevenrights.rfq.create import create_rfqs
 from api_integration.excel.convert import process_attachments_wrapper
+from api_integration.constants import LOCK_FILE
 
 # ============ Example subfolders for testing ============
 # Use only ONE of these per run - select the appropriate test message ID
@@ -27,12 +31,12 @@ FAIL_TEST_MESSAGE_ID_FOR_REPLY = (
 # - In conjunction with subfolder argument
 
 # Target message-ID (subfolder name) for processing specific email thread
-# None runs pipeline for all emails
-SUBFOLDER = None
+# None runs pipeline for all email threads
+SUBFOLDER: str | None = None
 # dry_run=True skips actual execution (safe mode, no side effects)
-DRY_RUN = False
+DRY_RUN: bool = False
 # test_run=True forces execution (use with caution, may overwrite data)
-TEST_RUN = False
+TEST_RUN: bool = False
 
 # In constants.py
 # set IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS to skip adding suppliers (slow PUT)
@@ -40,11 +44,12 @@ TEST_RUN = False
 
 
 def main(
-    subfolder: str = SUBFOLDER,
+    subfolder: str | None = SUBFOLDER,
     dry_run: bool = DRY_RUN,
     test_run: bool = TEST_RUN,
 ) -> None:
     """Execute the mail processing pipeline.
+    TODO: Move into package, import here
 
     Args:
         subfolder: Target message ID or subfolder name to process.
@@ -115,8 +120,28 @@ def main(
 
 
 if __name__ == "__main__":
-    main(
-        subfolder=SUBFOLDER,
-        dry_run=DRY_RUN,
-        test_run=TEST_RUN,
-    )
+    # !!! First of ALL - open lock file in Append + Read mode
+    lock_fp = LOCK_FILE.open("a+")
+    try:
+        # Trying to lock 1 byte of file w/o awaiting  (LK_NBLCK)
+        msvcrt.locking(lock_fp.fileno(), msvcrt.LK_NBLCK, 1)
+    except (IOError, OSError):
+        # If file is locked by concurrent process -> exit(0) silently
+        print(f"{LOCK_FILE} locked")
+        sys.exit(0)
+
+    try:
+        # If locking succeeds -> launch main pipeline
+        main(
+            subfolder=SUBFOLDER,
+            dry_run=DRY_RUN,
+            test_run=TEST_RUN,
+        )
+    finally:
+        # Release locking unconditionally and close file before exit
+        try:
+            lock_fp.seek(0)
+            msvcrt.locking(lock_fp.fileno(), msvcrt.LK_UNLCK, 1)
+        except (IOError, OSError):
+            pass
+        lock_fp.close()

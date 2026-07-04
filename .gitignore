@@ -230,3 +230,6 @@ downloads/*
 # json and excel samples for API test 
 samples/*
 !samples/.gitkeep
+
+# lock file
+*.lock
