@@ -1,6 +1,7 @@
 """Configuration settings and secrets"""
 
 from functools import lru_cache
+from pathlib import Path
 from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
@@ -12,13 +13,28 @@ from pydantic import (
 )
 
 
+def get_env_file_path() -> Path:
+    """
+    Динамически определяет путь к .env файлу.
+    """
+    # 1. Проверяем структуру разработки (рядом с папкой src)
+    dev_root = Path(__file__).resolve().parent.parent.parent
+    if (dev_root / "src").exists() and (dev_root / ".env").exists():
+        return dev_root / ".env"
+
+    # 2. Для продакшена (Windows Scheduler) используем текущую рабочую директорию.
+    # В планировщике Windows обязательно должно быть заполнено поле "Рабочая папка" (Start in).
+    return Path(".env").resolve()
+
+
 class Settings(BaseSettings):
     """
     App settings from env vars
     """
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        # Передаем динамический путь к файлу
+        env_file=get_env_file_path(),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
@@ -43,7 +59,7 @@ class Settings(BaseSettings):
     APP_ENV: str = Field(
         default="dev",
         pattern="^(dev|prod)$",
-        description="Режим запуска (для логирования)",
+        description="Режим запуска",
     )
 
     @property
@@ -55,6 +71,6 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     """
-    Returns caches setting
+    Returns cached setting
     """
     return Settings()

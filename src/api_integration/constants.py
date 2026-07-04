@@ -1,8 +1,41 @@
 """Module with app-specific constants"""
 
 from pathlib import Path
+from api_integration.config import get_settings
 
-project_root = Path(__file__).resolve().parent.parent.parent
+# Загружаем валидированные настройки приложения
+settings = get_settings()
+
+
+def determine_project_root() -> Path:
+    # Если в .env написано APP_ENV=dev
+    if settings.APP_ENV == "dev":
+        return Path(__file__).resolve().parent.parent.parent
+
+    # Если APP_ENV=prod (или не задан), корнем считается папка запуска
+    # Это папка, указанная в поле "Рабочая папка" (Start in) в Windows Task Scheduler
+    import os
+
+    return Path(os.getcwd()).resolve()
+
+
+project_root = determine_project_root()
+
+# Local directory with json samples for API requests
+SAMPLES_DIR = f"{project_root}/samples"
+
+# Local directory for imcoming emails, attachments and interim precessing flags
+DOWNLOADS_DIR = f"{project_root}/downloads"
+
+# Local directory for user-level json configurations
+CONFIG_DIR = f"{project_root}/config"
+
+# Trusted recipients file location
+TRUSTED_RECIPIENTS_FILE = f"{CONFIG_DIR}/trusted_recipients.json"
+
+# Lock file location - project root (safest location)
+LOCK_FILE: Path = project_root / "mail_pipeline_processor.lock"
+
 
 # Flag to skip calling put_rfq_supplier_group_ids (PUT call may slow pipeline down)
 # True - skip, False - execute
@@ -19,25 +52,9 @@ IS_SEARCH_EXISTING_RFQ_BEFORE_POST = False
 # None -> MUST-BE value as template_id is not know apriori
 RFQ_DEFAULT_LOT_TEMPLATE_ID: int | None = None
 
-
 # Default organizer user_access_ids
 # TODO: rm UNUSED
 RFQ_DEFAULT_ORGANIZER_USER_ID: int = 108014
-
-# Local directory with json samples for API requests
-SAMPLES_DIR = f"{project_root}/samples"
-
-# Local directory for imcoming emails, attachments and interim precessing flags
-DOWNLOADS_DIR = f"{project_root}/downloads"
-
-# Local directory for user-level json configurations
-CONFIG_DIR = f"{project_root}/config"
-
-# Trusted recipients file location
-TRUSTED_RECIPIENTS_FILE = f"{CONFIG_DIR}/trusted_recipients.json"
-
-# Lock file location - project root (safest location)
-LOCK_FILE: Path = project_root / "mail_pipeline_processor.lock"
 
 
 # The subject template to search for (IMAP does a substring match)
