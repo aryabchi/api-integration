@@ -94,9 +94,13 @@ flowchart TD
 
     R -- Нет --> API2["Создание RFQ: POST /api/v1/rfq"]
 
-    API2 --> API3["Доавление поставщиков: PUT /api/v1/rfq/{rfq_id}"]
+    API2 --> API3["Добавление поставщиков: PUT /api/v1/rfq/{rfq_id}"]
 
-    API3 --> U{"Запросы выполнены успешно?"}
+    API3 --> API4["Загрузка шаблона лота: POST /api/v1/rfq/lot-templates/import"]
+
+    API4 --> API5["Привязка шаблона лота к RFQ: POST /api/v1//rfq/{rfq_id}/lot"]
+
+    API5 --> U{"Запросы выполнены успешно?"}
 
     U -- Да --> V[Сформировать ссылку на RFQ]
 
@@ -144,7 +148,7 @@ flowchart TD
     %% Выделение API-вызовов
     classDef api fill:#D6EAF8,stroke:#1F78B4,stroke-width:2px,color:#000,font-weight:bold;
 
-    class API1,API2,API3 api;
+    class API1,API2,API3,API4,API5 api;
 ```
 
 

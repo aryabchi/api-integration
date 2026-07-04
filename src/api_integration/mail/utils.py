@@ -3,6 +3,17 @@ import json
 import os
 
 
+def _normalize_error(error) -> list[str]:
+    """Normalize error field to list[str] format (backward compat)."""
+    if error is None:
+        return []
+    if isinstance(error, str):
+        return [error]
+    if isinstance(error, list):
+        return error
+    return [str(error)]
+
+
 def get_rfq_draft_url(rfq_id: int, template: str = RFQ_DRAFT_URL) -> str:
     return template.format(rfq_id=rfq_id)
 

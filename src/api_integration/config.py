@@ -38,7 +38,12 @@ class Settings(BaseSettings):
     SEVEN_RIGHTS_API_VERSION: str = Field(description="Суффикс с версией API 7rights")
     SEVEN_RIGHTS_API_KEY: str = Field(description="API ключ 7rights")
     SEVEN_RIGHTS_API_AWAIT_TIMEOUT: int = Field(
-        description="Таймаут ожидания ответа от API, сек"
+        description="Таймаут ожидания ответа от API 7rights, сек"
+    )
+    APP_ENV: str = Field(
+        default="dev",
+        pattern="^(dev|prod)$",
+        description="Режим запуска (для логирования)",
     )
 
     @property

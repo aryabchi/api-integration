@@ -19,26 +19,35 @@ response sample:
 """
 
 from pathlib import Path
+from typing import Any
+
 import requests
 
 from api_integration.config import get_settings
+from api_integration.sevenrights.api.schemas.api_results import LotTemplateApiResult
 
 
 def post_lot_template(
-    file_path: str | Path,
-    default_lot_template_id: int | None = None,
+    data: dict[str, Any] | None = None,
     timeout: int = 30,
-):
+) -> LotTemplateApiResult:
     """
     Post an Excel file as a new lot template via multipart/form-data upload.
     Implements POST /api/v1/rfq/lot-templates/import
     Returns:
-        dict {lot_template_id, error}
+        LotTemplateApiResult: dict with keys "error" and "lot_template_id"
     """
 
     settings = get_settings()
 
-    file_path = Path(file_path)
+    if not data:
+        return {
+            "error": "Missing lot_template data",
+            "lot_template_id": None,
+        }
+
+    file_path = Path(data.get("path", ""))
+    default_lot_template_id = data.get("lot_template_id")
     if not file_path.exists():
         return {
             "error": f"File not found: {file_path}",
@@ -88,6 +97,13 @@ def post_lot_template(
             lot_template_id = lot_template_id_from_response
         else:
             lot_template_id = default_lot_template_id
+
+        if lot_template_id is None:
+            return {
+                "error": "Missing lot_template_id in response and no default provided",
+                "lot_template_id": None,
+            }
+
         return {
             "error": None,
             "lot_template_id": lot_template_id,

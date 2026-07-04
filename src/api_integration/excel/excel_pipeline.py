@@ -80,7 +80,7 @@ def process_attachments(
     """
     End-to-end wrapper: find templates, validate, read lot and RFQ Excel, remap, merge.
     """
-    result: dict[str, Any] = {"lot_template": None, "rfq_template": None, "error": None}
+    result: dict[str, Any] = {"lot_template": None, "rfq_template": None, "error": []}
 
     try:
         templates = find_attachment_templates(directory, extensions)
@@ -92,36 +92,36 @@ def process_attachments(
                 f"RFQ template filename should include one of: {', '.join(ALLOWED_ATTACHMENT_RFQ_TEMPLATE_TERMS)}."
             )
             print(msg)
-            result["error"] = msg
+            result["error"] = [msg]
             return result
 
         if not templates.rfq_template:
             msg = "No RFQ template file found"
             print(msg)
-            result["error"] = msg
+            result["error"] = [msg]
             return result
 
         if templates.lot_template:
             lot_path = Path(directory) / templates.lot_template[0]
             lot_result = read_lot_excel(lot_path)
             if "error" in lot_result:
-                result["error"] = lot_result["error"]
+                result["error"] = [lot_result["error"]]
                 result["lot_template"] = None
             else:
                 result["lot_template"] = lot_result
 
         rfq_path = Path(directory) / templates.rfq_template[0]
-        data = read_tender_excel(rfq_path)
-        if "error" in data:
-            result["error"] = data["error"]
+        rfq_data = read_tender_excel(rfq_path)
+        if "error" in rfq_data:
+            result["error"] = [rfq_data["error"]]
             return result
 
-        rfq_data = remap_excel_to_rfq_properties(data)
+        rfq_data = remap_excel_to_rfq_properties(rfq_data)
         rfq_data = apply_excel_value_mappings(rfq_data)
         result["rfq_template"] = merge_rfq_with_defaults(rfq_data)
 
     except Exception as exc:
-        result["error"] = str(exc)
+        result["error"] = [str(exc)]
 
     return result
 

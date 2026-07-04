@@ -29,7 +29,7 @@ def send_replies(
     sender_password: str = None,
     download_dir: str = DOWNLOADS_DIR,
     exclude: tuple = ("junk",),
-    subfolder: str = None,
+    subfolder: str | None = None,
     dry_run: bool = False,
     test_run: bool = False,
 ) -> int:

@@ -10,7 +10,7 @@ from api_integration.constants import (
     EXCEL_TO_RFQ_VALUES_MAPPING,
     RFQ_TO_DEFAULTS_MAPPING,
 )
-from api_integration.sevenrights.api.schemas.rfq import RfqCreateRequest
+from api_integration.sevenrights.api.schemas.api_requests import RfqCreateRequest
 
 
 def read_tender_excel(
@@ -29,11 +29,15 @@ def read_tender_excel(
         dict with str keys and str values, or {"error": "..."} if sheet is missing.
     """
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings(
-            action="ignore", message="Data Validation extension is not supported"
-        )
-        wb = load_workbook(path, data_only=True)
+    try:
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action="ignore", message="Data Validation extension is not supported"
+            )
+            wb = load_workbook(path, data_only=True)
+    except Exception as exc:
+        return {"error": f"Failed to load workbook: {exc}"}
+
     if sheet_name not in wb.sheetnames:
         msg = f"Sheet '{sheet_name}' not found in {path}. Available sheets: {wb.sheetnames}"
         print(msg)
@@ -128,18 +132,14 @@ def apply_excel_value_mappings(data: dict[str, str], sep: str = ";") -> dict[str
     individually (unmapped parts are excluded). If at least one part is mapped:
     - all mapped values are lists -> flattened into a single list
     - otherwise -> single value if one mapped part, else list of mapped values
-    If the input contains an 'error' key, returns a dict with only the error.
 
     Args:
         data: Dictionary with RFQ property names and raw Excel string values.
         sep: multi-valued Excel string values separator
 
     Returns:
-        Dictionary with converted values, or {'error': ...} if input contains an error.
+        Dictionary with converted values.
     """
-    if "error" in data:
-        return {"error": data["error"]}
-
     result: dict[str, Any] = {}
     for key, value in data.items():
         if key not in EXCEL_TO_RFQ_VALUES_MAPPING:
@@ -198,15 +198,12 @@ def remap_excel_to_rfq_properties(data: dict[str, str]) -> dict[str, str]:
 
     Returns:
         New dictionary with remapped keys where mapping exists.
-        If input contains 'error', it is retained in the output.
     """
     result = {
         rfq_key: data[excel_key]
         for excel_key, rfq_key in EXCEL_TO_RFQ_MAPPING.items()
         if excel_key in data
     }
-    if "error" in data:
-        result["error"] = data["error"]
     return result
 
 
@@ -214,17 +211,13 @@ def merge_rfq_with_defaults(data: dict[str, str]) -> dict[str, str]:
     """
     Merges the remapped RFQ dictionary with RFQ_TO_DEFAULTS_MAPPING from constants.py.
     Missing fields are added from defaults; overlapping keys take precedence from defaults.
-    If the input contains an 'error' key, returns a dict with only the error.
 
     Args:
         data: Dictionary returned by remap_excel_to_rfq_properties()
 
     Returns:
-        Merged dictionary, or {'error': ...} if input contains an error.
+        Merged dictionary.
     """
-    if "error" in data:
-        return {"error": data["error"]}
-
     merged = dict(data)
     merged.update(RFQ_TO_DEFAULTS_MAPPING)
     return merged

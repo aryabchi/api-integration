@@ -3,11 +3,16 @@ import requests
 from pydantic import ValidationError
 
 from api_integration.config import get_settings
-from api_integration.sevenrights.api.schemas.rfq import RfqUpdateSupplierGroupIdsRequest
+from api_integration.sevenrights.api.schemas.api_requests import (
+    RfqUpdateSupplierGroupIdsRequest,
+)
+from api_integration.sevenrights.api.schemas.api_results import RfqApiResult
 from api_integration.sevenrights.api.utils import _print_validation_errors
 
 
-def put_rfq_supplier_group_ids(rfq_id: int, data: dict, timeout: int = 30) -> dict:
+def put_rfq_supplier_group_ids(
+    rfq_id: int, data: dict, timeout: int = 30
+) -> RfqApiResult:
     settings = get_settings()
 
     payload_data = data

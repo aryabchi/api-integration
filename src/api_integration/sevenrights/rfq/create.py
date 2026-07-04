@@ -10,12 +10,13 @@ from api_integration.constants import (
 from api_integration.sevenrights.api.search_rfq import search_rfq
 from api_integration.sevenrights.rfq.utils import split_rfq_payload
 from api_integration.sevenrights.rfq.create_rfq_pipeline import create_rfq
+from api_integration.sevenrights.api.utils import _normalize_error
 
 
 def create_rfqs(
     download_dir: str = DOWNLOADS_DIR,
     exclude: tuple = ("junk",),
-    subfolder: str = None,
+    subfolder: str | None = None,
     dry_run: bool = False,
     test_run: bool = False,
     timeout: int = 30,
@@ -55,6 +56,10 @@ def create_rfqs(
         with open(excel_marker_path, "r", encoding="utf-8") as f:
             rfq_data = json.load(f)
 
+        # Normalize error field (backward compat: old files may have str or None)
+        if "error" in rfq_data:
+            rfq_data["error"] = _normalize_error(rfq_data["error"])
+
         # Check if RFQ_EXCEL_MARKER has non-empty error - skip processing
         if rfq_data.get("error"):
             print(
@@ -80,19 +85,20 @@ def create_rfqs(
         payload = split_rfq_payload(rfq_data)
 
         # Prevent duplicate RFQ creation: search by title before posting (guarded)
+        search_error = None
         # If a matching RFQ exists, skip creation and record its id in the error result
         # TODO: refactor
         if IS_SEARCH_EXISTING_RFQ_BEFORE_POST:
             search_title = (payload.rfq_template or {}).get("title")
             if search_title:
                 search_result = search_rfq(search_title, timeout=timeout)
-                if (
-                    search_result.get("error") is None
-                    and search_result.get("rfq_id") is not None
-                ):
+                search_error = search_result.get("error")
+                if search_error is None and search_result.get("rfq_id") is not None:
                     existing_id = search_result["rfq_id"]
                     result = {
-                        "error": f"RFQ '{search_title}' already exists with id={existing_id}",
+                        "error": [
+                            f"RFQ '{search_title}' already exists with id={existing_id}"
+                        ],
                         "rfq_id": None,
                     }
                     with open(info_marker_path, "w", encoding="utf-8") as f:
@@ -106,10 +112,15 @@ def create_rfqs(
         # No duplicated RFQs found, can proceed to FRQ and lot template creation
         result = create_rfq(rfq_data, timeout=timeout)
 
+        # Accumulate search_rfq error if any
+        if search_error:
+            result["error"] = _normalize_error(result.get("error"))
+            result["error"].append(search_error)
+
         with open(info_marker_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
 
-        if result.get("error") is None:
+        if not result.get("error"):
             print(
                 f"  ✓ created RFQ {result.get('rfq_id')} for {os.path.basename(folder_path)}"
             )
@@ -119,7 +130,7 @@ def create_rfqs(
             )
         else:
             print(
-                f"  ✗ failed to create RFQ for {os.path.basename(folder_path)}: {result.get('error')}"
+                f"  ✗ failed to create RFQ for {os.path.basename(folder_path)}: {', '.join(result.get('error', []))}"
             )
 
         processed += 1

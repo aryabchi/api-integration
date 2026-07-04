@@ -4,7 +4,7 @@ from pathlib import Path
 
 project_root = Path(__file__).resolve().parent.parent.parent
 
-# Flag to skip calling put_rfq_supplier_group_ids (PUT call may slow pipe down)
+# Flag to skip calling put_rfq_supplier_group_ids (PUT call may slow pipeline down)
 # True - skip, False - execute
 IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
 
@@ -15,7 +15,8 @@ IS_SEARCH_EXISTING_RFQ_BEFORE_POST = False
 # Default lot_template_id (unless brand new created first)
 # 12993 -> Копия ТЗ Самсунг Артем перезакуп Хабаровский край 19.06.2026.xlsx
 # 13200 -> "ТЗ Малино-Смоленск.xlsx"
-# None -> MUST BE value as template_id is not know apriori
+
+# None -> MUST-BE value as template_id is not know apriori
 RFQ_DEFAULT_LOT_TEMPLATE_ID: int | None = None
 
 

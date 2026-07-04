@@ -8,7 +8,7 @@ from api_integration.excel.excel_pipeline import process_attachments
 def process_attachments_wrapper(
     download_dir: str = DOWNLOADS_DIR,
     exclude: tuple = ("junk",),
-    subfolder: str = None,
+    subfolder: str | None = None,
     dry_run: bool = False,
     test_run: bool = False,
 ) -> int:
@@ -49,10 +49,12 @@ def process_attachments_wrapper(
         with open(excel_marker_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
 
-        if result.get("error") is None:
+        if not result.get("error"):
             print(f"  ✓ processed {os.path.basename(folder_path)}")
         else:
-            print(f"  ✗ failed {os.path.basename(folder_path)}: {result.get('error')}")
+            print(
+                f"  ✗ failed {os.path.basename(folder_path)}: {', '.join(result.get('error', []))}"
+            )
 
         processed += 1
 
