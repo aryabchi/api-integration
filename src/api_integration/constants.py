@@ -33,8 +33,12 @@ DOWNLOADS_DIR = f"{project_root}/downloads"
 # Local directory for user-level json configurations
 CONFIG_DIR = f"{project_root}/config"
 
-# Config dir for trusted recipients
+# Trusted recipients file location
 TRUSTED_RECIPIENTS_FILE = f"{CONFIG_DIR}/trusted_recipients.json"
+
+# Lock file location - project root (safest location)
+LOCK_FILE: Path = project_root / "mail_pipeline_processor.lock"
+
 
 # The subject template to search for (IMAP does a substring match)
 SUBJECT_TEMPLATE = "*"
