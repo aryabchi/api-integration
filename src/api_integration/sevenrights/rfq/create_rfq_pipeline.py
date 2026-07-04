@@ -1,4 +1,3 @@
-from typing import Any
 from api_integration.sevenrights.api.post_rfq import post_rfq
 from api_integration.sevenrights.api.post_lot_template import post_lot_template
 from api_integration.sevenrights.api.post_rfq_lot import post_rfq_lot
@@ -12,7 +11,7 @@ from api_integration.sevenrights.api.utils import _normalize_error
 
 def create_rfq(rfq_data, timeout: int = 30) -> RfqResult:
     """
-    Implements complete RFQ creation piplene:
+    Implements complete RFQ creation piplene with error accumulation:
     - split payload
     - post RFQ draft
     - update draft with suppliers

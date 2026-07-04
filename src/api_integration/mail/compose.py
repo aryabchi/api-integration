@@ -10,18 +10,7 @@ from api_integration.constants import (
     RFQ_EXCEL_MARKER,
     REPLY_BODY_MARKER,
 )
-from api_integration.mail.utils import get_rfq_draft_url
-
-
-def _normalize_error(error) -> list[str]:
-    """Normalize error field to list[str] format (backward compat)."""
-    if error is None:
-        return []
-    if isinstance(error, str):
-        return [error]
-    if isinstance(error, list):
-        return error
-    return [str(error)]
+from api_integration.mail.utils import get_rfq_draft_url, _normalize_error
 
 
 def _extract_nested_value(data: dict = None, key_path: str = "") -> str:
