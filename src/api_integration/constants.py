@@ -37,8 +37,8 @@ TRUSTED_RECIPIENTS_FILE = f"{CONFIG_DIR}/trusted_recipients.json"
 LOCK_FILE: Path = project_root / "mail_pipeline_processor.lock"
 
 
-# Flag to skip calling put_rfq_supplier_group_ids (PUT call may slow pipeline down)
-# True - skip, False - execute
+# Flag to skip calling put_rfq_supplier_group_ids
+# True - skip, False - execute (should be value)
 IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
 
 # Flag to do/skip RFQ search (by title) before creation attempt
