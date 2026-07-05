@@ -234,3 +234,7 @@ samples/*
 
 # lock file
 *.lock
+
+# log files
+logs/*
+*.log
