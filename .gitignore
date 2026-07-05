@@ -238,3 +238,6 @@ samples/*
 # log files
 logs/*
 *.log
+
+# 
+src/api_integration/_version.py
