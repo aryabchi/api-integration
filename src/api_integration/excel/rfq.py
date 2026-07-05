@@ -1,5 +1,6 @@
 import json
 import warnings
+import logging
 from pathlib import Path
 from typing import Any, Union
 
@@ -11,6 +12,8 @@ from api_integration.constants import (
     RFQ_TO_DEFAULTS_MAPPING,
 )
 from api_integration.sevenrights.api.schemas.api_requests import RfqCreateRequest
+
+logger = logging.getLogger(__name__)
 
 
 def read_tender_excel(
@@ -40,7 +43,7 @@ def read_tender_excel(
 
     if sheet_name not in wb.sheetnames:
         msg = f"Sheet '{sheet_name}' not found in {path}. Available sheets: {wb.sheetnames}"
-        print(msg)
+        logger.info(msg)
         return {"error": msg}
 
     ws = wb[sheet_name]

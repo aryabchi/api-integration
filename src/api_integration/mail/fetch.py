@@ -3,15 +3,17 @@ import json
 import imaplib
 import email
 import traceback
+import logging
 from email.header import decode_header
 from email.utils import parseaddr
 from api_integration.mail.sanitizers import sanitize_filename
 from api_integration.mail.utils import is_trusted_email
-
 from api_integration.constants import (
     DOWNLOADS_DIR,
     IMAP_MAIL_SEARCH_TEMPLATE,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def decode_mime_filename(filename_header):
@@ -48,22 +50,24 @@ def fetch_mail(
     os.makedirs(download_dir, exist_ok=True)
     mail = None
     try:
-        print(f"Connecting to {imap_server}...")
+        logger.info(f"Connecting to {imap_server}...")
         mail = imaplib.IMAP4_SSL(imap_server, imap_port)
 
-        print("Logging in...")
+        logger.info("Logging in...")
         mail.login(mailbox, password)
         mail.select("INBOX")
 
-        print(f"Searching for emails by pattern: '{imap_mail_search_template}'...")
+        logger.info(
+            f"Searching for emails by pattern: '{imap_mail_search_template}'..."
+        )
         status, messages = mail.search(None, imap_mail_search_template)
 
         if status != "OK":
-            print("No emails found or search failed.")
+            logger.warning("No emails found or search failed.")
             return
 
         email_ids = messages[0].split()
-        print(f"Found {len(email_ids)} matching email(s).")
+        logger.info(f"Found {len(email_ids)} matching email(s).")
 
         attachments_saved = 0
         emails_skipped = 0
@@ -100,7 +104,7 @@ def fetch_mail(
 
                 # --- 2. Skip if folder already exists ---
                 if os.path.isdir(email_folder_path):
-                    print(f"  -> Skipping (folder already exists): {folder_name}")
+                    logger.info(f"  -> Skipping (folder already exists): {folder_name}")
                     emails_skipped += 1
                     continue
 
@@ -116,8 +120,8 @@ def fetch_mail(
                 else:
                     subject = subject_raw or "(no subject)"
 
-                print(f"\nProcessing email: {subject}")
-                print(f"  -> Saved to folder: {folder_name}")
+                logger.info(f"Processing email: {subject}")
+                logger.info(f"  -> Saved to folder: {folder_name}")
 
                 # --- Persist metadata ---
                 metadata = {
@@ -186,21 +190,23 @@ def fetch_mail(
                     with open(filepath, "wb") as f:
                         f.write(part.get_payload(decode=True))
 
-                    print(f"    -> Saved attachment: {os.path.basename(filepath)}")
+                    logger.info(
+                        f"    -> Saved attachment: {os.path.basename(filepath)}"
+                    )
                     attachments_saved += 1
 
-        print(f"\nTotal attachments saved: {attachments_saved}")
-        print(f"Total emails skipped (already processed): {emails_skipped}")
+        logger.info(f"Total attachments saved: {attachments_saved}")
+        logger.info(f"Total emails skipped (already processed): {emails_skipped}")
 
     except imaplib.IMAP4.error as e:
-        print(f"IMAP Error: {e}")
-        print(
+        logger.error(f"IMAP Error: {e}")
+        logger.info(
             "Hints:\n"
             "- Ensure you are using an App Password, not regular Yandex password.\n"
             "- Ensure the IMAP is turned on in Yandex account settings.\n"
         )
     except Exception as e:
-        print(f"An error occurred: {e}")
+        logger.error(f"An error occurred: {e}")
         traceback.print_exc()
     finally:
         if mail:

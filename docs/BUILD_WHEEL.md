@@ -159,3 +159,13 @@ python -m build
 
 - `INSTALL_FROM_WHEEL.md` — инструкция по установке готового wheel
 - `README.md` — общая документация проекта
+
+
+## Комментарии 
+
+Если у пользователя нет прав на установку (pip install) на целевой машине
+
+```
+pip download . --destination-directory dist\dependencies
+# dist/* --> target host 
+```

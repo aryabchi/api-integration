@@ -3,6 +3,7 @@ import re
 import json
 import smtplib
 import datetime
+import logging
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from api_integration.constants import (
@@ -10,6 +11,8 @@ from api_integration.constants import (
     REPLY_SENT_MARKER,
     REPLY_BODY_MARKER,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def _extract_email_address(field: str) -> str:
@@ -43,7 +46,7 @@ def send_replies(
     """
 
     if not sender_email or not sender_password:
-        print("sender_email and sender_password are required.")
+        logger.warning("sender_email and sender_password are required.")
         return 0
 
     sent = 0
@@ -53,12 +56,12 @@ def send_replies(
     if subfolder:
         folder_path = os.path.join(download_dir, subfolder)
         if not os.path.isdir(folder_path):
-            print(f"✗ Subfolder not found: {folder_path}")
+            logger.warning(f"✗ Subfolder not found: {folder_path}")
             return 0
         folders_to_process = [folder_path]
     else:
         if not os.path.isdir(download_dir):
-            print(f"Download directory not found: {download_dir}")
+            logger.warning(f"Download directory not found: {download_dir}")
             return 0
         folders_to_process = [
             os.path.join(download_dir, entry)
@@ -73,12 +76,14 @@ def send_replies(
 
         if not (os.path.isfile(meta_path) and os.path.isfile(reply_path)):
             if subfolder:
-                print(f"  ✗ Missing email_meta.json or reply.txt in {subfolder}")
+                logger.warning(
+                    f"  ✗ Missing email_meta.json or reply.txt in {subfolder}"
+                )
             continue
 
         # --- Skip if reply was already sent (unless test_run mode) ---
         if os.path.exists(sent_marker_path) and not test_run:
-            print(
+            logger.info(
                 f"  -> Skipping (reply already sent): {os.path.basename(folder_path)}"
             )
             skipped += 1
@@ -91,7 +96,7 @@ def send_replies(
 
         recipient = _extract_email_address(meta.get("from", ""))
         if not recipient:
-            print(
+            logger.warning(
                 f"  ✗ no recipient found in {os.path.basename(folder_path)}, skipping"
             )
             continue
@@ -111,7 +116,7 @@ def send_replies(
         msg.attach(MIMEText(reply_text, subtype, "utf-8"))
 
         if dry_run:
-            print(
+            logger.info(
                 f"  [dry-run] would send to {recipient} (folder: {os.path.basename(folder_path)})"
             )
             sent += 1
@@ -127,11 +132,13 @@ def send_replies(
             with open(sent_marker_path, "w", encoding="utf-8") as f:
                 f.write(f"Reply sent on {datetime.datetime.now().isoformat()}\n")
 
-            print(f"  ✓ sent to {recipient} (folder: {os.path.basename(folder_path)})")
+            logger.info(
+                f"  ✓ sent to {recipient} (folder: {os.path.basename(folder_path)})"
+            )
             sent += 1
         except Exception as e:
-            print(f"  ✗ failed for {recipient}: {e}")
+            logger.error(f"  ✗ failed for {recipient}: {e}")
 
-    print(f"\nTotal replies sent: {sent}")
-    print(f"Total replies skipped (already sent): {skipped}")
+    logger.info(f"Total replies sent: {sent}")
+    logger.info(f"Total replies skipped (already sent): {skipped}")
     return sent

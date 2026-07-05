@@ -18,6 +18,9 @@ dependencies = [
     "openpyxl==3.1.5",
 ]
 
+[project.scripts]
+run-api-integration = "api_integration.pipeline:run_pipeline_with_lock"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",

@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 
 from api_integration.constants import (
     DOWNLOADS_DIR,
@@ -11,6 +12,8 @@ from api_integration.constants import (
     REPLY_BODY_MARKER,
 )
 from api_integration.mail.utils import get_rfq_draft_url, _normalize_error
+
+logger = logging.getLogger(__name__)
 
 
 def _extract_nested_value(data: dict = None, key_path: str = "") -> str:
@@ -144,12 +147,12 @@ def generate_replies(
     if subfolder:
         folder_path = os.path.join(download_dir, subfolder)
         if not os.path.isdir(folder_path):
-            print(f"✗ Subfolder not found: {folder_path}")
+            logger.warning(f"✗ Subfolder not found: {folder_path}")
             return 0
         folders_to_process = [folder_path]
     else:
         if not os.path.isdir(download_dir):
-            print(f"Download directory not found: {download_dir}")
+            logger.warning(f"Download directory not found: {download_dir}")
             return 0
         folders_to_process = [
             os.path.join(download_dir, entry)
@@ -172,7 +175,7 @@ def generate_replies(
 
         # Skip if reply file already exists (unless test_run mode)
         if os.path.exists(reply_path) and not test_run:
-            print(f"  -> Skipping (reply already exists): {entry}")
+            logger.info(f"  -> Skipping (reply already exists): {entry}")
             skipped += 1
             continue
 
@@ -205,12 +208,12 @@ def generate_replies(
 
         # If still no rfq_info (neither marker exists or excel has no error), skip
         if rfq_info is None:
-            print(f"  -> Skipping (no RFQ info marker): {entry}")
+            logger.info(f"  -> Skipping (no RFQ info marker): {entry}")
             skipped += 1
             continue
 
         if dry_run:
-            print(f"  [dry-run] would generate reply for: {entry}")
+            logger.info(f"  [dry-run] would generate reply for: {entry}")
             generated += 1
             continue
 
@@ -234,9 +237,9 @@ def generate_replies(
         with open(reply_path, "w", encoding="utf-8") as f:
             f.write(reply_text)
 
-        print(f"  ✓ reply generated for: {entry}")
+        logger.info(f"  ✓ reply generated for: {entry}")
         generated += 1
 
-    print(f"\nTotal replies generated: {generated}")
-    print(f"Total replies skipped: {skipped}")
+    logger.info(f"Total replies generated: {generated}")
+    logger.info(f"Total replies skipped: {skipped}")
     return generated
