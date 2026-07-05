@@ -59,7 +59,14 @@ class Settings(BaseSettings):
     APP_ENV: str = Field(
         default="dev",
         pattern="^(dev|prod)$",
-        description="Режим запуска",
+        description="Режим запуска (критически влиется на project_root -> поиск .env и расположение рабочих директорий)",
+    )
+    # поля для логирования
+    LOG_LEVEL: str = Field(
+        default="INFO", pattern="^(DEBUG|INFO|WARNING|ERROR|CRITICAL)$"
+    )
+    LOG_FILE_NAME: str = Field(
+        default="pipeline.log", description="Имя файла для логов"
     )
 
     @property

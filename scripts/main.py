@@ -35,11 +35,9 @@ TEST_RUN: bool = False
 
 
 if __name__ == "__main__":
-    from api_integration.constants import project_root
     from api_integration.config import get_settings
 
     settings = get_settings()
-    print(f"APP_ENV={settings.APP_ENV}, project_root={project_root}")
 
     # Call locking wrapper around business logic pipeline
     run_pipeline_with_lock(

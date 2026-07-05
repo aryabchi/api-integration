@@ -1,9 +1,11 @@
+import logging
 from typing import Any, Union
 from pathlib import Path
-
 from openpyxl import load_workbook
 
 from api_integration.constants import RFQ_DEFAULT_LOT_TEMPLATE_ID
+
+logger = logging.getLogger(__name__)
 
 
 def read_lot_excel(
@@ -18,7 +20,7 @@ def read_lot_excel(
         wb = load_workbook(path, data_only=True)
         if sheet_name not in wb.sheetnames:
             msg = f"Sheet '{sheet_name}' not found in {path}. Available sheets: {wb.sheetnames}"
-            print(msg)
+            logger.info(msg)
             return {"error": msg}
         # TODO: add data validation logic
         return {

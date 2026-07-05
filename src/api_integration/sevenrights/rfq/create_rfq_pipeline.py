@@ -1,3 +1,4 @@
+import logging
 from api_integration.sevenrights.api.post_rfq import post_rfq
 from api_integration.sevenrights.api.post_lot_template import post_lot_template
 from api_integration.sevenrights.api.post_rfq_lot import post_rfq_lot
@@ -7,6 +8,8 @@ from api_integration.sevenrights.api.put_rfq_supplier_group_ids import (
 )
 from api_integration.sevenrights.api.schemas.api_results import RfqResult
 from api_integration.sevenrights.api.utils import _normalize_error
+
+logger = logging.getLogger(__name__)
 
 
 def create_rfq(rfq_data, timeout: int = 30) -> RfqResult:
@@ -20,7 +23,7 @@ def create_rfq(rfq_data, timeout: int = 30) -> RfqResult:
     """
 
     payload = split_rfq_payload(rfq_data)
-    print("    -> Creaitng RFQ draft...")
+    logger.info("    -> Creaitng RFQ draft...")
     result = post_rfq(data=payload.rfq_template, timeout=timeout)
     result["error"] = _normalize_error(result.get("error"))
 
@@ -29,7 +32,7 @@ def create_rfq(rfq_data, timeout: int = 30) -> RfqResult:
         return result
 
     if payload.rfq_suppliers is not None:
-        print(f"    -> [{result['rfq_id']}] Adding supplier groups to RFQ...")
+        logger.info(f"    -> [{result['rfq_id']}] Adding supplier groups to RFQ...")
         put_result = put_rfq_supplier_group_ids(
             rfq_id=result["rfq_id"],
             data=payload.rfq_suppliers,
@@ -41,7 +44,7 @@ def create_rfq(rfq_data, timeout: int = 30) -> RfqResult:
     # Handle lot template if present in payload
     if payload.lot_template:
         # Upload lot template (function decides: upload file or use default ID)
-        print(f"    -> [{result['rfq_id']}] Importing lot template...")
+        logger.info(f"    -> [{result['rfq_id']}] Importing lot template...")
         lot_result = post_lot_template(
             data=payload.lot_template,
             timeout=timeout,
@@ -52,7 +55,7 @@ def create_rfq(rfq_data, timeout: int = 30) -> RfqResult:
         lot_template_id = lot_result["lot_template_id"]
 
         # Bind lot template to RFQ (lot_template_id guaranteed not None after early return)
-        print(
+        logger.info(
             f"    -> [{result['rfq_id']}] Binding lot template {lot_template_id} to RFQ..."
         )
         lot_bind_result = post_rfq_lot(

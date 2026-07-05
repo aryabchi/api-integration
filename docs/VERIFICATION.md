@@ -60,9 +60,16 @@ pip install C:\full_path_to\api_integration-0.1.0-py3-none-any.whl
 pip install --no-index --find-links=C:\путь_к_папке_dist\dependencies\ --find-links=C:\путь_к_папке_dist\ api_integration
 ```
 
+*При обновлении версии*
+
+```bash
+pip install --upgrade --no-index --find-links=C:\TestUserEnv\dist\dependencies\ --find-links=C:\TestUserEnv\dist\ api_integration
+```
+
 * `--no-index` — принудительно запрещает `pip` ходить в интернет на сайт PyPI.
 * `--find-links=...` — указывает локальные папки, где лежат заготовленные `.whl` файлы зависимостей и вашей библиотеки.
 * `api_integration` — имя вашего пакета из `pyproject.toml`, который `pip` найдет в указанных папках и установит.
+* `--upgrade` — заставляет pip удалить старую версию библиотеки, удалить старый .exe файл и установить новые.
 
 *Результат:* Все библиотеки (`pydantic` и др.) и ваша точка входа `run-api-integration.exe` успешно развернуты внутри `C:\TestUserEnv\.venv\`
 
@@ -109,7 +116,7 @@ subfolder=None, dry_run=False, test_run=False
 
 ### Комментарии
 
-* В Windows 11 при попытке активировать окружение командой `.\.venv\Scripts\Activate.ps1` вы можете получить красную ошибку: «...выполнение скриптов отключено в этой системе».
+1. В Windows 11 при попытке активировать окружение командой `.\.venv\Scripts\Activate.ps1` вы можете получить красную ошибку: «...выполнение скриптов отключено в этой системе».
 
 ```
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
@@ -117,6 +124,6 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 
 Это разрешит запуск скриптов только для текущего окна терминала без изменения глобальной безопасности ОС. (При реальном запуске через Windows Scheduler этой проблемы нет, так как мы вызываем .exe напрямую, минуя .ps1
 
-* Если у пользователя нет прав на установку (pip install) на целевой машине
+2. Если у пользователя нет прав на установку (pip install) на целевой машине
 
 См. Шаг 5b

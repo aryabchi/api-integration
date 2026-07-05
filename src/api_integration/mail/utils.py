@@ -1,6 +1,9 @@
-from api_integration.constants import RFQ_DRAFT_URL, TRUSTED_RECIPIENTS_FILE
+import logging
 import json
 import os
+from api_integration.constants import RFQ_DRAFT_URL, TRUSTED_RECIPIENTS_FILE
+
+logger = logging.getLogger(__name__)
 
 
 def _normalize_error(error) -> list[str]:
@@ -34,7 +37,7 @@ def is_trusted_email(email: str, filename: str = TRUSTED_RECIPIENTS_FILE) -> boo
 
     # Return False immediately if the file does not exist
     if not os.path.exists(filename):
-        print(f"Warning: Configuration file '{filename}' not found.")
+        logger.warning(f"Warning: Configuration file '{filename}' not found.")
         return False
 
     try:
@@ -43,8 +46,8 @@ def is_trusted_email(email: str, filename: str = TRUSTED_RECIPIENTS_FILE) -> boo
             return email_clean in trusted_set
 
     except json.JSONDecodeError:
-        print(f"Error: '{filename}' contains invalid JSON formatting.")
+        logger.error(f"Error: '{filename}' contains invalid JSON formatting.")
         return False
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        logger.error(f"An unexpected error occurred: {e}")
         return False

@@ -230,20 +230,21 @@ python ./scripts/main.py
 ```
 
 
-## Сборка и распространение приложения (build/install для `APP_ENV=prod`)
+## Сборка, распространение, проверка и настройка запуска приложения (build/install для `APP_ENV=prod`)
 
 - [BUILD_WHEEL.md](docs/BUILD_WHEEL.md) — как собрать wheel проекта
 - [INSTALL_FROM_WHEEL.md](docs/INSTALL_FROM_WHEEL.md) — как установить wheel на целевую машину
 - [VERIFICATION.md](docs/VERIFICATION.md) - как установить wheel и проверить скрипт на целевой машине (`prod mode`)
-
+- [DEPLOYMENT_WINDOWS.md](docs/DEPLOYMENT_WINDOWS.md) - как настроить автоматический запуск в Планировщике задач
 
 ## Где смотреть настройки скрипта
 
-Для пользователя
+Для пользователя:
 * `.env` - локальный файл с секретами для переменных окружения (**необходимо создать** в корне и заполнить ключи значениями по шаблону `.env.example`)
 * `/config/trusted_recipients.json` - доверенные адресаты 
 
-Для программиста также 
+Для программиста:
+*  `.env`
 * `/src/constants.py` - константы, пути, маппинги, шаблоны, etc. (назначение объяснено в комментарии к каждой переменной)
 
 
