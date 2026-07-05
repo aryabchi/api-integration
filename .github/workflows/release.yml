@@ -1,0 +1,59 @@
+name: Automated Version Bump and GitHub Release
+
+on:
+  push:
+    branches:
+      - main # Запуск при любом прямом пуше или слиянии PR в ветку main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Критически важно для создания тегов и релизов
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Скачиваем всю историю Git, чтобы setuptools-scm видел прошлые теги
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-python: "3.11"
+
+      # 1. Автоматический расчет следующей версии и создание Git-тега
+      - name: Automated Version Bump
+        id: tag_version
+        uses: anothrNick/github-tag-action@1.64.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true # Теги будут создаваться в формате v1.0.0
+          DEFAULT_BUMP: patch # Если в коммитах нет ключевых слов, увеличиваем патч (0.1.0 -> 0.1.1)
+          # Опционально: если в описании PR или коммите есть #major или #minor, 
+          # шаг автоматически увеличит соответствующую часть версии.
+
+      # 2. Обновляем локальные теги перед сборкой пакета
+      - name: Fetch newly created tag
+        run: git fetch --tags
+
+      # 3. Собираем Wheel пакет (.whl теперь получит строго новую версию из тега)
+      - name: Install Build Tools & Build Package
+        run: |
+          pip install build
+          python -m build
+
+      # 4. Автоматическое создание GitHub Release и прикрепление .whl артефактов
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          generate_release_notes: true # описание релиза на основе PR
+          draft: false
+          prerelease: false
+          files: |
+            dist/*.whl
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
