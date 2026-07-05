@@ -91,6 +91,7 @@ cp .env.example .env
 - `IMAP_SERVER` / `IMAP_PORT`
 - `SMTP_SERVER` / `SMTP_PORT`
 - `SEVEN_RIGHTS_API_BASE_URL` / `SEVEN_RIGHTS_API_VERSION` / `SEVEN_RIGHTS_API_KEY`
+- `APP_ENV=prod`
 
 Создайте `config/trusted_recipients.json` со списком доверенных email-адресов.
 
@@ -105,3 +106,7 @@ python ./scripts/main.py
 - Пакет устанавливается в `site-packages` целиком и не требует исходного кода.
 - При обновлении пакета сначала удалите старую версию (`pip uninstall api_integration`) и установите новый wheel.
 - Для разработки используйте editable-режим: `pip install -e .`
+
+## Запуск через Планировщик заданий (Task Scheduler)
+
+* В планировщике Windows **обязательно** должно быть заполнено поле "Рабочая папка" (Start in). Корнем проекта (там же находится `.env`) считается она

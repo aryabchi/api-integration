@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=64", "wheel"]
+requires = ["setuptools>=64", "wheel", "setuptools-scm>=8.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "api_integration"
-version = "0.1.0"
+dynamic = ["version"]
 description = "API integration for 7rights RFQ automation"
 readme = "README.md"
 authors = [
@@ -17,6 +17,9 @@ dependencies = [
     "requests==2.33.0",
     "openpyxl==3.1.5",
 ]
+
+[project.scripts]
+run-api-integration = "api_integration.pipeline:run_pipeline_with_lock"
 
 [project.optional-dependencies]
 dev = [
@@ -33,3 +36,6 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.setuptools_scm]
+version_file = "src/api_integration/_version.py" # Опционально: создаст файл версии внутри пакет

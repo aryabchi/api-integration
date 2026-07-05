@@ -1,4 +1,5 @@
 import json
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Union
@@ -15,6 +16,8 @@ from api_integration.excel.rfq import (
     merge_rfq_with_defaults,
 )
 from api_integration.excel.lot import read_lot_excel
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -91,13 +94,13 @@ def process_attachments(
                 f"Lot template filename should include one of: {', '.join(ALLOWED_ATTACHMENT_LOT_TEMPLATE_TERMS)}. "
                 f"RFQ template filename should include one of: {', '.join(ALLOWED_ATTACHMENT_RFQ_TEMPLATE_TERMS)}."
             )
-            print(msg)
+            logger.info(msg)
             result["error"] = [msg]
             return result
 
         if not templates.rfq_template:
             msg = "No RFQ template file found"
-            print(msg)
+            logger.info(msg)
             result["error"] = [msg]
             return result
 

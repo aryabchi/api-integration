@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 
 from api_integration.constants import (
     DOWNLOADS_DIR,
@@ -11,6 +12,8 @@ from api_integration.sevenrights.api.search_rfq import search_rfq
 from api_integration.sevenrights.rfq.utils import split_rfq_payload
 from api_integration.sevenrights.rfq.create_rfq_pipeline import create_rfq
 from api_integration.sevenrights.api.utils import _normalize_error
+
+logger = logging.getLogger(__name__)
 
 
 def create_rfqs(
@@ -27,12 +30,12 @@ def create_rfqs(
     if subfolder:
         folder_path = os.path.join(download_dir, subfolder)
         if not os.path.isdir(folder_path):
-            print(f"✗ Subfolder not found: {folder_path}")
+            logger.warning(f"✗ Subfolder not found: {folder_path}")
             return 0
         folders_to_process = [folder_path]
     else:
         if not os.path.isdir(download_dir):
-            print(f"Download directory not found: {download_dir}")
+            logger.warning(f"Download directory not found: {download_dir}")
             return 0
         folders_to_process = [
             os.path.join(download_dir, entry)
@@ -46,7 +49,7 @@ def create_rfqs(
 
         # Check RFQ_EXCEL_MARKER existence
         if not os.path.exists(excel_marker_path):
-            print(
+            logger.info(
                 f"  -> Skipping (no {RFQ_EXCEL_MARKER}): {os.path.basename(folder_path)}"
             )
             skipped += 1
@@ -62,7 +65,7 @@ def create_rfqs(
 
         # Check if RFQ_EXCEL_MARKER has non-empty error - skip processing
         if rfq_data.get("error"):
-            print(
+            logger.info(
                 f"  -> Skipping ({RFQ_EXCEL_MARKER} has error): {os.path.basename(folder_path)}"
             )
             skipped += 1
@@ -70,7 +73,7 @@ def create_rfqs(
 
         # Check RFQ_INFO_MARKER existence (unless test_run bypasses it)
         if not test_run and os.path.exists(info_marker_path):
-            print(
+            logger.info(
                 f"  -> Skipping ({RFQ_INFO_MARKER} exists): {os.path.basename(folder_path)}"
             )
             skipped += 1
@@ -78,7 +81,9 @@ def create_rfqs(
 
         if dry_run:
             mode = "test-run" if test_run else "dry-run"
-            print(f"  [{mode}] would create RFQ for {os.path.basename(folder_path)}")
+            logger.info(
+                f"  [{mode}] would create RFQ for {os.path.basename(folder_path)}"
+            )
             processed += 1
             continue
 
@@ -103,7 +108,7 @@ def create_rfqs(
                     }
                     with open(info_marker_path, "w", encoding="utf-8") as f:
                         json.dump(result, f, ensure_ascii=False, indent=2)
-                    print(
+                    logger.info(
                         f"  ✗ duplicate RFQ '{search_title}' (existing id {existing_id}) for {os.path.basename(folder_path)}"
                     )
                     skipped += 1
@@ -121,22 +126,22 @@ def create_rfqs(
             json.dump(result, f, ensure_ascii=False, indent=2)
 
         if not result.get("error"):
-            print(
+            logger.info(
                 f"  ✓ created RFQ {result.get('rfq_id')} for {os.path.basename(folder_path)}"
             )
         elif result.get("rfq_id") is not None:
-            print(
+            logger.info(
                 f"  ✓ incomplete RFQ {result.get('rfq_id')} for {os.path.basename(folder_path)}"
             )
         else:
-            print(
+            logger.info(
                 f"  ✗ failed to create RFQ for {os.path.basename(folder_path)}: {', '.join(result.get('error', []))}"
             )
 
         processed += 1
 
-    print(f"\nTotal RFQs processed: {processed}")
-    print(f"Total RFQs skipped: {skipped}")
+    logger.info(f"Total RFQs processed: {processed}")
+    logger.info(f"Total RFQs skipped: {skipped}")
     return processed
 
 
