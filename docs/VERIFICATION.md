@@ -29,23 +29,25 @@ python -m venv .venv
 *Результат:* В начале строки терминала появится префикс (`.venv`), подтверждающий, что вы внутри чистой среды
 
 ## Шаг 4. Подготовка пользовательских настроек
-Создайте конфигурационный файл `.env` прямо в папке `C:\TestUserEnv` или скопируйте из `.env.example` и дозаполните:
+Создайте конфигурационный файл `.env` прямо в папке `C:\TestUserEnv` или скопируйте из `.env.example` и дозаполните.
+**НЕ ЗАБУДЬТЕ** установить APP_ENV=prod
+
 ```
 MAILBOX_NAME=your-email@example.com
 MAILBOX_APP_PASSWORD=your-app-password
 SEVEN_RIGHTS_API_KEY=your-api-key
-# === Режим запуска: dev или prod ===
-APP_ENV=prod
+# === Режим запуска: prod ===
+APP_ENV=prod # !!! 
 ```
 
 Создайте `config\trusted_recipients.json`
 ```
 [
-    "somebody@yandex.ru"
+    "somebody@somewhere.ru"
 ]
 ```
 
-## Шаг 5a. Установка из собранного пакета (с подтягиванием зависимостей из PyPI)
+## Шаг 5a. Установка из собранного пакета (С подтягиванием зависимостей из PyPI через интернет)
 Установите собранный на Шаге 1 `.whl` файл. Замените путь на фактический путь к вашему репозиторию:
 ```bash
 pip install C:\full_path_to\api_integration-0.1.0-py3-none-any.whl
@@ -55,15 +57,24 @@ pip install C:\full_path_to\api_integration-0.1.0-py3-none-any.whl
 ## Шаг 5b. Оффлайн-установка пакета и зависимостей (Без интернета и прав админа)
 Поскольку у пользователя может не быть прав на глобальную установку или доступ к интернету заблокирован, устанавливаем локально внутри `.venv` из заранее скачанных пакетов.
 
-Выполните команду установки, указав путь к папке `dist`, которую передал разработчик:
+Выполните команду установки, указав путь к папке `dist`, _которую передал разработчик_:
 ```bash
 pip install --no-index --find-links=C:\путь_к_папке_dist\dependencies\ --find-links=C:\путь_к_папке_dist\ api_integration
 ```
 
-*При обновлении версии*
+При повторной установке той же версии whl
+```
+pip install --no-index --find-links=D:\путь_к_папке_dist\dist --find-links=D:\путь_к_папке_dist\dist\dependencies api_integration
+```
 
+При обновлении версии whl
 ```bash
-pip install --upgrade --no-index --find-links=C:\TestUserEnv\dist\dependencies\ --find-links=C:\TestUserEnv\dist\ api_integration
+pip install --upgrade --no-index --find-links=D:\путь_к_папке_dist\dist --find-links=D:\путь_к_папке_dist\dist\dependencies api_integration
+```
+
+Удаление пакета
+```bash
+pip uninstall api_integration -y 
 ```
 
 * `--no-index` — принудительно запрещает `pip` ходить в интернет на сайт PyPI.
