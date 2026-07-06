@@ -39,11 +39,11 @@ LOCK_FILE: Path = project_root / "mail_pipeline_processor.lock"
 
 # Flag to skip calling put_rfq_supplier_group_ids
 # True - skip, False - execute (should be value)
-IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
+IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = settings.IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS
 
 # Flag to do/skip RFQ search (by title) before creation attempt
 # True for production, False for testing
-IS_SEARCH_EXISTING_RFQ_BEFORE_POST = False
+IS_SEARCH_EXISTING_RFQ_BEFORE_POST = settings.IS_SEARCH_EXISTING_RFQ_BEFORE_POST
 
 # Default lot_template_id (unless brand new created first)
 # 12993 -> Копия ТЗ Самсунг Артем перезакуп Хабаровский край 19.06.2026.xlsx
@@ -51,11 +51,6 @@ IS_SEARCH_EXISTING_RFQ_BEFORE_POST = False
 
 # None -> MUST-BE value as template_id is not know apriori
 RFQ_DEFAULT_LOT_TEMPLATE_ID: int | None = None
-
-# Default organizer user_access_ids
-# TODO: rm UNUSED
-RFQ_DEFAULT_ORGANIZER_USER_ID: int = 108014
-
 
 # The subject template to search for (IMAP does a substring match)
 SUBJECT_TEMPLATE = "*"
@@ -128,13 +123,6 @@ PARTIAL_SUCCESS_REPLY_TEMPLATE = (
     "С наилучшими пожеланиями,<br>"
     "Агент Коля<br>"
 )
-
-# TODO: rm after testing, USED somewhere
-# Minimal required RFQ info for create
-TEST_RFQ_CREATE_BOILERPLATE = {
-    "title": "Тестовая закупка транспортных услуг",
-    "finish_datetime": "2026-07-01T18:00:00Z",
-}
 
 # Possible mapping of Excel field name "Наим поля в UI"
 # (from Шаблон запроса создания тендера v1.3/TENDER)

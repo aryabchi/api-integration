@@ -6,18 +6,17 @@ import requests
 from pydantic import ValidationError
 import json
 
-from api_integration.constants import TEST_RFQ_CREATE_BOILERPLATE
 from api_integration.config import get_settings
 from api_integration.sevenrights.api.schemas.api_requests import RfqCreateRequest
 from api_integration.sevenrights.api.schemas.api_results import RfqApiResult
 from api_integration.sevenrights.api.utils import _print_validation_errors
 
 
-def post_rfq(data: dict = None, timeout: int = 30) -> RfqApiResult:
+def post_rfq(data: dict, timeout: int = 30) -> RfqApiResult:
 
     settings = get_settings()
 
-    payload_data = data if data is not None else TEST_RFQ_CREATE_BOILERPLATE
+    payload_data = data
 
     try:
         model = RfqCreateRequest.model_validate(payload_data)
@@ -90,7 +89,6 @@ if __name__ == "__main__":
 
     start_time = time.perf_counter()
     result = post_rfq(
-        timeout=30,
         data={
             "title": "АВТО - Артем - Хабаровский край - 08.07.2026 - 01.09.2026",
             "finish_datetime": "2026-08-01T17:00:00",

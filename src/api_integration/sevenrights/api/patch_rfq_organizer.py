@@ -75,7 +75,6 @@ from pathlib import Path
 import requests
 from pydantic import ValidationError
 
-from api_integration.constants import RFQ_DEFAULT_ORGANIZER_USER_ID
 from api_integration.config import get_settings
 from api_integration.sevenrights.api.schemas.api_requests import (
     RfqPatchOrganizerRequest,
@@ -152,7 +151,7 @@ if __name__ == "__main__":
     start_time = time.perf_counter()
     result = patch_rfq_organizer(
         rfq_id=9839,
-        organizer_user_id=RFQ_DEFAULT_ORGANIZER_USER_ID,
+        organizer_user_id=108014,
         timeout=30,
     )
     end_time = time.perf_counter()

@@ -201,6 +201,8 @@ cp .env.example .env
 - `SMTP_SERVER` / `SMTP_PORT` - параметры SMTP
 - `SEVEN_RIGHTS_API_BASE_URL` / `SEVEN_RIGHTS_API_VERSION` / `SEVEN_RIGHTS_API_KEY` - параметры API 7Rights
 - `APP_ENV=dev`
+- `IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS` - пропустить медленный PUT запрос для поставщиков (`false` по умолчанию)
+- `IS_SEARCH_EXISTING_RFQ_BEFORE_POST` - искать существующий RFQ по названию перед созданием (`true` для продакшена, `false` для тестирования)
 
 Создайте файл с доверенными адресатами:
 

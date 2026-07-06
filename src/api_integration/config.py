@@ -61,12 +61,32 @@ class Settings(BaseSettings):
         pattern="^(dev|prod)$",
         description="Режим запуска (критически влиется на project_root -> поиск .env и расположение рабочих директорий)",
     )
+
+    IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS: bool = Field(
+        default=False,
+        description="Пропустить PUT запрос для поставщиков",
+    )
+    IS_SEARCH_EXISTING_RFQ_BEFORE_POST: bool = Field(
+        default=True,
+        description="Искать существующий RFQ по названию перед созданием",
+    )
+
     # поля для логирования
     LOG_LEVEL: str = Field(
         default="INFO", pattern="^(DEBUG|INFO|WARNING|ERROR|CRITICAL)$"
     )
     LOG_FILE_NAME: str = Field(
         default="pipeline.log", description="Имя файла для логов"
+    )
+
+    LOG_MAX_BYTES: int = Field(
+        default=5_242_880,  # 5 * 1024 * 1024
+        description="Максимальный размер одного файла лога в байтах (5 МБ)",
+    )
+
+    # 10 архивных файлов
+    LOG_BACKUP_COUNT: int = Field(
+        default=10, description="Количество сохраняемых архивных файлов логов"
     )
 
     @property
