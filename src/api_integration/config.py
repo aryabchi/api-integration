@@ -69,6 +69,16 @@ class Settings(BaseSettings):
         default="pipeline.log", description="Имя файла для логов"
     )
 
+    LOG_MAX_BYTES: int = Field(
+        default=5_242_880,  # 5 * 1024 * 1024
+        description="Максимальный размер одного файла лога в байтах (5 МБ)",
+    )
+
+    # 10 архивных файлов
+    LOG_BACKUP_COUNT: int = Field(
+        default=10, description="Количество сохраняемых архивных файлов логов"
+    )
+
     @property
     def SEVEN_RIGHTS_API_URL(self) -> str:
         """Полный URL для вызова модели в Ollama."""
