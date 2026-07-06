@@ -61,6 +61,16 @@ class Settings(BaseSettings):
         pattern="^(dev|prod)$",
         description="Режим запуска (критически влиется на project_root -> поиск .env и расположение рабочих директорий)",
     )
+
+    IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS: bool = Field(
+        default=False,
+        description="Пропустить PUT запрос для поставщиков",
+    )
+    IS_SEARCH_EXISTING_RFQ_BEFORE_POST: bool = Field(
+        default=True,
+        description="Искать существующий RFQ по названию перед созданием",
+    )
+
     # поля для логирования
     LOG_LEVEL: str = Field(
         default="INFO", pattern="^(DEBUG|INFO|WARNING|ERROR|CRITICAL)$"

@@ -39,11 +39,11 @@ LOCK_FILE: Path = project_root / "mail_pipeline_processor.lock"
 
 # Flag to skip calling put_rfq_supplier_group_ids
 # True - skip, False - execute (should be value)
-IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = False
+IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS = settings.IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS
 
 # Flag to do/skip RFQ search (by title) before creation attempt
 # True for production, False for testing
-IS_SEARCH_EXISTING_RFQ_BEFORE_POST = False
+IS_SEARCH_EXISTING_RFQ_BEFORE_POST = settings.IS_SEARCH_EXISTING_RFQ_BEFORE_POST
 
 # Default lot_template_id (unless brand new created first)
 # 12993 -> Копия ТЗ Самсунг Артем перезакуп Хабаровский край 19.06.2026.xlsx
