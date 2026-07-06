@@ -7,17 +7,13 @@ from email.utils import parseaddr
 
 from exchangelib import Credentials, Account, Configuration, DELEGATE
 from exchangelib.errors import (
-    ErrorInvalidCredentials,
+    UnauthorizedError,
     ErrorNonExistentMailbox,
-    ErrorImpersonateUserDenied,
-    ErrorMailboxStoreUnavailable,
+    ErrorImpersonationDenied,
     ErrorAccessDenied,
     ErrorInternalServerError,
     ErrorServerBusy,
-    ErrorInvalidIdMalformed,
-    ErrorMimeContentConversionFailed,
-    ErrorInvalidPropertyRequest,
-    ErrorItemNotFound,
+    TransportError,
 )
 
 from api_integration.mail.sanitizers import sanitize_filename
@@ -102,22 +98,29 @@ def fetch_mail(
         logger.info(f"Total attachments saved: {attachments_saved}")
         logger.info(f"Total emails skipped (already processed): {emails_skipped}")
 
-    except ErrorInvalidCredentials as e:
+    except UnauthorizedError as e:
         logger.error(
             f"Exchange Authentication Failed: Invalid username or password. {e}"
         )
     except ErrorNonExistentMailbox as e:
+        # Убедитесь, что переменная mailbox определена выше в вашей функции
         logger.error(f"Exchange Mailbox Not Found: {mailbox}. {e}")
-    except ErrorImpersonateUserDenied as e:
+
+    except ErrorImpersonationDenied as e:
         logger.error(f"Exchange Impersonation Denied: {e}")
-    except ErrorMailboxStoreUnavailable as e:
-        logger.error(f"Exchange Mailbox Store Unavailable: {e}")
+
     except ErrorAccessDenied as e:
         logger.error(f"Exchange Access Denied: {e}")
-    except ErrorInternalServerError as e:
-        logger.error(f"Exchange Internal Server Error: {e}")
+
     except ErrorServerBusy as e:
         logger.error(f"Exchange Server Busy: {e}")
+
+    except (ErrorInternalServerError, TransportError) as e:
+        # Объединяем внутренние ошибки сервера и недоступность базы данных/хранилища
+        logger.error(
+            f"Exchange Internal Server Error or Mailbox Store Unavailable: {e}"
+        )
+
     except Exception as e:
         logger.error(f"An unexpected error occurred: {e}")
         logger.debug(traceback.format_exc())
