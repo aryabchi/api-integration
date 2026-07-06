@@ -52,11 +52,6 @@ IS_SEARCH_EXISTING_RFQ_BEFORE_POST = False
 # None -> MUST-BE value as template_id is not know apriori
 RFQ_DEFAULT_LOT_TEMPLATE_ID: int | None = None
 
-# Default organizer user_access_ids
-# TODO: rm UNUSED
-RFQ_DEFAULT_ORGANIZER_USER_ID: int = 108014
-
-
 # The subject template to search for (IMAP does a substring match)
 SUBJECT_TEMPLATE = "*"
 
@@ -128,13 +123,6 @@ PARTIAL_SUCCESS_REPLY_TEMPLATE = (
     "С наилучшими пожеланиями,<br>"
     "Агент Коля<br>"
 )
-
-# TODO: rm after testing, USED somewhere
-# Minimal required RFQ info for create
-TEST_RFQ_CREATE_BOILERPLATE = {
-    "title": "Тестовая закупка транспортных услуг",
-    "finish_datetime": "2026-07-01T18:00:00Z",
-}
 
 # Possible mapping of Excel field name "Наим поля в UI"
 # (from Шаблон запроса создания тендера v1.3/TENDER)
