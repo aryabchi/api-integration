@@ -3,9 +3,9 @@ import json
 import logging
 import traceback
 from email.header import decode_header
-from email.utils import parseaddr
 
 from exchangelib import Credentials, Account, Configuration, DELEGATE
+from exchangelib.protocol import BaseProtocol, NoVerifyHTTPAdapter
 from exchangelib.errors import (
     UnauthorizedError,
     ErrorNonExistentMailbox,
@@ -53,9 +53,18 @@ def fetch_mail(
         logger.info(f"Connecting to Exchange server: {settings.EXCHANGE_SERVER}...")
 
         credentials = Credentials(
-            username=settings.EXCHANGE_USERNAME, password=password
+            username=settings.EXCHANGE_USERNAME,
+            password=password,
         )
-        config = Configuration(server=settings.EXCHANGE_SERVER, credentials=credentials)
+
+        # 2. Подменяем стандартный класс сессии в exchangelib на наш кастомный
+        BaseProtocol.HTTP_ADAPTER_CLS.session_class = NoVerifyHTTPAdapter
+        BaseProtocol.HTTP_ADAPTER_CLS.DEFAULT_TIMEOUT = 30
+
+        config = Configuration(
+            server=settings.EXCHANGE_SERVER,
+            credentials=credentials,
+        )
 
         account = Account(
             primary_smtp_address=mailbox,
@@ -63,12 +72,20 @@ def fetch_mail(
             autodiscover=False,
             access_type=DELEGATE,
         )
+        logging.info("Configuration initialized. Checking real network connection...")
+        # РЕАЛЬНЫЙ ТЕСТ: Запрашиваем версию сервера по сети.
+        # Это принудительно инициирует веб-сессию и проверит ваши credentials
+        server_version = account.protocol.version
 
-        logger.info(f"Successfully connected to mailbox: {mailbox}")
+        logging.info(
+            f"Successfully connected to Exchange Server! "
+            f"Server version: {server_version.build}. "
+            f"Access to mailbox {mailbox} succeeds."
+        )
 
         # Access inbox
         inbox = account.inbox
-        logger.info("Fetching all emails from inbox...")
+        logger.info("Fetching emails from inbox...")
 
         # Retrieve only unread messages, newest first
         messages = inbox.filter(is_read=False).order_by("-datetime_received")
