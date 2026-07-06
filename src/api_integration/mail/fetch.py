@@ -57,10 +57,15 @@ def fetch_mail(
         mail.login(mailbox, password)
         mail.select("INBOX")
 
-        logger.info(
-            f"Searching for emails by pattern: '{imap_mail_search_template}'..."
-        )
-        status, messages = mail.search(None, imap_mail_search_template)
+        # Determine search criteria based on template
+        if imap_mail_search_template.strip():
+            logger.info(
+                f"Searching for emails by pattern: '{imap_mail_search_template}'..."
+            )
+            status, messages = mail.search(None, imap_mail_search_template)
+        else:
+            logger.info("Fetching all emails (no search filter)...")
+            status, messages = mail.search(None, "ALL")
 
         if status != "OK":
             logger.warning("No emails found or search failed.")
