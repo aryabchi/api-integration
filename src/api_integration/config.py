@@ -94,6 +94,12 @@ class Settings(BaseSettings):
         """Полный URL для вызова модели в Ollama."""
         return f"{str(self.SEVEN_RIGHTS_API_BASE_URL).rstrip('/')}/{self.SEVEN_RIGHTS_API_VERSION.rstrip('/')}"
 
+    # Corporate Exchange Server (probably) config params
+    EXCHANGE_USERNAME: str = Field(description="SIBUR\corp_user_acount")
+    EXCHANGE_PASSWORD: str = Field(description="corp_user_acount_password")
+    EXCHANGE_SERVER: str = Field(description="mail.sibur.local")
+    PRIMARY_SMTP_ADDRESS: str = Field(description="nikolavtologistov@sibur.ru")
+
 
 @lru_cache
 def get_settings() -> Settings:
