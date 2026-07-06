@@ -5,7 +5,8 @@ import msvcrt
 import logging
 
 from api_integration.config import get_settings
-from api_integration.mail.imap.fetch import fetch_mail
+from api_integration.mail.imap.fetch import fetch_mail as fetch_imap_mail
+from api_integration.mail.ews.fetch import fetch_mail as fetch_ews_mail
 from api_integration.mail.compose import generate_replies
 from api_integration.mail.send import send_replies
 from api_integration.sevenrights.rfq.create import create_rfqs
@@ -45,10 +46,12 @@ def run_pipeline(
 
     # 1. fetch emails, save attachments
     logger.info("Step 1: Fetching emails and saving attachments")
-    fetch_mail(
-        mailbox=mailbox,
-        password=password,
-    )
+    if settings.MAIL_SERVER == "CORPORATE":
+        logger.info("Using Exchange EWS fetcher")
+        fetch_ews_mail()
+    else:
+        logger.info("Using Internet IMAP fetcher")
+        fetch_imap_mail()
     logger.info("Step 1 completed: Fetch mail")
 
     # 2. process attachments
