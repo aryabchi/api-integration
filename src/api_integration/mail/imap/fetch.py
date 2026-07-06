@@ -12,8 +12,10 @@ from api_integration.constants import (
     DOWNLOADS_DIR,
     IMAP_MAIL_SEARCH_TEMPLATE,
 )
+from api_integration.config import get_settings
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 
 def decode_mime_filename(filename_header):
@@ -34,11 +36,9 @@ def decode_mime_filename(filename_header):
 
 
 def fetch_mail(
-    imap_server: str,
-    imap_port: int,
-    mailbox: str,
-    password: str,
-    imap_mail_search_template: str = IMAP_MAIL_SEARCH_TEMPLATE,
+    mailbox: str = settings.MAILBOX_NAME,
+    password: str = settings.MAILBOX_APP_PASSWORD,
+    mail_search_template: str = IMAP_MAIL_SEARCH_TEMPLATE,
     download_dir: str = DOWNLOADS_DIR,
     disallowed_attachment_extensions: tuple = (".json",),
     junk_subdir: str = "junk",
@@ -47,6 +47,9 @@ def fetch_mail(
     content/attachments into per-email subfolders named by Message-ID.
     Skips processing entirely if the Message-ID folder already exists.
     """
+    imap_server = settings.IMAP_SERVER
+    imap_port = settings.IMAP_PORT
+
     os.makedirs(download_dir, exist_ok=True)
     mail = None
     try:
@@ -58,11 +61,9 @@ def fetch_mail(
         mail.select("INBOX")
 
         # Determine search criteria based on template
-        if imap_mail_search_template.strip():
-            logger.info(
-                f"Searching for emails by pattern: '{imap_mail_search_template}'..."
-            )
-            status, messages = mail.search(None, imap_mail_search_template)
+        if mail_search_template.strip():
+            logger.info(f"Searching for emails by pattern: '{mail_search_template}'...")
+            status, messages = mail.search(None, mail_search_template)
         else:
             logger.info("Fetching all emails (no search filter)...")
             status, messages = mail.search(None, "ALL")

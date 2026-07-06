@@ -5,7 +5,7 @@ import msvcrt
 import logging
 
 from api_integration.config import get_settings
-from api_integration.mail.fetch import fetch_mail
+from api_integration.mail.imap.fetch import fetch_mail
 from api_integration.mail.compose import generate_replies
 from api_integration.mail.send import send_replies
 from api_integration.sevenrights.rfq.create import create_rfqs
@@ -46,8 +46,6 @@ def run_pipeline(
     # 1. fetch emails, save attachments
     logger.info("Step 1: Fetching emails and saving attachments")
     fetch_mail(
-        imap_server=settings.IMAP_SERVER,
-        imap_port=settings.IMAP_PORT,
         mailbox=mailbox,
         password=password,
     )
