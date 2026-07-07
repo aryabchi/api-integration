@@ -28,8 +28,8 @@ def _is_html(text: str) -> bool:
 
 
 def send_replies(
-    sender_email: str = None,
-    sender_password: str = None,
+    sender_email: str = settings.MAILBOX_NAME,
+    sender_password: str = settings.MAILBOX_APP_PASSWORD,
     download_dir: str = DOWNLOADS_DIR,
     exclude: tuple = ("junk",),
     subfolder: str | None = None,

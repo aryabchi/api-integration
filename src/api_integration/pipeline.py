@@ -85,8 +85,6 @@ def run_pipeline(
     # 5. send replies
     logger.info("Step 5: Sending replies")
     send_replies(
-        sender_email=mailbox,
-        sender_password=password,
         subfolder=subfolder,
         dry_run=dry_run,
         test_run=test_run,
