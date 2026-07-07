@@ -200,9 +200,12 @@ cp .env.example .env
 - `IMAP_SERVER` / `IMAP_PORT` - параметры IMAP
 - `SMTP_SERVER` / `SMTP_PORT` - параметры SMTP
 - `SEVEN_RIGHTS_API_BASE_URL` / `SEVEN_RIGHTS_API_VERSION` / `SEVEN_RIGHTS_API_KEY` - параметры API 7Rights
-- `APP_ENV=dev`
+- `APP_ENV=dev` - **важно** для определения корня проекта
+- `MAIL_SERVER=INTERNET` - для вызова корректных функций получения/отправки почты на доступные в интернете почтовые серверы
+- `LOG_LEVEL` - уровень логирования `DEBUG|INFO` для разработки
 - `IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS` - пропустить медленный PUT запрос для поставщиков (`false` по умолчанию)
 - `IS_SEARCH_EXISTING_RFQ_BEFORE_POST` - искать существующий RFQ по названию перед созданием (`true` для продакшена, `false` для тестирования)
+- `EXCHANGE_XXX` - не будут работать вне КСПД
 
 Создайте файл с доверенными адресатами:
 
