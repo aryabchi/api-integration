@@ -15,23 +15,23 @@ FAIL_TEST_MESSAGE_ID_FOR_REPLY = (
 # ============================================================
 # Common parameters for the entire pipeline (used in all steps)
 # ============================================================
-# WARNING: test_run=True bypasses all conditional checks and tries to execute
+# WARNING: `test_run=True` bypasses all conditional checks and tries to execute
 # actions potentially overwriting historical results. Use it:
 # - With caution
 # - For debugging
-# - In conjunction with subfolder argument
+# - In conjunction with `subfolder`
 
 # Target message-ID (subfolder name) for processing specific email thread
 # None runs pipeline for all email threads
 SUBFOLDER: str | None = PASS_TEST_MESSAGE_ID_FOR_REPLY
-# dry_run=True skips actual execution (safe mode, no side effects)
+# `dry_run=True` skips actual execution (safe mode, no side effects)
 DRY_RUN: bool = False
-# test_run=True forces execution (use with caution, may overwrite data)
+# `test_run=True` forces execution (use with caution, may overwrite data)
 TEST_RUN: bool = False
 
-# In constants.py
-# set IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS to skip adding suppliers (slow PUT)
-# set IS_SEARCH_EXISTING_RFQ_BEFORE_POST to skip adding RFQ with same title
+# Additionally in `.env`
+# set `IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS` to skip adding RFQ suppliers
+# set `IS_SEARCH_EXISTING_RFQ_BEFORE_POST` not add RFQ with same title
 
 
 if __name__ == "__main__":

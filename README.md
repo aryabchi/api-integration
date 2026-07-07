@@ -231,15 +231,15 @@ python -c "import api_integration; print('OK')"
 запускаем
 
 ```bash
-python ./scripts/main.py
+python -m scripts.main
 ```
 
 
-## Сборка, распространение, проверка и настройка запуска приложения (build/install для `APP_ENV=prod`)
+## Сборка, распространение, проверка и настройка запуска приложения (build/install/run)
 
 - [BUILD_WHEEL.md](docs/BUILD_WHEEL.md) — как собрать wheel проекта
-- [INSTALL_FROM_WHEEL.md](docs/INSTALL_FROM_WHEEL.md) — как установить wheel на целевую машину
-- [VERIFICATION.md](docs/VERIFICATION.md) - как установить wheel и проверить скрипт на целевой машине (`prod mode`)
+- [INSTALL_FROM_WHEEL.md](docs/INSTALL_FROM_WHEEL.md) — как установить wheel
+- [VERIFICATION.md](docs/VERIFICATION.md) - как установить wheel и проверить скрипт на целевой машине (`APP_ENV=prod`)
 - [DEPLOYMENT_WINDOWS.md](docs/DEPLOYMENT_WINDOWS.md) - как настроить автоматический запуск в Планировщике задач
 
 ## Где смотреть настройки скрипта
