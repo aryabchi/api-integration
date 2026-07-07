@@ -8,7 +8,8 @@ from api_integration.config import get_settings
 from api_integration.mail.imap.fetch import fetch_mail as fetch_imap_mail
 from api_integration.mail.ews.fetch import fetch_mail as fetch_ews_mail
 from api_integration.mail.compose import generate_replies
-from api_integration.mail.smtp.send import send_replies
+from api_integration.mail.smtp.send import send_replies as send_smtp_replies
+from api_integration.mail.ews.send import send_replies as send_ews_replies
 from api_integration.sevenrights.rfq.create import create_rfqs
 from api_integration.excel.convert import process_attachments_wrapper
 from api_integration.constants import (
@@ -84,11 +85,20 @@ def run_pipeline(
 
     # 5. send replies
     logger.info("Step 5: Sending replies")
-    send_replies(
-        subfolder=subfolder,
-        dry_run=dry_run,
-        test_run=test_run,
-    )
+    if settings.MAIL_SERVER == "CORPORATE":
+        logger.info("Using Exchange EWS sender")
+        send_ews_replies(
+            subfolder=subfolder,
+            dry_run=dry_run,
+            test_run=test_run,
+        )
+    else:
+        logger.info("Using Internet SMTP sender")
+        send_smtp_replies(
+            subfolder=subfolder,
+            dry_run=dry_run,
+            test_run=test_run,
+        )
     logger.info("Step 5 completed: Send replies")
 
     logger.info("=== Pipeline execution completed ===")
