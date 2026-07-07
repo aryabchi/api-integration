@@ -23,10 +23,6 @@ from exchangelib.errors import (
     ErrorInternalServerError,
     ErrorServerBusy,
     TransportError,
-    ErrorInvalidIdMalformed,
-    ErrorMimeContentConversionFailed,
-    ErrorInvalidPropertyRequest,
-    ErrorItemNotFound,
 )
 
 from api_integration.constants import (
