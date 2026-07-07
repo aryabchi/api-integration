@@ -1,42 +1,48 @@
 import os
-import re
 import json
-import smtplib
 import datetime
 import logging
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import traceback
+from typing import Optional
+
+from exchangelib import Message, Mailbox
+from exchangelib.errors import ErrorAccessDenied
+from api_integration.mail.ews.helpers import create_exchange_account
+
 from api_integration.constants import (
     DOWNLOADS_DIR,
     REPLY_SENT_MARKER,
     REPLY_BODY_MARKER,
 )
+from api_integration.config import get_settings
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 
 def _extract_email_address(field: str) -> str:
+    import re
+
     m = re.search(r"<([^>]+)>", field or "")
     return m.group(1) if m else (field or "").strip()
 
 
 def _is_html(text: str) -> bool:
-    """Check if text contains HTML tags."""
+    import re
+
     return bool(re.search(r"<[a-z][a-z0-9]*\b[^>]*>", text, re.IGNORECASE))
 
 
 def send_replies(
-    smtp_server: str,
-    smtp_port: int,
-    sender_email: str = None,
-    sender_password: str = None,
+    sender_email: str = settings.PRIMARY_SMTP_ADDRESS,
+    sender_password: str = settings.EXCHANGE_PASSWORD,
     download_dir: str = DOWNLOADS_DIR,
     exclude: tuple = ("junk",),
     subfolder: str | None = None,
     dry_run: bool = False,
     test_run: bool = False,
 ) -> int:
-    """Send replies via SMTP.
+    """Send replies via Exchange EWS.
 
     If `subfolder` is specified, only the reply for that specific email folder
     will be sent. Otherwise, it iterates through all subfolders in `download_dir`.
@@ -44,6 +50,10 @@ def send_replies(
     Skips sending if the reply marker file already exists in the subfolder.
     Upon successful send, creates the marker file to prevent duplicate sends.
     """
+
+    account = create_exchange_account(mailbox=sender_email, password=sender_password)
+    if not account:
+        return 0
 
     if not sender_email or not sender_password:
         logger.warning("sender_email and sender_password are required.")
@@ -101,19 +111,8 @@ def send_replies(
             )
             continue
 
-        # Construct the email message
-        msg = MIMEMultipart()
-        msg["From"] = sender_email
-        msg["To"] = recipient
-        msg["Subject"] = f"Re: {meta.get('subject', '')}"
-
-        # Threading headers
-        if meta.get("message_id"):
-            msg["In-Reply-To"] = meta["message_id"]
-            msg["References"] = meta["message_id"]
-
-        subtype = "html" if _is_html(reply_text) else "plain"
-        msg.attach(MIMEText(reply_text, subtype, "utf-8"))
+        # Construct the email message via EWS
+        subject = f"Re: {meta.get('subject', '')}"
 
         if dry_run:
             logger.info(
@@ -122,11 +121,27 @@ def send_replies(
             sent += 1
             continue
 
-        # Send via SMTP
+        # Send via Exchange
         try:
-            with smtplib.SMTP_SSL(smtp_server, smtp_port) as srv:
-                srv.login(sender_email, sender_password)
-                srv.send_message(msg)
+            msg = Message(
+                account=account,
+                folder=account.sent,
+                subject=subject,
+                # from_mailbox=Mailbox(email_address=sender_email),
+                # Changed from_mailbox to author (maps to the "From" field in EWS)
+                author=Mailbox(email_address=sender_email),
+                to_recipients=[Mailbox(email_address=recipient)],
+            )
+
+            # Set body type based on content
+            if _is_html(reply_text):
+                msg.body = reply_text
+                msg.text_body = None
+            else:
+                msg.text_body = reply_text
+                msg.body = None
+
+            msg.send()
 
             # --- Save placeholder file upon successful send ---
             with open(sent_marker_path, "w", encoding="utf-8") as f:
@@ -136,8 +151,15 @@ def send_replies(
                 f"  ✓ sent to {recipient} (folder: {os.path.basename(folder_path)})"
             )
             sent += 1
+
+        except ErrorAccessDenied as e:
+            logger.error(
+                f"  ✗ Access denied for {recipient}: {e}. "
+                f"Check 'Send As'/'Send on Behalf' permissions for {sender_email}"
+            )
         except Exception as e:
             logger.error(f"  ✗ failed for {recipient}: {e}")
+            logger.debug(traceback.format_exc())
 
     logger.info(f"Total replies sent: {sent}")
     logger.info(f"Total replies skipped (already sent): {skipped}")

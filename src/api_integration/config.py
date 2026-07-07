@@ -59,7 +59,16 @@ class Settings(BaseSettings):
     APP_ENV: str = Field(
         default="dev",
         pattern="^(dev|prod)$",
-        description="Режим запуска (критически влиется на project_root -> поиск .env и расположение рабочих директорий)",
+        description=(
+            "Режим запуска (критически влиется на project_root -> расположение рабочих директорий)"
+            "prod - project_root указывает на текущую директорию запуска"
+        ),
+    )
+
+    MAIL_SERVER: str = Field(
+        default="INTERNET",
+        pattern="^(INTERNET|CORPORATE)$",
+        description="Тип почтового сервера (INTERNET=Yandex IMAP/SMTP, CORPORATE=MS Exchange EWS)",
     )
 
     IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS: bool = Field(
@@ -93,6 +102,12 @@ class Settings(BaseSettings):
     def SEVEN_RIGHTS_API_URL(self) -> str:
         """Полный URL для вызова модели в Ollama."""
         return f"{str(self.SEVEN_RIGHTS_API_BASE_URL).rstrip('/')}/{self.SEVEN_RIGHTS_API_VERSION.rstrip('/')}"
+
+    # Corporate Exchange Server (probably) config params
+    EXCHANGE_USERNAME: str = Field(description="COMPANY\company_user_acount")
+    EXCHANGE_PASSWORD: str = Field(description="company_user_acount_password")
+    EXCHANGE_SERVER: str = Field(description="mail.company.local")
+    PRIMARY_SMTP_ADDRESS: str = Field(description="nikolavtologistov@company.ru")
 
 
 @lru_cache
