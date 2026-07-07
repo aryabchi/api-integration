@@ -200,9 +200,12 @@ cp .env.example .env
 - `IMAP_SERVER` / `IMAP_PORT` - параметры IMAP
 - `SMTP_SERVER` / `SMTP_PORT` - параметры SMTP
 - `SEVEN_RIGHTS_API_BASE_URL` / `SEVEN_RIGHTS_API_VERSION` / `SEVEN_RIGHTS_API_KEY` - параметры API 7Rights
-- `APP_ENV=dev`
+- `APP_ENV=dev` - **важно** для определения корня проекта
+- `MAIL_SERVER=INTERNET` - для вызова корректных функций получения/отправки почты на доступные в интернете почтовые серверы
+- `LOG_LEVEL` - уровень логирования `DEBUG|INFO` для разработки
 - `IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS` - пропустить медленный PUT запрос для поставщиков (`false` по умолчанию)
 - `IS_SEARCH_EXISTING_RFQ_BEFORE_POST` - искать существующий RFQ по названию перед созданием (`true` для продакшена, `false` для тестирования)
+- `EXCHANGE_XXX` - не будут работать вне КСПД и не используются при флаге `MAIL_SERVER=INTERNET`
 
 Создайте файл с доверенными адресатами:
 
@@ -228,15 +231,15 @@ python -c "import api_integration; print('OK')"
 запускаем
 
 ```bash
-python ./scripts/main.py
+python -m scripts.main
 ```
 
 
-## Сборка, распространение, проверка и настройка запуска приложения (build/install для `APP_ENV=prod`)
+## Сборка, распространение, проверка и настройка запуска приложения (build/install/run)
 
 - [BUILD_WHEEL.md](docs/BUILD_WHEEL.md) — как собрать wheel проекта
-- [INSTALL_FROM_WHEEL.md](docs/INSTALL_FROM_WHEEL.md) — как установить wheel на целевую машину
-- [VERIFICATION.md](docs/VERIFICATION.md) - как установить wheel и проверить скрипт на целевой машине (`prod mode`)
+- [INSTALL_FROM_WHEEL.md](docs/INSTALL_FROM_WHEEL.md) — как установить wheel
+- [VERIFICATION.md](docs/VERIFICATION.md) - как установить wheel и проверить скрипт на целевой машине (`APP_ENV=prod`)
 - [DEPLOYMENT_WINDOWS.md](docs/DEPLOYMENT_WINDOWS.md) - как настроить автоматический запуск в Планировщике задач
 
 ## Где смотреть настройки скрипта

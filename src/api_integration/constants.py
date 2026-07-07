@@ -57,9 +57,11 @@ SUBJECT_TEMPLATE = "*"
 
 # Full mail search pattern
 # IMAP search syntax. SUBJECT does a substring match. HAS_ATTACHMENT doesn't work
-IMAP_MAIL_SEARCH_TEMPLATE = (
-    f'(SUBJECT "{SUBJECT_TEMPLATE}" HEADER "Content-Type" "multipart/mixed")'
-)
+# IMAP_MAIL_SEARCH_TEMPLATE = (
+#     f'(SUBJECT "{SUBJECT_TEMPLATE}" HEADER "Content-Type" "multipart/mixed")'
+# )
+# Empty string means fetch all messages (uses IMAP "ALL" search criteria)
+IMAP_MAIL_SEARCH_TEMPLATE = ""
 
 # Accepted email attachment extensions supported by openpyxl, e.g. .xlsx, .xlsm, but NOT .xls
 ALLOWED_ATTACHMENT_FILE_EXTENSIONS = (".xlsx",)
