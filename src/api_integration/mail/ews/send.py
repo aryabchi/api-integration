@@ -76,7 +76,7 @@ def send_replies(
 
         # Подменяем стандартный класс сессии в exchangelib на игнорирующий TLS validation errors
         BaseProtocol.HTTP_ADAPTER_CLS.session_class = NoVerifyHTTPAdapter
-        BaseProtocol.HTTP_ADAPTER_CLS.DEFAULT_TIMEOUT = 30
+        BaseProtocol.TIMEOUT = 30
 
         config = Configuration(server=settings.EXCHANGE_SERVER, credentials=credentials)
 
@@ -198,7 +198,9 @@ def send_replies(
                 account=account,
                 folder=account.sent,
                 subject=subject,
-                from_mailbox=Mailbox(email_address=sender_email),
+                # from_mailbox=Mailbox(email_address=sender_email),
+                # Changed from_mailbox to author (maps to the "From" field in EWS)
+                author=Mailbox(email_address=sender_email),
                 to_recipients=[Mailbox(email_address=recipient)],
             )
 

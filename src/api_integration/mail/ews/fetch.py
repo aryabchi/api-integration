@@ -59,7 +59,7 @@ def fetch_mail(
 
         # 2. Подменяем стандартный класс сессии в exchangelib на игнорирующий TLS validation errors
         BaseProtocol.HTTP_ADAPTER_CLS.session_class = NoVerifyHTTPAdapter
-        BaseProtocol.HTTP_ADAPTER_CLS.DEFAULT_TIMEOUT = 30
+        BaseProtocol.TIMEOUT = 30
 
         config = Configuration(
             server=settings.EXCHANGE_SERVER,
