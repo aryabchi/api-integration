@@ -5,7 +5,14 @@ import logging
 import traceback
 from typing import Optional
 
-from exchangelib import Credentials, Account, Configuration, DELEGATE, Message, Mailbox
+from exchangelib import (
+    Credentials,
+    Account,
+    Configuration,
+    DELEGATE,
+    Message,
+    Mailbox,
+)
 from exchangelib.protocol import BaseProtocol, NoVerifyHTTPAdapter
 from exchangelib.errors import (
     UnauthorizedError,
@@ -130,129 +137,102 @@ def send_replies(
     sent = 0
     skipped = 0
 
-    try:
-        # Determine which folders to process based on the `subfolder` argument
-        if subfolder:
-            folder_path = os.path.join(download_dir, subfolder)
-            if not os.path.isdir(folder_path):
-                logger.warning(f"✗ Subfolder not found: {folder_path}")
-                return 0
-            folders_to_process = [folder_path]
-        else:
-            if not os.path.isdir(download_dir):
-                logger.warning(f"Download directory not found: {download_dir}")
-                return 0
-            folders_to_process = [
-                os.path.join(download_dir, entry)
-                for entry in sorted(os.listdir(download_dir))
-                if os.path.isdir(os.path.join(download_dir, entry))
-                and entry not in exclude
-            ]
+    # Determine which folders to process based on the `subfolder` argument
+    if subfolder:
+        folder_path = os.path.join(download_dir, subfolder)
+        if not os.path.isdir(folder_path):
+            logger.warning(f"✗ Subfolder not found: {folder_path}")
+            return 0
+        folders_to_process = [folder_path]
+    else:
+        if not os.path.isdir(download_dir):
+            logger.warning(f"Download directory not found: {download_dir}")
+            return 0
+        folders_to_process = [
+            os.path.join(download_dir, entry)
+            for entry in sorted(os.listdir(download_dir))
+            if os.path.isdir(os.path.join(download_dir, entry)) and entry not in exclude
+        ]
 
-        for folder_path in folders_to_process:
-            meta_path = os.path.join(folder_path, "email_meta.json")
-            reply_path = os.path.join(folder_path, REPLY_BODY_MARKER)
-            sent_marker_path = os.path.join(folder_path, REPLY_SENT_MARKER)
+    for folder_path in folders_to_process:
+        meta_path = os.path.join(folder_path, "email_meta.json")
+        reply_path = os.path.join(folder_path, REPLY_BODY_MARKER)
+        sent_marker_path = os.path.join(folder_path, REPLY_SENT_MARKER)
 
-            if not (os.path.isfile(meta_path) and os.path.isfile(reply_path)):
-                if subfolder:
-                    logger.warning(
-                        f"  ✗ Missing email_meta.json or reply.txt in {subfolder}"
-                    )
-                continue
-
-            # --- Skip if reply was already sent (unless test_run mode) ---
-            if os.path.exists(sent_marker_path) and not test_run:
-                logger.info(
-                    f"  -> Skipping (reply already sent): {os.path.basename(folder_path)}"
+        if not (os.path.isfile(meta_path) and os.path.isfile(reply_path)):
+            if subfolder:
+                logger.warning(
+                    f"  ✗ Missing email_meta.json or reply.txt in {subfolder}"
                 )
-                skipped += 1
-                continue
+            continue
 
-            try:
-                with open(meta_path, "r", encoding="utf-8") as f:
-                    meta = json.load(f)
-                with open(reply_path, "r", encoding="utf-8") as f:
-                    reply_text = f.read()
+        # --- Skip if reply was already sent (unless test_run mode) ---
+        if os.path.exists(sent_marker_path) and not test_run:
+            logger.info(
+                f"  -> Skipping (reply already sent): {os.path.basename(folder_path)}"
+            )
+            skipped += 1
+            continue
 
-                recipient = _extract_email_address(meta.get("from", ""))
-                if not recipient:
-                    logger.warning(
-                        f"  ✗ no recipient found in {os.path.basename(folder_path)}, skipping"
-                    )
-                    continue
+        with open(meta_path, "r", encoding="utf-8") as f:
+            meta = json.load(f)
+        with open(reply_path, "r", encoding="utf-8") as f:
+            reply_text = f.read()
 
-                # Construct the email message via EWS
-                subject = f"Re: {meta.get('subject', '')}"
-                body = reply_text
+        recipient = _extract_email_address(meta.get("from", ""))
+        if not recipient:
+            logger.warning(
+                f"  ✗ no recipient found in {os.path.basename(folder_path)}, skipping"
+            )
+            continue
 
-                if dry_run:
-                    logger.info(
-                        f"  [dry-run] would send to {recipient} (folder: {os.path.basename(folder_path)})"
-                    )
-                    sent += 1
-                    continue
+        # Construct the email message via EWS
+        subject = f"Re: {meta.get('subject', '')}"
 
-                try:
-                    msg = Message(
-                        account=account,
-                        folder=account.sent,
-                        subject=subject,
-                        body=body,
-                        from_mailbox=Mailbox(email_address=sender_email),
-                        to_recipients=[Mailbox(email_address=recipient)],
-                    )
+        if dry_run:
+            logger.info(
+                f"  [dry-run] would send to {recipient} (folder: {os.path.basename(folder_path)})"
+            )
+            sent += 1
+            continue
 
-                    # Set threading headers if available
-                    if meta.get("message_id"):
-                        msg.in_reply_to = meta["message_id"]
-                        msg.references = meta["message_id"]
+        # Send via Exchange
+        try:
+            msg = Message(
+                account=account,
+                folder=account.sent,
+                subject=subject,
+                from_mailbox=Mailbox(email_address=sender_email),
+                to_recipients=[Mailbox(email_address=recipient)],
+            )
 
-                    # Set body type based on content
-                    if _is_html(reply_text):
-                        msg.body = body
-                        msg.text_body = None
-                    else:
-                        msg.text_body = body
-                        msg.body = None
+            # Set body type based on content
+            if _is_html(reply_text):
+                msg.body = reply_text
+                msg.text_body = None
+            else:
+                msg.text_body = reply_text
+                msg.body = None
 
-                    msg.send()
-                    logger.info(
-                        f"  ✓ sent to {recipient} (folder: {os.path.basename(folder_path)})"
-                    )
-                    sent += 1
+            msg.send()
 
-                except ErrorAccessDenied as e:
-                    logger.error(
-                        f"  ✗ Access denied for {recipient}: {e}. "
-                        f"Check 'Send As'/'Send on Behalf' permissions for {sender_email}"
-                    )
-                except Exception as e:
-                    logger.error(f"  ✗ failed to send to {recipient}: {e}")
-                    logger.debug(traceback.format_exc())
+            # --- Save placeholder file upon successful send ---
+            with open(sent_marker_path, "w", encoding="utf-8") as f:
+                f.write(f"Reply sent on {datetime.datetime.now().isoformat()}\n")
 
-                # --- Save placeholder file upon successful send ---
-                if sent > 0:
-                    try:
-                        with open(sent_marker_path, "w", encoding="utf-8") as f:
-                            f.write(
-                                f"Reply sent on {datetime.datetime.now().isoformat()}\n"
-                            )
-                    except Exception as e:
-                        logger.error(
-                            f"Failed to write sent marker for {folder_path}: {e}"
-                        )
+            logger.info(
+                f"  ✓ sent to {recipient} (folder: {os.path.basename(folder_path)})"
+            )
+            sent += 1
 
-            except Exception as e:
-                logger.error(
-                    f"  ✗ failed for folder {os.path.basename(folder_path)}: {e}"
-                )
-                logger.debug(traceback.format_exc())
-                continue
-
-    except Exception as e:
-        logger.error(f"An unexpected error occurred while sending replies: {e}")
-        logger.debug(traceback.format_exc())
+        except ErrorAccessDenied as e:
+            logger.error(
+                f"  ✗ Access denied for {recipient}: {e}. "
+                f"Check 'Send As'/'Send on Behalf' permissions for {sender_email}"
+            )
+        except Exception as e:
+            logger.error(f"  ✗ failed for {recipient}: {e}")
+            logger.debug(traceback.format_exc())
 
     logger.info(f"Total replies sent: {sent}")
     logger.info(f"Total replies skipped (already sent): {skipped}")
