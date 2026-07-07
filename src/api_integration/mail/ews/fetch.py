@@ -4,17 +4,8 @@ import logging
 import traceback
 from email.header import decode_header
 
-from exchangelib import Credentials, Account, Configuration, DELEGATE, FileAttachment
-from exchangelib.protocol import BaseProtocol, NoVerifyHTTPAdapter
-from exchangelib.errors import (
-    UnauthorizedError,
-    ErrorNonExistentMailbox,
-    ErrorImpersonationDenied,
-    ErrorAccessDenied,
-    ErrorInternalServerError,
-    ErrorServerBusy,
-    TransportError,
-)
+from exchangelib import FileAttachment
+from api_integration.mail.ews.helpers import create_exchange_account
 
 from api_integration.mail.sanitizers import sanitize_filename
 from api_integration.mail.utils import is_trusted_email
@@ -48,41 +39,11 @@ def fetch_mail(
 
     os.makedirs(download_dir, exist_ok=True)
 
-    account = None
+    account = create_exchange_account(mailbox=mailbox, password=password)
+    if not account:
+        return
+
     try:
-        logger.info(f"Connecting to Exchange server: {settings.EXCHANGE_SERVER}...")
-
-        credentials = Credentials(
-            username=settings.EXCHANGE_USERNAME,
-            password=password,
-        )
-
-        # 2. Подменяем стандартный класс сессии в exchangelib на игнорирующий TLS validation errors
-        BaseProtocol.HTTP_ADAPTER_CLS.session_class = NoVerifyHTTPAdapter
-        BaseProtocol.TIMEOUT = 30
-
-        config = Configuration(
-            server=settings.EXCHANGE_SERVER,
-            credentials=credentials,
-        )
-
-        account = Account(
-            primary_smtp_address=mailbox,
-            config=config,
-            autodiscover=False,
-            access_type=DELEGATE,
-        )
-        logging.info("Configuration initialized. Checking real network connection...")
-        # РЕАЛЬНЫЙ ТЕСТ: Запрашиваем версию сервера по сети.
-        # Это принудительно инициирует веб-сессию и проверит ваши credentials
-        server_version = account.protocol.version
-
-        logging.info(
-            f"Successfully connected to Exchange Server! "
-            f"Server version: {server_version.build}. "
-            f"Access to mailbox {mailbox} succeeds."
-        )
-
         # Access inbox
         inbox = account.inbox
         logger.info("Fetching emails from inbox...")
@@ -115,32 +76,6 @@ def fetch_mail(
         logger.info(f"Total attachments saved: {attachments_saved}")
         logger.info(f"Total emails skipped (already processed): {emails_skipped}")
 
-    except UnauthorizedError as e:
-        logger.error(
-            f"Exchange Authentication Failed: Invalid username or password. {e}"
-        )
-    except ErrorNonExistentMailbox as e:
-        # Убедитесь, что переменная mailbox определена выше в вашей функции
-        logger.error(f"Exchange Mailbox Not Found: {mailbox}. {e}")
-
-    except ErrorImpersonationDenied as e:
-        logger.error(f"Exchange Impersonation Denied: {e}")
-
-    except ErrorAccessDenied as e:
-        logger.error(f"Exchange Access Denied: {e}")
-
-    except ErrorServerBusy as e:
-        logger.error(f"Exchange Server Busy: {e}")
-
-    except (ErrorInternalServerError, TransportError) as e:
-        # Объединяем внутренние ошибки сервера и недоступность базы данных/хранилища
-        logger.error(
-            f"Exchange Internal Server Error or Mailbox Store Unavailable: {e}"
-        )
-
-    except Exception as e:
-        logger.error(f"An unexpected error occurred: {e}")
-        logger.debug(traceback.format_exc())
     finally:
         if account:
             try:

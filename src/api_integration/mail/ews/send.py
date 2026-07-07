@@ -5,25 +5,9 @@ import logging
 import traceback
 from typing import Optional
 
-from exchangelib import (
-    Credentials,
-    Account,
-    Configuration,
-    DELEGATE,
-    Message,
-    Mailbox,
-)
-from exchangelib.protocol import BaseProtocol, NoVerifyHTTPAdapter
-from exchangelib.errors import (
-    UnauthorizedError,
-    ErrorNonExistentMailbox,
-    ErrorImpersonateUserDenied,
-    ErrorMailboxStoreUnavailable,
-    ErrorAccessDenied,
-    ErrorInternalServerError,
-    ErrorServerBusy,
-    TransportError,
-)
+from exchangelib import Message, Mailbox
+from exchangelib.errors import ErrorAccessDenied
+from api_integration.mail.ews.helpers import create_exchange_account
 
 from api_integration.constants import (
     DOWNLOADS_DIR,
@@ -67,63 +51,8 @@ def send_replies(
     Upon successful send, creates the marker file to prevent duplicate sends.
     """
 
-    account = None
-    try:
-        logger.info("Connecting to Exchange server for sending replies...")
-        credentials = Credentials(
-            username=settings.EXCHANGE_USERNAME, password=sender_password
-        )
-
-        # Подменяем стандартный класс сессии в exchangelib на игнорирующий TLS validation errors
-        BaseProtocol.HTTP_ADAPTER_CLS.session_class = NoVerifyHTTPAdapter
-        BaseProtocol.TIMEOUT = 30
-
-        config = Configuration(server=settings.EXCHANGE_SERVER, credentials=credentials)
-
-        account = Account(
-            primary_smtp_address=sender_email,
-            config=config,
-            autodiscover=False,
-            access_type=DELEGATE,
-        )
-        logger.info("Configuration initialized. Checking real network connection...")
-        # РЕАЛЬНЫЙ ТЕСТ: Запрашиваем версию сервера по сети.
-        # Это принудительно инициирует веб-сессию и проверит credentials
-        server_version = account.protocol.version
-
-        logger.info(
-            f"Successfully connected to Exchange Server! "
-            f"Server version: {server_version.build}. "
-            f"Access to mailbox {sender_email} succeeds."
-        )
-    except UnauthorizedError as e:
-        logger.error(
-            f"Exchange Authentication Failed: Invalid username or password. {e}"
-        )
-        return 0
-    except ErrorNonExistentMailbox as e:
-        logger.error(f"Exchange Mailbox Not Found: {sender_email}. {e}")
-        return 0
-    except ErrorImpersonateUserDenied as e:
-        logger.error(f"Exchange Impersonation Denied: {e}")
-        return 0
-    except ErrorMailboxStoreUnavailable as e:
-        logger.error(f"Exchange Mailbox Store Unavailable: {e}")
-        return 0
-    except ErrorAccessDenied as e:
-        logger.error(f"Exchange Access Denied: {e}")
-        return 0
-    except ErrorInternalServerError as e:
-        logger.error(f"Exchange Internal Server Error: {e}")
-        return 0
-    except ErrorServerBusy as e:
-        logger.error(f"Exchange Server Busy: {e}")
-        return 0
-    except (ErrorInternalServerError, TransportError) as e:
-        logger.error(f"Exchange Internal Server Error or Transport Error: {e}")
-        return 0
-    except Exception as e:
-        logger.error(f"Failed to connect to Exchange: {e}")
+    account = create_exchange_account(mailbox=sender_email, password=sender_password)
+    if not account:
         return 0
 
     if not sender_email or not sender_password:
