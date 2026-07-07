@@ -159,3 +159,12 @@ def run_pipeline_with_lock(
         except (IOError, OSError):
             pass
         lock_fp.close()
+
+
+if __name__ == "__main__":
+    """This can be run by package.module syntax
+    1. Having .env and /config/trusted_recipients.json in the same folder you run
+    2. .env must have APP_ENV=prod to figure out project_root
+    $ python -m api_integration.pipeline
+    """
+    run_pipeline_with_lock()

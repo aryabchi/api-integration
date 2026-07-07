@@ -205,7 +205,7 @@ cp .env.example .env
 - `LOG_LEVEL` - уровень логирования `DEBUG|INFO` для разработки
 - `IS_SKIP_PUT_RFQ_SUPPLIER_GROUP_IDS` - пропустить медленный PUT запрос для поставщиков (`false` по умолчанию)
 - `IS_SEARCH_EXISTING_RFQ_BEFORE_POST` - искать существующий RFQ по названию перед созданием (`true` для продакшена, `false` для тестирования)
-- `EXCHANGE_XXX` - не будут работать вне КСПД
+- `EXCHANGE_XXX` - не будут работать вне КСПД и не используются при флаге `MAIL_SERVER=INTERNET`
 
 Создайте файл с доверенными адресатами:
 
