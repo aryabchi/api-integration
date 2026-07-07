@@ -4,7 +4,7 @@ import logging
 import traceback
 from email.header import decode_header
 
-from exchangelib import Credentials, Account, Configuration, DELEGATE
+from exchangelib import Credentials, Account, Configuration, DELEGATE, FileAttachment
 from exchangelib.protocol import BaseProtocol, NoVerifyHTTPAdapter
 from exchangelib.errors import (
     UnauthorizedError,
@@ -264,9 +264,9 @@ def _process_attachment(
     """
 
     # Only handle physical file attachments
-    if attachment.attachment_class.__name__ != "FileAttachment":
-        logger.debug(
-            f"Skipping non-file attachment type: {attachment.attachment_class.__name__} ({attachment.name})"
+    if not isinstance(attachment, FileAttachment):
+        logger.info(
+            f"Skipping non-file attachment type: {type(attachment).__name__} ({getattr(attachment, 'name', 'Unknown')})"
         )
         return 0
 
