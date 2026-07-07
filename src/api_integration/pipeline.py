@@ -8,7 +8,7 @@ from api_integration.config import get_settings
 from api_integration.mail.imap.fetch import fetch_mail as fetch_imap_mail
 from api_integration.mail.ews.fetch import fetch_mail as fetch_ews_mail
 from api_integration.mail.compose import generate_replies
-from api_integration.mail.send import send_replies
+from api_integration.mail.smtp.send import send_replies
 from api_integration.sevenrights.rfq.create import create_rfqs
 from api_integration.excel.convert import process_attachments_wrapper
 from api_integration.constants import (
@@ -85,8 +85,6 @@ def run_pipeline(
     # 5. send replies
     logger.info("Step 5: Sending replies")
     send_replies(
-        smtp_server=settings.SMTP_SERVER,
-        smtp_port=settings.SMTP_PORT,
         sender_email=mailbox,
         sender_password=password,
         subfolder=subfolder,

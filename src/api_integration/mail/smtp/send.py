@@ -11,8 +11,10 @@ from api_integration.constants import (
     REPLY_SENT_MARKER,
     REPLY_BODY_MARKER,
 )
+from api_integration.config import get_settings
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 
 def _extract_email_address(field: str) -> str:
@@ -26,8 +28,6 @@ def _is_html(text: str) -> bool:
 
 
 def send_replies(
-    smtp_server: str,
-    smtp_port: int,
     sender_email: str = None,
     sender_password: str = None,
     download_dir: str = DOWNLOADS_DIR,
@@ -44,6 +44,9 @@ def send_replies(
     Skips sending if the reply marker file already exists in the subfolder.
     Upon successful send, creates the marker file to prevent duplicate sends.
     """
+
+    smtp_server = settings.SMTP_SERVER
+    smtp_port = settings.SMTP_PORT
 
     if not sender_email or not sender_password:
         logger.warning("sender_email and sender_password are required.")
