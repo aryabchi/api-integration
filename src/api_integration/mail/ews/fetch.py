@@ -57,7 +57,7 @@ def fetch_mail(
             password=password,
         )
 
-        # 2. Подменяем стандартный класс сессии в exchangelib на наш кастомный
+        # 2. Подменяем стандартный класс сессии в exchangelib на игнорирующий TLS validation errors
         BaseProtocol.HTTP_ADAPTER_CLS.session_class = NoVerifyHTTPAdapter
         BaseProtocol.HTTP_ADAPTER_CLS.DEFAULT_TIMEOUT = 30
 
