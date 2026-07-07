@@ -76,15 +76,9 @@ def fetch_mail(
         logger.info(f"Total attachments saved: {attachments_saved}")
         logger.info(f"Total emails skipped (already processed): {emails_skipped}")
 
-    finally:
-        if account:
-            try:
-                # EWS uses persistent HTTP connections; no explicit logout needed
-                logger.debug(
-                    "Exchange account session cleanup (no explicit logout required)."
-                )
-            except Exception:
-                pass
+    except Exception as e:
+        logger.error(f"An error occurred while fetching mail: {e}")
+        logger.debug(traceback.format_exc())
 
 
 def _process_single_message(
