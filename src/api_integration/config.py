@@ -59,7 +59,10 @@ class Settings(BaseSettings):
     APP_ENV: str = Field(
         default="dev",
         pattern="^(dev|prod)$",
-        description="Режим запуска (критически влиется на project_root -> расположение рабочих директорий)",
+        description=(
+            "Режим запуска (критически влиется на project_root -> расположение рабочих директорий)"
+            "prod - project_root указывает на текущую директорию запуска"
+        ),
     )
 
     MAIL_SERVER: str = Field(

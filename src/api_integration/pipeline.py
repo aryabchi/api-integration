@@ -36,8 +36,6 @@ def run_pipeline(
     """
 
     settings = get_settings()
-    mailbox = settings.MAILBOX_NAME
-    password = settings.MAILBOX_APP_PASSWORD
 
     # Print pipeline configuration
     logger.info("=== Mail processing pipeline ===")

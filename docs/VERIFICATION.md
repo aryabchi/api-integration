@@ -30,14 +30,26 @@ python -m venv .venv
 
 ## Шаг 4. Подготовка пользовательских настроек
 Создайте конфигурационный файл `.env` прямо в папке `C:\TestUserEnv` или скопируйте из `.env.example` и дозаполните.
-**НЕ ЗАБУДЬТЕ** установить APP_ENV=prod
+**НЕ ЗАБУДЬТЕ** установить `APP_ENV=prod`
 
 ```
 MAILBOX_NAME=your-email@example.com
 MAILBOX_APP_PASSWORD=your-app-password
 SEVEN_RIGHTS_API_KEY=your-api-key
+
 # === Режим запуска: prod ===
 APP_ENV=prod # !!! 
+
+# === Mail server type (INTERNET=Yandex IMAP/SMTP, CORPORATE=MS Exchange EWS) ===
+# На основе этого принимается решение, по каким протоколам происходит получение/отправка почты
+MAIL_SERVER=CORPORATE
+
+# === Exchange settings ===
+EXCHANGE_USERNAME=CORP\dedicated_accont_with_mailbox
+EXCHANGE_PASSWORD=dedicated_account_with_mailbox_password
+EXCHANGE_SERVER=mail.sibur.local # correct MAPI server, defauld port 443
+# Указываем адрес ящика, который нужно проверять и от имени которого слать ответы:
+PRIMARY_SMTP_ADDRESS=dedicated_account_mailbox@sibur.ru # pre-existing mailbox
 ```
 
 Создайте `config\trusted_recipients.json`
