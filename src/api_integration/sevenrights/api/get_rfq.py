@@ -1,3 +1,5 @@
+"""Тестовый модуль получение RFQ"""
+
 import sys
 from pathlib import Path
 import json
