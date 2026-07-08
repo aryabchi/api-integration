@@ -17,6 +17,7 @@ dependencies = [
     "requests==2.33.0",
     "openpyxl==3.1.5",
     "exchangelib==5.6.0",
+    "tenacity==9.1.4"
 ]
 
 [project.scripts]
