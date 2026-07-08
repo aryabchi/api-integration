@@ -36,6 +36,9 @@ Usage:
 
     # Or using the installed console script (if package is installed):
     run-api-integration
+
+    # Or without virtual env pre-activation:
+    .\.venv\Scripts\python .\scripts\example.py
 """
 
 from api_integration.pipeline import run_pipeline_with_lock
