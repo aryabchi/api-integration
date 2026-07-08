@@ -126,10 +126,23 @@ def send_replies(
             continue
 
         # Send via SMTP
+        # Port-based SSL mode selection:
+        # - Port 465: Implicit SSL (Yandex) - connection wrapped in SSL from start
+        # - Port 587: Explicit TLS via STARTTLS (Corporate) - upgrade plain connection to TLS
         try:
-            with smtplib.SMTP_SSL(smtp_server, smtp_port) as srv:
-                srv.login(sender_email, sender_password)
-                srv.send_message(msg)
+            if smtp_port == 465:
+                # Implicit SSL mode for Yandex SMTP
+                with smtplib.SMTP_SSL(smtp_server, smtp_port) as srv:
+                    srv.login(sender_email, sender_password)
+                    srv.send_message(msg)
+            else:
+                # Explicit TLS via STARTTLS for corporate SMTP (typically port 587)
+                with smtplib.SMTP(smtp_server, smtp_port) as srv:
+                    srv.ehlo()
+                    srv.starttls()
+                    srv.ehlo()
+                    srv.login(sender_email, sender_password)
+                    srv.send_message(msg)
 
             # --- Save placeholder file upon successful send ---
             with open(sent_marker_path, "w", encoding="utf-8") as f:

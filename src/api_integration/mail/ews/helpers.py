@@ -10,6 +10,7 @@ from exchangelib.errors import (
     ErrorInternalServerError,
     ErrorServerBusy,
     TransportError,
+    AutoDiscoverError,
 )
 
 from api_integration.config import get_settings
@@ -21,6 +22,7 @@ settings = get_settings()
 def create_exchange_account(mailbox: str, password: str) -> Optional[Account]:
     """Create and verify Exchange account connection.
 
+    Attempts autodiscover first, then falls back to explicit EWS endpoint URL.
     Returns Account on success, None on failure.
     """
     try:
@@ -35,17 +37,40 @@ def create_exchange_account(mailbox: str, password: str) -> Optional[Account]:
         BaseProtocol.HTTP_ADAPTER_CLS.session_class = NoVerifyHTTPAdapter
         BaseProtocol.HTTP_ADAPTER_CLS.DEFAULT_TIMEOUT = 30
 
-        config = Configuration(
-            server=settings.EXCHANGE_SERVER,
-            credentials=credentials,
-        )
+        # Construct EWS endpoint URL as fallback
+        ews_url = f"https://{settings.EXCHANGE_SERVER}/EWS/Exchange.asmx"
 
-        account = Account(
-            primary_smtp_address=mailbox,
-            config=config,
-            autodiscover=False,
-            access_type=DELEGATE,
-        )
+        # Strategy: Try autodiscover first, fall back to explicit endpoint
+        try:
+            logger.info("Attempting autodiscover...")
+            # Autodiscover config: server only (no service_endpoint)
+            autodiscover_config = Configuration(
+                server=settings.EXCHANGE_SERVER,
+                credentials=credentials,
+            )
+            account = Account(
+                primary_smtp_address=mailbox,
+                config=autodiscover_config,
+                autodiscover=True,
+                access_type=DELEGATE,
+            )
+            logger.info("Autodiscover succeeded.")
+        except AutoDiscoverError:
+            logger.warning(
+                f"Autodiscover failed for {mailbox}, falling back to explicit endpoint: {ews_url}"
+            )
+            # Fallback config: service_endpoint only (no server)
+            fallback_config = Configuration(
+                credentials=credentials,
+                service_endpoint=ews_url,
+            )
+            account = Account(
+                primary_smtp_address=mailbox,
+                config=fallback_config,
+                autodiscover=False,
+                access_type=DELEGATE,
+            )
+
         logger.info("Configuration initialized. Checking real network connection...")
         # РЕАЛЬНЫЙ ТЕСТ: Запрашиваем версию сервера по сети.
         # Это принудительно инициирует веб-сессию и проверит credentials
