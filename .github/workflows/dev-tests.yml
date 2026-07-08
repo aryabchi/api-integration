@@ -1,9 +1,10 @@
 name: Dev Branch Tests
 
-on:
-  push:
-    branches:
-      - dev
+# on:
+#   push:
+#     branches:
+#       - dev
+on: workflow_dispatch
 
 jobs:
   test:
