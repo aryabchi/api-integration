@@ -1,19 +1,35 @@
 import time
-from datetime import datetime
-from pathlib import Path
-
 import requests
 from pydantic import ValidationError
+from tenacity import RetryError
 import json
 
 from api_integration.config import get_settings
 from api_integration.sevenrights.api.schemas.api_requests import RfqCreateRequest
 from api_integration.sevenrights.api.schemas.api_results import RfqApiResult
-from api_integration.sevenrights.api.utils import _print_validation_errors
+from api_integration.sevenrights.api.utils import (
+    _print_validation_errors,
+    retry_network,
+)
 
 
 def post_rfq(data: dict, timeout: int = 30) -> RfqApiResult:
+    """
+    Create an RFQ via 7rights API.
 
+    Network-transient failures are retried: transient connection/DNS errors
+    (for example ``ConnectionError`` or ``NameResolutionError``) trigger up to 3
+    attempts with exponential backoff (~2s, ~4s). HTTP responses, successful or
+    not, are never retried. If retries are exhausted, the returned dict contains
+    an ``error`` describing the last failure.
+
+    Args:
+        data: RFQ payload.
+        timeout: Request timeout in seconds.
+
+    Returns:
+        Dict with ``error`` and ``rfq_id`` keys.
+    """
     settings = get_settings()
 
     payload_data = data
@@ -36,8 +52,18 @@ def post_rfq(data: dict, timeout: int = 30) -> RfqApiResult:
         "Content-Type": "application/json",
     }
 
+    @retry_network(max_wait=settings.SEVEN_RIGHTS_API_AWAIT_TIMEOUT)
+    def _post():
+        return requests.post(url, headers=headers, json=body, timeout=timeout)
+
     try:
-        response = requests.post(url, headers=headers, json=body, timeout=timeout)
+        response = _post()
+    except RetryError as exc:
+        last_exc = exc.last_attempt.exception()
+        return {
+            "error": f"Failed after 3 attempts: {type(last_exc).__name__}: {last_exc}",
+            "rfq_id": None,
+        }
     except requests.RequestException as exc:
         return {
             "error": str(exc),

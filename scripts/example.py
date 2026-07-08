@@ -16,7 +16,10 @@ Prerequisites:
        .\.venv\Scripts\Activate.ps1
 
     2. Latest .whl must be installed IN THAT virtual env
+       # deps from Internet
        pip install api_integration-<latest-tag-version>-py3-none-any.whl
+       # OR deps from local dir (no Internet)
+       pip install --no-index --find-links=.\dist --find-links=.\dist\dependencies api_integration
 
     3. .env file with `APP_ENV=prod` and valid credentials must exist in the project root (./.env file)
 
@@ -33,6 +36,9 @@ Usage:
 
     # Or using the installed console script (if package is installed):
     run-api-integration
+
+    # Or without virtual env pre-activation:
+    .\.venv\Scripts\python .\scripts\example.py
 """
 
 from api_integration.pipeline import run_pipeline_with_lock
