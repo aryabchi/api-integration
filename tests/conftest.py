@@ -25,12 +25,17 @@ TEST_ENV = {
 }
 
 
-def pytest_load_initial_conftests(early_config, parser, args):
-    """Inject obfuscated settings before any test module is imported.
+# Inject as early as possible: when this module is imported by pytest.
+os.environ.update(TEST_ENV)
 
-    This makes `Settings()` validation succeed even when no `.env` is present
-    (e.g. in GitHub Actions CI).
-    """
+
+def pytest_load_initial_conftests(early_config, parser, args):
+    """Primary: inject env vars before any conftest/test module is imported."""
+    os.environ.update(TEST_ENV)
+
+
+def pytest_sessionstart(session):
+    """Fallback: ensure env vars are present right before collection starts."""
     os.environ.update(TEST_ENV)
 
 
