@@ -104,7 +104,7 @@ class Settings(BaseSettings):
         return f"{str(self.SEVEN_RIGHTS_API_BASE_URL).rstrip('/')}/{self.SEVEN_RIGHTS_API_VERSION.rstrip('/')}"
 
     # Corporate Exchange Server (probably) config params
-    EXCHANGE_USERNAME: str = Field(description="COMPANY\company_user_acount")
+    EXCHANGE_USERNAME: str = Field(description="COMPANY\\company_user_acount")
     EXCHANGE_PASSWORD: str = Field(description="company_user_acount_password")
     EXCHANGE_SERVER: str = Field(description="mail.company.local")
     PRIMARY_SMTP_ADDRESS: str = Field(description="nikolavtologistov@company.ru")
